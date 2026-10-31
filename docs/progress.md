@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: `/ponytail-review` on the branch, then the pull request into `main`.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: review and merge of pull request #1 into `main`; WP1 starts after the merge.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -21,7 +21,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | Done | `7f4cfb8` tests and CI, `394660d` deterministic S2 spec. CI green: Pint, Larastan, Pest 81, Playwright 9. Pest came in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Done | `dba2494` traceability. S10 recovery-code test added on the way |
 | 12 | Browser walk per role at 360 px and desktop | | Done | 2026-10-31: Playwright CLI sessions `-s=admin`, `-s=focal`, `-s=restricted` each signed in with password and authenticator code and reached the dashboard; `-s=public` checked `/ne` and `/en` at 360 px. Screenshots stayed on the developer machine, outside the repo |
-| | `/ponytail-review` clean, pull request into `main` | | To do | |
+| | `/ponytail-review` clean, pull request into `main` | | Done | Review's one must-fix fixed in `96f43f8`; pull request #1 (https://github.com/ShriBuzz/ghm-system/pull/1), CI green |
 
 WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start only after the WP0 pull request is reviewed and merged.
 
