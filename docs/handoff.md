@@ -8,10 +8,11 @@ Last updated 2026-10-31, after WP0 step 6 on the Mac.
 
 1. `CLAUDE.md`: the rules. They win over any skill.
 2. `docs/rfq-requirements.md`: the RFQ requirement wording, P1 to P10, A1 to A7, N1 to N4, S1 to S10.
-3. `WP0-kickoff.md`: the WP0 steps.
-4. `docs/progress.md`: what is done, what is next, open questions and decisions.
-5. `docs/local-setup.md`: how to set up a machine.
-6. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
+3. `docs/clarification-questions.md`: questions for NBI, the assumptions the code follows until they answer, and what to change after.
+4. `WP0-kickoff.md`: the WP0 steps.
+5. `docs/progress.md`: what is done, what is next, open questions and decisions.
+6. `docs/local-setup.md`: how to set up a machine.
+7. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
 
 ## What git does not carry
 
