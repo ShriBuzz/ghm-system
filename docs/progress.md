@@ -14,7 +14,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 3 | `.env.example` for MySQL, `config/ghm.php` | | Done | `7b82594`; unused `sessions` table (IP and user-agent columns) dropped in `f7b92b7` |
 | 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | Done | `91e3ff0` panel, `5be7456` Pest, `5c1aed3` roles and MFA. Walked in a browser: sign-in, forced MFA setup, code challenge |
 | 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `8ffab3a` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
-| 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | Done | `feat(S3,S5,A4,A1)` case schema. Tables from plan section 6; S6 has its table only, the events come in WP2. P6 value lists are open (question 1) |
+| 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | Done | `f017803` case schema. Tables from plan section 6; S6 has its table only, the events come in WP2. P6 value lists are open (question 1) |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | To do | Depends on step 6 |
 | 8 | Security headers, HTTPS outside local | S1 | To do | |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | To do | |
