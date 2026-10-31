@@ -16,7 +16,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `8ffab3a` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | Done | `f017803` case schema. Tables from plan section 6; S6 has its table only, the events come in WP2. P6 option lists wait on NBI (`docs/clarification-questions.md`, question 5) |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | Done | `9d39508` access rule. No case screens yet, so the browser check comes with WP2 |
-| 8 | Security headers, HTTPS outside local | S1 | Done | `feat(S1)` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
+| 8 | Security headers, HTTPS outside local | S1 | Done | `b5f9c74` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | To do | |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | To do | Pest already added in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; the requirement list for traceability is in `docs/rfq-requirements.md` |
