@@ -32,10 +32,14 @@ class Grievance extends Model
     #[Scope]
     protected function visibleTo(Builder $query, User $user): void
     {
+        // The category is checked too, so a save racing a category change cannot leak a case.
+        $restricted = fn (Builder $q) => $q->where('is_restricted', true)
+            ->orWhereHas('category', fn (Builder $c) => $c->where('is_restricted', true));
+
         match ($user->role) {
             Role::Administrator => null,
-            Role::FocalPerson => $query->where('is_restricted', false),
-            Role::RestrictedOfficer => $query->where('is_restricted', true),
+            Role::FocalPerson => $query->whereNot($restricted),
+            Role::RestrictedOfficer => $query->where($restricted),
         };
     }
 
