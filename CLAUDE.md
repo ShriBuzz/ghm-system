@@ -2,6 +2,7 @@
 
 This repo builds the online grievance handling system for RFQ NBI/GHM/RFQ/01.
 The full plan is in `docs/implementation-plan.md`. These rules win over any skill when they disagree.
+Status, decisions and open questions are in `docs/progress.md`. In a new session or on a new machine, read `docs/handoff.md` first.
 
 ## Order of authority
 
