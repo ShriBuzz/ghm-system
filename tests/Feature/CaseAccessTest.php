@@ -53,3 +53,16 @@ it('lets only the Administrator remove a restricted mark', function (Role $role)
 
     expect($user->can('removeRestriction', $case))->toBe($role === Role::Administrator);
 })->with(Role::cases())->group('A5');
+
+it('hides a case in a restricted category even when its stored flag lags behind', function () {
+    $case = Grievance::factory()->for(Category::factory()->restricted())->create();
+    // A bulk update skips the observer, as a save racing a category change would.
+    Grievance::whereKey($case->id)->update(['is_restricted' => false]);
+
+    $focal = User::factory()->create(['role' => Role::FocalPerson]);
+    $officer = User::factory()->create(['role' => Role::RestrictedOfficer]);
+
+    expect(Grievance::visibleTo($focal)->pluck('id')->all())->toBe([])
+        ->and($focal->can('view', $case->fresh()))->toBeFalse()
+        ->and(Grievance::visibleTo($officer)->pluck('id')->all())->toBe([$case->id]);
+})->group('A5');

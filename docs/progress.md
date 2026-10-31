@@ -79,6 +79,7 @@ Made so far (the commit messages have the detail):
 - From `/ponytail-review`: the profile page (`/admin/profile`) is on, so each user can change their own password (current one required) and manage MFA; its save throttle is keyed on the user, not the IP. After the first seed on a server, the `GHM_ADMIN_*` lines are deleted from `.env` and the config re-cached (`technical-note.md`).
 - `config/session.php` and `config/cache.php` default to the `file` driver and a 30-minute session, so a production `.env` missing those lines still meets S2 and S5.
 - Follow-ups from the review, not blocking: check the category's restricted flag at query time in `visibleTo()` too, closing a millisecond race when a category is restricted while one of its cases is being saved; remove Filament's info widget from the dashboard (WP2 replaces the dashboard).
+- Branch `fix/A5-visibility-and-timezone`: `visibleTo()` now also checks the category's restricted flag at query time (the review follow-up above), and the app timezone is `Asia/Kathmandu`, so working days and dates follow Nepal time (A2).
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:
