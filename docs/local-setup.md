@@ -97,12 +97,22 @@ php artisan key:generate
 DB_PASSWORD=the-password-you-chose
 ```
 
+Give the first Administrator fake local details. The seeder refuses to run while any of them is empty:
+
+```dotenv
+GHM_ADMIN_NAME="Local Administrator"
+GHM_ADMIN_EMAIL=admin@example.com
+GHM_ADMIN_PASSWORD=a-long-local-password
+```
+
 Then:
 
 ```sh
-php artisan migrate
+php artisan migrate --seed
 php artisan serve        # http://127.0.0.1:8000
 ```
+
+The first sign-in at `/admin` asks you to set up an authenticator app; every account must have one.
 
 ### 5. Agent tooling (once per machine)
 
@@ -122,12 +132,12 @@ php artisan serve        # http://127.0.0.1:8000
 | What | Command | Works from |
 |---|---|---|
 | Run the app | `php artisan serve`, then http://127.0.0.1:8000 | now |
-| Staff panel | http://127.0.0.1:8000/admin | WP0 step 4 |
+| Staff panel | http://127.0.0.1:8000/admin | now |
 | Code style | `vendor/bin/pint --test` | now |
-| PHP tests | `php artisan test`, or one requirement with `php artisan test --group=A5` | now; Pest from step 10 |
+| PHP tests | `php artisan test`, or one requirement with `php artisan test --group=A5` | now |
 | Static analysis | `vendor/bin/phpstan analyse` | step 10 |
 | Browser tests | `npx playwright test`, or `npx playwright test --grep @smoke` | step 10 |
-| Browser session per role | `npx playwright cli -s=focal open http://127.0.0.1:8000/admin` | step 4 |
+| Browser session per role | `npx playwright cli -s=focal open http://127.0.0.1:8000/admin` | now |
 
 ## Windows (first machine)
 
