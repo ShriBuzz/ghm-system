@@ -148,3 +148,4 @@ How the Windows laptop was set up, for reference:
 - GitHub CLI through `winget install --id GitHub.cli`.
 - MySQL 8.0 as the `MySQL80` service. It starts manually: run `Start-Service MySQL80` in an admin PowerShell after a reboot.
 - Open a new terminal after installing anything, so PATH changes apply.
+- Git on Windows does not record the executable bit. A shell script first committed from Windows lands as `100644` and fails on macOS and Linux with "Permission denied"; this broke the Impeccable hook until it was fixed with `git update-index --chmod=+x`. Check new scripts with `git ls-files -s`.
