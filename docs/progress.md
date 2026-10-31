@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 5.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 6, which takes its exact columns from `docs/implementation-plan.md` (not in the repo yet).
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -11,9 +11,9 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 0 | Pre-checks and machine setup | | Done | Windows laptop: PHP 8.4, Composer, gh, MySQL 8.0. Mac: PHP 8.4, Composer 2.11, MySQL 8.4, Node 24 |
 | 1 | Laravel 13 skeleton, Vite and Tailwind removed | | Done | `99eedf6` |
 | 2 | Agent setup: Karpathy, Impeccable, Playwright, Ponytail, `/impeccable init` | | Done | `88ae807`, then the handoff commit (Ponytail settings, `PRODUCT.md`) |
-| 3 | `.env.example` for MySQL, `config/ghm.php` | | Done | `b8ce3a1`; unused `sessions` table (IP and user-agent columns) dropped in `e3a42a9` |
-| 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | Done | `d281436` panel, `abae9a2` Pest, then `feat(A1,S10)` roles and MFA. Walked in a browser: sign-in, forced MFA setup, code challenge |
-| 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | To do | |
+| 3 | `.env.example` for MySQL, `config/ghm.php` | | Done | `7b82594`; unused `sessions` table (IP and user-agent columns) dropped in `f7b92b7` |
+| 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | Done | `91e3ff0` panel, `5be7456` Pest, `5c1aed3` roles and MFA. Walked in a browser: sign-in, forced MFA setup, code challenge |
+| 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `feat(S2)` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | To do | A4 wording and draft Nepali labels are in `docs/rfq-requirements.md`; exact columns come from plan section 6. The kickoff tags this step S3, S5, A4; the activity log is S6 in the RFQ |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | To do | Depends on step 6 |
 | 8 | Security headers, HTTPS outside local | S1 | To do | |
@@ -50,17 +50,20 @@ Made so far (the commit messages have the detail):
 - PHP 8.4 locally; CI will use 8.4 too.
 - MFA is required for every user, as the kickoff says, although the RFQ marks two-factor login (S10) as Desirable.
 - Local databases `ghm` (app) and `ghm_testing` (tests), user `ghm`.
-- Pest came in at step 4, not step 10, because every requirement from step 4 on needs a Pest test. Feature tests refresh `ghm_testing`.
+- Pest came in at step 4, not step 10, because every requirement from step 4 on needs a Pest test. Feature tests refresh `ghm_testing` (MySQL) locally, and will in CI.
 - MFA uses Filament's authenticator app with recovery codes, so a lost phone does not lock out the only Administrator. Secret and codes use the `encrypted` cast.
 - Filament's default avatars come from ui-avatars.com, which would send each staff name to a third party. `InitialsAvatarProvider` draws them in the page instead.
 - The admin seeder reads its values through `config('ghm.admin')`, because `env()` returns null once config is cached. It validates them (password at least 8 characters) and does nothing if the email already exists.
 - The skeleton `DatabaseSeeder` no longer creates a test user, so `db:seed` is safe in production.
+- Login lockout (S2): failed passwords are counted per email for 15 minutes; the fifth locks that email for 15 minutes from that failure, and attempts during the lock do not extend it. A successful sign-in clears the count. Keys use a SHA-256 hash of the trimmed, lower-cased email, never the IP. Risk, as planned: anyone who knows a staff email can lock that account for 15 minutes.
+- Filament's own five-per-minute login throttle keyed on the IP; it is re-keyed on the email hash. Wrong MFA codes stay under Filament's per-user limiter.
+- "Remember me" is removed from the login form: its cookie would sign a user back in after the 30-minute idle expiry.
+- Filament database notifications are off (Filament's default), so nothing polls the server and keeps a session alive. A test guards this.
+- `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:
 
-- The login lockout is keyed on a hash of the email only, never the IP. Filament's own login rate limit is keyed on the IP and is replaced in step 5. Risk: anyone who knows a staff email can lock that account for 15 minutes.
 - The activity log records that an encrypted field changed, never its value.
 - The admin CSP will probably need `'unsafe-eval'` and inline styles for Livewire and Alpine. Step 8 finds the minimum and records it in the technical note. The public CSP stays self-only.
-- Pest runs against MySQL (`ghm_testing`) locally and in CI.
 - The step 12 role users are created locally with fake names through tinker, not a committed seeder.
 - The language cookie is `locale`, with values `ne` and `en`, defaulting to `ne`.

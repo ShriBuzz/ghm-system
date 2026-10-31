@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-10-31, after WP0 step 2, when work moved from the Windows laptop to a Mac.
+Last updated 2026-10-31, after WP0 step 5 on the Mac. Step 6 waits on `docs/implementation-plan.md` for its exact columns.
 
 ## Read first
 
@@ -32,7 +32,7 @@ A fresh `APP_KEY` is fine now because no encrypted data exists yet. Once it does
 1. Work through `docs/local-setup.md`: tools, MySQL, GitHub, the project, agent tooling.
 2. Start Claude Code in the project folder and give it this prompt:
 
-   > Read CLAUDE.md, docs/rfq-requirements.md, WP0-kickoff.md, docs/progress.md and docs/handoff.md. We are on branch wp0/foundations and kickoff steps 1 and 2 are done. Check this machine against docs/local-setup.md (php -v, the PHP extensions, composer -V, node -v, MySQL reachable as the ghm user, php artisan test, vendor/bin/pint --test) and report anything missing. Then continue with step 3. Commit and push after each step, and update docs/progress.md as you go. Stop before step 6 if docs/implementation-plan.md is still missing, and bring open questions to me instead of guessing.
+   > Read CLAUDE.md, docs/rfq-requirements.md, WP0-kickoff.md, docs/progress.md and docs/handoff.md. We are on branch wp0/foundations; docs/progress.md says which kickoff steps are done. Check this machine against docs/local-setup.md (php -v, the PHP extensions, composer -V, node -v, MySQL reachable as the ghm user, php artisan test, vendor/bin/pint --test) and report anything missing. Then continue with the next open step. Commit and push after each step, and update docs/progress.md as you go. Stop before step 6 if docs/implementation-plan.md is still missing, and bring open questions to me instead of guessing.
 
 ## Keep this current
 
