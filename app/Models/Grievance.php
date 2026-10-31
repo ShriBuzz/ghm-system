@@ -3,19 +3,41 @@
 namespace App\Models;
 
 use App\Enums\Priority;
+use App\Enums\Role;
 use App\Enums\Status;
+use App\Observers\GrievanceObserver;
 use Database\Factories\GrievanceFactory;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Hidden(['pin_hash'])]
+#[ObservedBy(GrievanceObserver::class)]
 class Grievance extends Model
 {
     /** @use HasFactory<GrievanceFactory> */
     use HasFactory;
+
+    /**
+     * The one rule for which cases a staff member may see (A1, A5). Every
+     * list, page, file, summary, export and alert goes through it.
+     *
+     * @param  Builder<self>  $query
+     */
+    #[Scope]
+    protected function visibleTo(Builder $query, User $user): void
+    {
+        match ($user->role) {
+            Role::Administrator => null,
+            Role::FocalPerson => $query->where('is_restricted', false),
+            Role::RestrictedOfficer => $query->where('is_restricted', true),
+        };
+    }
 
     /**
      * @return BelongsTo<Category, $this>

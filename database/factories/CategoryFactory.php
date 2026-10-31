@@ -22,4 +22,14 @@ class CategoryFactory extends Factory
             'name_ne' => fake()->unique()->words(2, true),
         ];
     }
+
+    /**
+     * Indicate that cases in the category are restricted.
+     */
+    public function restricted(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_restricted' => true,
+        ]);
+    }
 }
