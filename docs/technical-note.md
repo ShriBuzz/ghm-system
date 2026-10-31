@@ -15,6 +15,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 
 | Package | Kind | Why |
 |---|---|---|
+| `filament/filament` | runtime | The staff admin panel at `/admin`, with its built-in authenticator-app MFA. Its CSS, JS and the Inter font are published into `public/` by `filament:upgrade` on every `composer install` and are not committed; the font is served locally, so the panel makes no third-party requests. |
 | `laravel/framework` | runtime | The application framework. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |

@@ -49,3 +49,7 @@ Thumbs.db
 **/.impeccable/live/deferred-svelte-component-accepts.json
 **/.impeccable/live/*.png
 # impeccable-ignore-end
+
+/public/css/filament
+/public/fonts/filament
+/public/js/filament
