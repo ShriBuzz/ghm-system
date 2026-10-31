@@ -6,7 +6,7 @@ Status, decisions and open questions are in `docs/progress.md`. In a new session
 
 ## Order of authority
 
-1. RFQ section 3 requirements (P1 to P10, A1 to A7, N1 to N4, S1 to S10)
+1. RFQ section 3 requirements (P1 to P10, A1 to A7, N1 to N4, S1 to S10), word for word in `docs/rfq-requirements.md`
 2. The project rules in this file
 3. Karpathy guidelines (appended at the end of this file)
 4. Ponytail

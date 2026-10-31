@@ -7,10 +7,11 @@ Last updated 2026-10-31, after WP0 step 2, when work moved from the Windows lapt
 ## Read first
 
 1. `CLAUDE.md`: the rules. They win over any skill.
-2. `WP0-kickoff.md`: the WP0 steps.
-3. `docs/progress.md`: what is done, what is next, open questions and decisions.
-4. `docs/local-setup.md`: how to set up a machine.
-5. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
+2. `docs/rfq-requirements.md`: the RFQ requirement wording, P1 to P10, A1 to A7, N1 to N4, S1 to S10.
+3. `WP0-kickoff.md`: the WP0 steps.
+4. `docs/progress.md`: what is done, what is next, open questions and decisions.
+5. `docs/local-setup.md`: how to set up a machine.
+6. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
 
 ## What git does not carry
 
@@ -31,7 +32,7 @@ A fresh `APP_KEY` is fine now because no encrypted data exists yet. Once it does
 1. Work through `docs/local-setup.md`: tools, MySQL, GitHub, the project, agent tooling.
 2. Start Claude Code in the project folder and give it this prompt:
 
-   > Read CLAUDE.md, WP0-kickoff.md, docs/progress.md and docs/handoff.md. We are on branch wp0/foundations and kickoff steps 1 and 2 are done. Check this machine against docs/local-setup.md (php -v, the PHP extensions, composer -V, node -v, MySQL reachable as the ghm user, php artisan test, vendor/bin/pint --test) and report anything missing. Then continue with step 3. Commit and push after each step, and update docs/progress.md as you go. Stop before step 6 if docs/implementation-plan.md is still missing, and bring open questions to me instead of guessing.
+   > Read CLAUDE.md, docs/rfq-requirements.md, WP0-kickoff.md, docs/progress.md and docs/handoff.md. We are on branch wp0/foundations and kickoff steps 1 and 2 are done. Check this machine against docs/local-setup.md (php -v, the PHP extensions, composer -V, node -v, MySQL reachable as the ghm user, php artisan test, vendor/bin/pint --test) and report anything missing. Then continue with step 3. Commit and push after each step, and update docs/progress.md as you go. Stop before step 6 if docs/implementation-plan.md is still missing, and bring open questions to me instead of guessing.
 
 ## Keep this current
 

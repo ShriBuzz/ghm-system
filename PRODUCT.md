@@ -8,14 +8,14 @@ web
 
 ## Users
 
-- **Complainants (public side).** Members of the public who file a grievance with the client, usually from a phone. They file in Nepali or English, receive a reference number and PIN (P7), and come back with those to follow their case. Some grievances are sensitive enough that their category is restricted.
+- **Complainants (public side).** Members of the public who file a grievance with the client, usually from a phone. They file in Nepali or English, anonymously or with a name (P4), receive a reference number and PIN (P7), and come back with those to a status page that shows the current status and the company's replies and lets them add information (P8). Some grievances are sensitive enough that their category is restricted.
 - **Staff (admin side).** Administrator, focal person and restricted-case officer, with the visibility rules in `CLAUDE.md`. They work in the Filament panel at `/admin`, which keeps Filament's own UI and is outside Impeccable's scope.
 
 Impeccable covers the public pages, the emails and the print views only.
 
 ## Product Purpose
 
-The online grievance handling system for RFQ NBI/GHM/RFQ/01. A member of the public files a grievance online, gets a reference number and PIN, and can follow the case; staff handle it against a 15-day SLA, configured with Saturday as the weekend day and a holiday calendar.
+The online grievance handling system for RFQ NBI/GHM/RFQ/01. A member of the public files a grievance online, gets a reference number and PIN, and can follow the case; staff handle it against a 15-working-day target (A2), configured with Saturday as the weekend day and a holiday calendar.
 
 Success is every RFQ section 3 requirement (P1–P10, A1–A7, N1–N4, S1–S10) met and traced in `docs/requirements-traceability.md`. Nothing beyond section 3 is built.
 
@@ -27,9 +27,9 @@ A commissioned build against a fixed RFQ, not a market product. What sets it apa
 
 - Public pages default to Nepali (`ne`) with English (`en`) as fallback. A language switch sets a cookie and the page `lang` attribute (P2). Categories and A4 statuses and priorities carry labels in both languages.
 - Every user-facing flow is checked at 360 px (touch) and at desktop width.
-- A grievance carries a category, a location, a description, attachments (up to 5 MB) and demographic fields. The PIN length is 6.
+- A grievance carries a category, a location, a date of incident, whether it happened once, repeatedly or is ongoing, a description and one optional attachment, a photo or PDF up to 5 MB (P5). Demographic fields are optional, each with "prefer not to say" (P6). The PIN length is 6.
 - Sessions expire after 30 idle minutes. This applies to a complainant part-way through a form as well as to staff.
-- Emails go out through a database queue run by cron (`schedule:run`), so they are not instant.
+- Emails go out through a database queue run by cron (`schedule:run`), so they are not instant. Staff alerts carry no grievance details, only "log in to view", and alerts for restricted cases go only to restricted-case officers (N1). A complainant who gave an email gets an acknowledgement (N2) and their reference number and PIN (P7).
 
 ## Capabilities and Constraints
 
@@ -41,11 +41,10 @@ A commissioned build against a fixed RFQ, not a market product. What sets it apa
 
 ### Open, not to be guessed
 
-- RFQ section 3 and `docs/implementation-plan.md` are not in the repo yet. Requirement wording beyond what `CLAUDE.md` and `WP0-kickoff.md` quote is unknown.
-- The client organisation behind "NBI" and the name shown on public pages and emails.
-- Whether a complainant can file anonymously.
-- What a complainant sees when tracking a case, beyond its status.
-- Who receives which emails (N1–N4), and what the print views are for.
+- Requirement wording is in `docs/rfq-requirements.md`. `docs/implementation-plan.md` is not in the repo yet.
+- The company's name on public pages and emails. The RFQ says only "a private company", and names NBI separately (S8).
+- The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
+- What the print views are for. The RFQ does not mention them.
 
 ## Evidence on Hand
 
@@ -60,6 +59,6 @@ No logo, brand guide, client name, category list, location list or real content 
 
 ## Accessibility & Inclusion
 
-- WCAG 2.2 AA for public pages, emails and print views. Chosen during init; check it against the RFQ text once that is in the repo.
+- WCAG 2.2 AA for public pages, emails and print views, chosen during init. The RFQ asks for basic accessibility on public pages: labelled fields, readable contrast, works with a screen reader and keyboard (S9). AA goes further; the project lead confirms whether to keep it.
 - Accessibility is never trimmed for brevity. Playwright specs include axe-core checks.
 - Each page declares its language in `lang`, so screen readers switch voice between Nepali and English.

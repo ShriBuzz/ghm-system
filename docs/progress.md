@@ -14,12 +14,12 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 3 | `.env.example` for MySQL, `config/ghm.php` | | To do | |
 | 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | To do | |
 | 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | To do | |
-| 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, A4 | Blocked | Needs plan section 6 and the RFQ A4 wording |
+| 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | To do | A4 wording and draft Nepali labels are in `docs/rfq-requirements.md`; exact columns come from plan section 6. The kickoff tags this step S3, S5, A4; the activity log is S6 in the RFQ |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | To do | Depends on step 6 |
 | 8 | Security headers, HTTPS outside local | S1 | To do | |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | To do | |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | To do | |
-| 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; traceability needs the requirement list |
+| 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; the requirement list for traceability is in `docs/rfq-requirements.md` |
 | 12 | Browser walk per role at 360 px and desktop | | To do | |
 | | `/ponytail-review` clean, pull request into `main` | | To do | |
 
@@ -27,10 +27,12 @@ WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start on
 
 ## Open questions for the project lead
 
-1. `docs/implementation-plan.md` and the RFQ section 3 text are not in the repo. Step 6 (fields, A4 statuses and priorities with Nepali labels) and the traceability file wait on them.
-2. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
-3. Is branch protection on for `main` on GitHub? `CLAUDE.md` says it is protected.
-4. `PRODUCT.md` lists product questions under "Open, not to be guessed": the client name on public pages, anonymous filing, what tracking shows, email recipients (N1 to N4) and what the print views are for. These matter from WP1.
+1. `docs/implementation-plan.md` is not in the repo. Step 6 takes its exact columns from plan section 6. The RFQ wording is in `docs/rfq-requirements.md`, which wins if the two disagree.
+2. The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
+3. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
+4. Is branch protection on for `main` on GitHub? `CLAUDE.md` says it is protected.
+5. `PRODUCT.md` targets WCAG 2.2 AA, which goes beyond the RFQ's basic accessibility (S9). Keep it?
+6. `PRODUCT.md` still has two product questions under "Open, not to be guessed": the company's name on public pages and emails, and what the print views are for. These matter from WP1.
 
 ## Decisions
 
@@ -44,6 +46,7 @@ Made so far (the commit messages have the detail):
 - Ponytail is enabled for the project in `.claude/settings.json`, which also names its marketplace so a new machine is offered the plugin.
 - `.cmd` files keep CRLF line endings.
 - PHP 8.4 locally; CI will use 8.4 too.
+- MFA is required for every user, as the kickoff says, although the RFQ marks two-factor login (S10) as Desirable.
 - Local databases `ghm` (app) and `ghm_testing` (tests), user `ghm`.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:
