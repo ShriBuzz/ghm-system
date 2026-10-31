@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 8.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 9.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -16,7 +16,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `8ffab3a` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | Done | `f017803` case schema. Tables from plan section 6; S6 has its table only, the events come in WP2. P6 option lists wait on NBI (`docs/clarification-questions.md`, question 5) |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | Done | `9d39508` access rule. No case screens yet, so the browser check comes with WP2 |
-| 8 | Security headers, HTTPS outside local | S1 | To do | |
+| 8 | Security headers, HTTPS outside local | S1 | Done | `feat(S1)` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | To do | |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | To do | Pest already added in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; the requirement list for traceability is in `docs/rfq-requirements.md` |
@@ -66,11 +66,12 @@ Made so far (the commit messages have the detail):
 - A category's restricted flag re-flags its cases with one bulk update, which skips model events. When WP2 adds the activity log (S6), it logs the category change itself.
 - `DatabaseSeeder` runs `WithoutModelEvents`, which skips the restriction observer. A future seeder that creates cases must not rely on it.
 - "Assignment only offers users who can see the case" (`CLAUDE.md`) is built with the assign field in WP2 (A3), using the same scope.
+- Step 8: one global middleware handles S1. Public pages are self-only; the admin CSP adds a per-response script nonce, `'unsafe-eval'`, inline styles and `data:` images, each shown necessary by removing it during a browser walk. `technical-note.md` has the policy and the reasons.
+- HTTPS is forced in every environment except `local` and `testing`, so staging behaves like production.
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:
 
 - The activity log records that an encrypted field changed, never its value.
-- The admin CSP will probably need `'unsafe-eval'` and inline styles for Livewire and Alpine. Step 8 finds the minimum and records it in the technical note. The public CSP stays self-only.
 - The step 12 role users are created locally with fake names through tinker, not a committed seeder.
 - The language cookie is `locale`, with values `ne` and `en`, defaulting to `ne`.
