@@ -91,14 +91,9 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Set the database in `.env`. WP0 step 3 makes MySQL the default in `.env.example`; until then the skeleton default is SQLite.
+`.env.example` already points at the local `ghm` database as the `ghm` user. Fill in the password you chose:
 
 ```dotenv
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ghm
-DB_USERNAME=ghm
 DB_PASSWORD=the-password-you-chose
 ```
 

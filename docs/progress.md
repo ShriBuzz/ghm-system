@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 3.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 4.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -8,10 +8,10 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
-| 0 | Pre-checks and machine setup | | Done | Windows laptop: PHP 8.4, Composer, gh, MySQL 8.0 |
+| 0 | Pre-checks and machine setup | | Done | Windows laptop: PHP 8.4, Composer, gh, MySQL 8.0. Mac: PHP 8.4, Composer 2.11, MySQL 8.4, Node 24 |
 | 1 | Laravel 13 skeleton, Vite and Tailwind removed | | Done | `99eedf6` |
 | 2 | Agent setup: Karpathy, Impeccable, Playwright, Ponytail, `/impeccable init` | | Done | `88ae807`, then the handoff commit (Ponytail settings, `PRODUCT.md`) |
-| 3 | `.env.example` for MySQL, `config/ghm.php` | | To do | |
+| 3 | `.env.example` for MySQL, `config/ghm.php` | | Done | `chore(WP0): MySQL environment and GHM rules config` |
 | 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | To do | |
 | 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | To do | |
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | To do | A4 wording and draft Nepali labels are in `docs/rfq-requirements.md`; exact columns come from plan section 6. The kickoff tags this step S3, S5, A4; the activity log is S6 in the RFQ |
