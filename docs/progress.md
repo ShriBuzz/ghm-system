@@ -76,6 +76,9 @@ Made so far (the commit messages have the detail):
 - Playwright refuses to run anything but `@smoke` against a non-local `BASE_URL` unless `E2E_FULL=1`, so production is only ever smoke-tested.
 - Step 12: every role sees only the Dashboard, because no role-specific screens exist yet; the role menus are checked again when WP2 adds them. The local role users (fake names, `@example.com`) were made through tinker, as planned.
 - The dashboard still shows Filament's default info widget (its version, links to filamentphp.com and GitHub). WP2 replaces the dashboard content.
+- From `/ponytail-review`: the profile page (`/admin/profile`) is on, so each user can change their own password (current one required) and manage MFA; its save throttle is keyed on the user, not the IP. After the first seed on a server, the `GHM_ADMIN_*` lines are deleted from `.env` and the config re-cached (`technical-note.md`).
+- `config/session.php` and `config/cache.php` default to the `file` driver and a 30-minute session, so a production `.env` missing those lines still meets S2 and S5.
+- Follow-ups from the review, not blocking: check the category's restricted flag at query time in `visibleTo()` too, closing a millisecond race when a category is restricted while one of its cases is being saved; remove Filament's info widget from the dashboard (WP2 replaces the dashboard).
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:

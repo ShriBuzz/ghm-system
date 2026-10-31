@@ -39,6 +39,10 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `@playwright/cli` | Named browser sessions per role for walking user flows. |
 | `@axe-core/playwright` | Accessibility checks inside Playwright specs. |
 
+## First Administrator
+
+`php artisan db:seed` creates the first Administrator from `GHM_ADMIN_NAME`, `GHM_ADMIN_EMAIL` and `GHM_ADMIN_PASSWORD`. Once it has run on a server, delete those three lines from `.env` and run `php artisan config:cache` again: `config:cache` copies them, password included, into `bootstrap/cache/config.php`. The Administrator then changes the password on the profile page (`/admin/profile`), where every user can change their own password (the current one is required) and manage MFA and recovery codes.
+
 ## Tests and CI
 
 - Pest feature tests run against MySQL `ghm_testing`, each tagged with its requirement ID (`php artisan test --group=A5`).

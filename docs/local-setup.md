@@ -112,7 +112,7 @@ php artisan migrate --seed
 php artisan serve        # http://127.0.0.1:8000
 ```
 
-The first sign-in at `/admin` asks you to set up an authenticator app; every account must have one.
+The first sign-in at `/admin` asks you to set up an authenticator app; every account must have one. Each user can change their password and manage MFA at `/admin/profile`.
 
 ### 5. Agent tooling (once per machine)
 
