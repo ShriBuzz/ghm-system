@@ -19,7 +19,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 8 | Security headers, HTTPS outside local | S1 | Done | `b5f9c74` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | Done | `51bfc6b` public shell. Walked at 360 px (JS on and off) and desktop in both languages; axe WCAG 2.2 AA clean |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | Done | `7f4cfb8` tests and CI, `394660d` deterministic S2 spec. CI green: Pint, Larastan, Pest 81, Playwright 9. Pest came in step 4 |
-| 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Done | `docs(WP0)` traceability. S10 recovery-code test added on the way |
+| 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Done | `dba2494` traceability. S10 recovery-code test added on the way |
 | 12 | Browser walk per role at 360 px and desktop | | To do | |
 | | `/ponytail-review` clean, pull request into `main` | | To do | |
 
