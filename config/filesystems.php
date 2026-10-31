@@ -33,7 +33,8 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Off: private files are reached only through the case-checked download route (S4).
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

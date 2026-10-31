@@ -31,7 +31,7 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
-| 1 | Reference number, PIN, attachment store (branch `wp2/shared-intake`) | P7, S4, S5 | Not started | |
+| 1 | Reference number, PIN, attachment store (branch `wp2/shared-intake`) | P7, S4, S5 | Done | `App\Support\ReferenceNumber`, `Pin`, `AttachmentStore`; local disk `serve` turned off. Commit in this row once pushed |
 | 2 | Staff panel in English, Filament info widget removed | A1 | Not started | |
 | 3 | Working-day count, nightly recount, `closed_at` | A2 | Not started | |
 | 4 | Settings: categories, locations, holidays, users | A7, A5 | Not started | |

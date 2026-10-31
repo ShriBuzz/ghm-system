@@ -61,6 +61,15 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - Admin panel: `script-src 'self' 'nonce-…' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:`, otherwise as above. Each allowance was removed in turn during a full browser walk (sign-in, MFA setup, dashboard, sign-out) and each one broke the panel: the nonce covers Filament's and Livewire's inline scripts (a fresh one per response); `'unsafe-eval'` is needed by Alpine; Filament uses inline `style` attributes and `<style>` blocks without a nonce; the MFA QR code and avatars are `data:` images.
 - Laravel's `/up` health page links a font on fonts.bunny.net and a script on cdn.jsdelivr.net. The public policy blocks both before any request leaves the browser; an uptime monitor only needs the 200.
 
+## Files and photos (P5, S4, S5)
+
+`App\Support\AttachmentStore` takes every upload, staff and public.
+
+- Accepted: JPEG, PNG, WebP and PDF up to `ghm.upload_max_kb` (5 MB). The type is read from the file's content, so a renamed program is refused.
+- Files go to `storage/app/private/attachments/` under a random 40-character name; the original name is kept encrypted in `attachments.original_name`. The `local` disk's `serve` option is off, so Laravel registers no `/storage/...` route; files are reached only through the case-checked download route.
+- Photos are redrawn with GD, which drops every metadata block (GPS position, phone model, time taken). The EXIF orientation is applied first when the `exif` extension is present; without it, a photo taken sideways stays sideways.
+- Known limit: PDF metadata (author name, creating software) is not removed. There is no light way to do it on shared hosting.
+
 ## Agent tooling (not shipped)
 
 - Impeccable 4.8.0, installed with `npx impeccable install --providers=claude --scope=project`. Skills and agents live in `.claude/`. The design hook sits in `.claude/settings.local.json`, which is per machine and not committed. The 20 MB engine binary is not committed either; the launcher downloads it on demand and checks it against `engine-checksums.txt`.
