@@ -13,7 +13,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 2 | Agent setup: Karpathy, Impeccable, Playwright, Ponytail, `/impeccable init` | | Done | `88ae807`, then the handoff commit (Ponytail settings, `PRODUCT.md`) |
 | 3 | `.env.example` for MySQL, `config/ghm.php` | | Done | `7b82594`; unused `sessions` table (IP and user-agent columns) dropped in `f7b92b7` |
 | 4 | Filament 5 panel at `/admin`, role enum, required MFA, admin seeder from `.env` | A1, S10 | Done | `91e3ff0` panel, `5be7456` Pest, `5c1aed3` roles and MFA. Walked in a browser: sign-in, forced MFA setup, code challenge |
-| 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `feat(S2)` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
+| 5 | Login lockout (5 tries, 15 minutes), no notification polling, idle tab back to login | S2 | Done | `8ffab3a` login hardening. Walked in a browser: lockout message, no remember me, idle tab back at sign-in |
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | To do | A4 wording and draft Nepali labels are in `docs/rfq-requirements.md`; exact columns come from plan section 6. The kickoff tags this step S3, S5, A4; the activity log is S6 in the RFQ |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | To do | Depends on step 6 |
 | 8 | Security headers, HTTPS outside local | S1 | To do | |
@@ -30,7 +30,7 @@ WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start on
 1. `docs/implementation-plan.md` is not in the repo. Step 6 takes its exact columns from plan section 6. The RFQ wording is in `docs/rfq-requirements.md`, which wins if the two disagree.
 2. The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
 3. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
-4. Is branch protection on for `main` on GitHub? `CLAUDE.md` says it is protected.
+4. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
 5. `PRODUCT.md` targets WCAG 2.2 AA, which goes beyond the RFQ's basic accessibility (S9). Keep it?
 6. `PRODUCT.md` still has two product questions under "Open, not to be guessed": the company's name on public pages and emails, and what the print views are for. These matter from WP1.
 7. `APP_NAME` is still the skeleton's `Laravel`. It shows as the panel brand, in page titles and as the account name in staff authenticator apps. What should it be?
