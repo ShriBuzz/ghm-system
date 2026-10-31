@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 9.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 10.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -17,7 +17,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 6 | Migrations, models, encrypted casts, enums, activity log | S3, S5, S6, A4 | Done | `f017803` case schema. Tables from plan section 6; S6 has its table only, the events come in WP2. P6 option lists wait on NBI (`docs/clarification-questions.md`, question 5) |
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | Done | `9d39508` access rule. No case screens yet, so the browser check comes with WP2 |
 | 8 | Security headers, HTTPS outside local | S1 | Done | `b5f9c74` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
-| 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | To do | |
+| 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | Done | `feat(P2,S9)` public shell. Walked at 360 px (JS on and off) and desktop in both languages; axe WCAG 2.2 AA clean |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | To do | Pest already added in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; the requirement list for traceability is in `docs/rfq-requirements.md` |
 | 12 | Browser walk per role at 360 px and desktop | | To do | |
@@ -31,8 +31,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 
 1. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
 2. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
-3. `PRODUCT.md` targets WCAG 2.2 AA, which goes beyond the RFQ's basic accessibility (S9). Keep it?
-4. `PRODUCT.md` lists two items as open: the company's name (a kick-off item, see `docs/clarification-questions.md`) and what the print views are for, which plan section 5 now answers (offline receipt slip, QR poster). Update `PRODUCT.md` before WP1.
+3. The Nepali copy on public pages (site name, placeholder line) needs a Nepali speaker's read before UAT (P2 manual check).
 
 ## Decisions
 
@@ -68,6 +67,10 @@ Made so far (the commit messages have the detail):
 - "Assignment only offers users who can see the case" (`CLAUDE.md`) is built with the assign field in WP2 (A3), using the same scope.
 - Step 8: one global middleware handles S1. Public pages are self-only; the admin CSP adds a per-response script nonce, `'unsafe-eval'`, inline styles and `data:` images, each shown necessary by removing it during a browser walk. `technical-note.md` has the policy and the reasons.
 - HTTPS is forced in every environment except `local` and `testing`, so staging behaves like production.
+- Step 9, via `/impeccable shape`: the public shell is deliberately plain (system fonts with Devanagari fallbacks, neutral palette, one accent, all colours in CSS variables). The full visual-direction workshop runs in WP1 with the form, when more of the company's identity may be known. The header shows the service name only ("गुनासो सुनुवाइ" / "Grievance handling") until kick-off.
+- WCAG 2.2 AA is the public-page target (confirmed 2026-10-31), beyond the RFQ's basic S9.
+- Language switch: a one-button POST form showing the other language in its own script, so it works without JavaScript. `/language` is exempt from CSRF: a forged request could only change the display language, and a token would expire with an idle visitor's session. The `locale` cookie lasts a year. `SetLocale` runs on public routes only, so the staff panel keeps `APP_LOCALE` (question 14 in `docs/clarification-questions.md`).
+- Tests reset Livewire's static state before each test (`tests/Pest.php`); otherwise a Filament page rendered earlier in the same process makes Livewire inject its assets into the next public page. Real requests never carry it over.
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:

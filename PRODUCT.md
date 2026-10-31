@@ -37,14 +37,14 @@ A commissioned build against a fixed RFQ, not a market product. What sets it apa
 - **Security headers (S1).** Self-only CSP on public routes, so styles and scripts come from those two files, never inline. `frame-ancestors 'none'` and `Referrer-Policy: no-referrer`.
 - **Privacy.** Personal data, IP addresses and user agents are never logged. Real grievance data never leaves production, so every mockup, fixture and screenshot uses fake data.
 - **Restricted cases.** A case is restricted when its category is restricted or a staff member marks it so. Only the administrator and restricted-case officers see restricted cases.
+- **Print views.** The plan names two: the offline receipt slip with reference number and PIN (A6) and the QR poster (P10).
 - **Fixed vocabulary.** Statuses and priorities are exactly as RFQ A4 lists them. Terms in use: grievance, reference number, PIN, category, location, focal person, restricted case, SLA.
 
 ### Open, not to be guessed
 
-- Requirement wording is in `docs/rfq-requirements.md`. `docs/implementation-plan.md` is not in the repo yet.
+- Requirement wording is in `docs/rfq-requirements.md`; the plan is in `docs/implementation-plan.md`. Questions for NBI are in `docs/clarification-questions.md`.
 - The company's name on public pages and emails. The RFQ says only "a private company", and names NBI separately (S8).
 - The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
-- What the print views are for. The RFQ does not mention them.
 
 ## Evidence on Hand
 
@@ -59,6 +59,6 @@ No logo, brand guide, client name, category list, location list or real content 
 
 ## Accessibility & Inclusion
 
-- WCAG 2.2 AA for public pages, emails and print views, chosen during init. The RFQ asks for basic accessibility on public pages: labelled fields, readable contrast, works with a screen reader and keyboard (S9). AA goes further; the project lead confirms whether to keep it.
+- WCAG 2.2 AA for public pages, emails and print views, chosen during init. The RFQ asks for basic accessibility on public pages: labelled fields, readable contrast, works with a screen reader and keyboard (S9). AA goes further; the project lead confirmed it on 2026-10-31.
 - Accessibility is never trimmed for brevity. Playwright specs include axe-core checks.
 - Each page declares its language in `lang`, so screen readers switch voice between Nepali and English.

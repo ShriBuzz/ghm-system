@@ -1,8 +1,10 @@
 {
+    "home.coming_soon": "गुनासो फारम छिट्टै यहाँ उपलब्ध हुनेछ।",
     "priority.critical": "अति गम्भीर",
     "priority.high": "उच्च",
     "priority.low": "न्यून",
     "priority.medium": "मध्यम",
+    "site.name": "गुनासो सुनुवाइ",
     "status.closed": "बन्द",
     "status.received": "प्राप्त",
     "status.referred_out_of_scope": "अन्यत्र पठाइएको / दायराबाहिर",

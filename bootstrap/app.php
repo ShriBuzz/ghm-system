@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SecurityHeaders::class);
+
+        // A forged request could only change someone's display language, and a
+        // token would expire with an idle visitor's session.
+        $middleware->preventRequestForgery(except: ['language']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

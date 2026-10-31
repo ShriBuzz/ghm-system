@@ -1,8 +1,10 @@
 {
+    "home.coming_soon": "The grievance form will be available here soon.",
     "priority.critical": "Critical",
     "priority.high": "High",
     "priority.low": "Low",
     "priority.medium": "Medium",
+    "site.name": "Grievance handling",
     "status.closed": "Closed",
     "status.received": "Received",
     "status.referred_out_of_scope": "Referred / Out of scope",
