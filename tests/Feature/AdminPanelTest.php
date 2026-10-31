@@ -20,3 +20,12 @@ it('draws staff avatars in the page instead of sending names to ui-avatars.com',
             .'<text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="sans-serif" font-size="26" fill="#fff">TO</text></svg>'
         ));
 })->group('A1');
+
+it('keeps deactivated staff out of the panel', function () {
+    $user = User::factory()->create([
+        'is_active' => false,
+        'app_authentication_secret' => AppAuthentication::make()->generateSecret(),
+    ]);
+
+    $this->actingAs($user)->get('/admin')->assertForbidden();
+})->group('A1');

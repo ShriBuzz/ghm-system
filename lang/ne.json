@@ -1,0 +1,13 @@
+{
+    "priority.critical": "अति गम्भीर",
+    "priority.high": "उच्च",
+    "priority.low": "न्यून",
+    "priority.medium": "मध्यम",
+    "status.closed": "बन्द",
+    "status.received": "प्राप्त",
+    "status.referred_out_of_scope": "अन्यत्र पठाइएको / दायराबाहिर",
+    "status.reopened": "पुनः खोलिएको",
+    "status.resolved": "समाधान भएको",
+    "status.under_assessment": "मूल्याङ्कनमा",
+    "status.under_investigation": "छानबिनमा"
+}

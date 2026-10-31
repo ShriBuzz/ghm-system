@@ -1,0 +1,13 @@
+{
+    "priority.critical": "Critical",
+    "priority.high": "High",
+    "priority.low": "Low",
+    "priority.medium": "Medium",
+    "status.closed": "Closed",
+    "status.received": "Received",
+    "status.referred_out_of_scope": "Referred / Out of scope",
+    "status.reopened": "Reopened",
+    "status.resolved": "Resolved",
+    "status.under_assessment": "Under assessment",
+    "status.under_investigation": "Under investigation"
+}

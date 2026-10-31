@@ -25,11 +25,20 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     use HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
 
     /**
-     * Every user is staff with a role; what each role may see is decided by policies.
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
+    /**
+     * Every active user is staff with a role; what each role may see is decided by policies.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->is_active;
     }
 
     /**
@@ -43,6 +52,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'is_active' => 'boolean',
         ];
     }
 }
