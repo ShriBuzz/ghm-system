@@ -68,7 +68,7 @@ it('keeps IP addresses out of the sign-in throttles', function () {
 
     expect(RateLimiter::attempts('livewire-rate-limiter:'.sha1(Login::class.'|authenticate|127.0.0.1')))->toBe(0)
         ->and(RateLimiter::attempts('login-throttle:'.hash('sha256', 'someone@example.com')))->toBe(1);
-})->group('S2');
+})->group('S2', 'S5');
 
 it('serves the hardened sign-in page at /admin/login', function () {
     $this->get('/admin/login')->assertSeeLivewire(Login::class);

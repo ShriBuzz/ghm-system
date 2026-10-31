@@ -8,6 +8,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 |---|---|---|
 | PHP | 8.4 (8.3+ required) | Extensions: curl, fileinfo, intl, mbstring, openssl, pdo_mysql, sodium, zip |
 | Laravel | 13.39 | From the `laravel/laravel` 13.x skeleton, with Vite and Tailwind removed |
+| Admin panel | Filament 5.11, Livewire 4.4 | Staff panel at `/admin`; its assets are published on `composer install` |
 | Database | MySQL 8 or MariaDB 10.6+ | |
 | Node | 20+ | Dev and CI only (Playwright, Impeccable); nothing on the server needs Node |
 

@@ -55,3 +55,27 @@ it('stores the authenticator secret encrypted', function () {
     expect($stored)->not->toContain($secret)
         ->and(Crypt::decryptString($stored))->toBe($secret);
 })->group('S10');
+
+it('signs in once with each recovery code instead of an authenticator code', function () {
+    $mfa = AppAuthentication::make();
+    $user = User::factory()->create(['app_authentication_secret' => $mfa->generateSecret()]);
+    $mfa->saveRecoveryCodes($user, ['recovery-code-one', 'recovery-code-two']);
+
+    $signInWithRecoveryCode = fn () => Livewire::test(Login::class)
+        ->fillForm(['email' => $user->email, 'password' => 'password'])
+        ->call('authenticate')
+        ->set('data.multiFactor.app.useRecoveryCode', true)
+        ->set('data.multiFactor.app.recoveryCode', 'recovery-code-one')
+        ->call('authenticate');
+
+    $signInWithRecoveryCode()->assertHasNoErrors();
+    $this->assertAuthenticatedAs($user);
+
+    Filament::auth()->logout();
+
+    $signInWithRecoveryCode()->assertHasErrors();
+    $this->assertGuest();
+
+    expect(DB::table('users')->where('id', $user->id)->value('app_authentication_recovery_codes'))
+        ->not->toContain('recovery-code-two');
+})->group('S10');
