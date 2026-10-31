@@ -5,7 +5,13 @@
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
+*.cmd text eol=crlf
 
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+/.claude export-ignore
+/.impeccable export-ignore
+CLAUDE.md export-ignore
+PRODUCT.md export-ignore
+DESIGN.md export-ignore
