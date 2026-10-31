@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-10-31, after WP0 step 11 on the Mac.
+Last updated 2026-10-31, after WP0 step 12 on the Mac. Left in WP0: `/ponytail-review` and the pull request.
 
 ## Read first
 

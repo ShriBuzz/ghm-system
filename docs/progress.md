@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 12.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: `/ponytail-review` on the branch, then the pull request into `main`.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -20,7 +20,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | Done | `51bfc6b` public shell. Walked at 360 px (JS on and off) and desktop in both languages; axe WCAG 2.2 AA clean |
 | 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | Done | `7f4cfb8` tests and CI, `394660d` deterministic S2 spec. CI green: Pint, Larastan, Pest 81, Playwright 9. Pest came in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Done | `dba2494` traceability. S10 recovery-code test added on the way |
-| 12 | Browser walk per role at 360 px and desktop | | To do | |
+| 12 | Browser walk per role at 360 px and desktop | | Done | 2026-10-31: Playwright CLI sessions `-s=admin`, `-s=focal`, `-s=restricted` each signed in with password and authenticator code and reached the dashboard; `-s=public` checked `/ne` and `/en` at 360 px. Screenshots stayed on the developer machine, outside the repo |
 | | `/ponytail-review` clean, pull request into `main` | | To do | |
 
 WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start only after the WP0 pull request is reviewed and merged.
@@ -74,6 +74,8 @@ Made so far (the commit messages have the detail):
 - Tests reset Livewire's static state before each test (`tests/Pest.php`); otherwise a Filament page rendered earlier in the same process makes Livewire inject its assets into the next public page. Real requests never carry it over.
 - Step 10: Larastan at level 8 on application code (config files left out: the one level 7 finding is in the skeleton's `config/filesystems.php`). Playwright's mobile project covers public pages and the desktop project the admin panel. Admin specs that sign in (the S2 idle reload, role menus) need seeded TOTP users and come with step 12 and WP2.
 - Playwright refuses to run anything but `@smoke` against a non-local `BASE_URL` unless `E2E_FULL=1`, so production is only ever smoke-tested.
+- Step 12: every role sees only the Dashboard, because no role-specific screens exist yet; the role menus are checked again when WP2 adds them. The local role users (fake names, `@example.com`) were made through tinker, as planned.
+- The dashboard still shows Filament's default info widget (its version, links to filamentphp.com and GitHub). WP2 replaces the dashboard content.
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:
