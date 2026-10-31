@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 10.
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 11.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -18,7 +18,7 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 | 7 | `Grievance::visibleTo()`, `GrievancePolicy`, restriction observer, Pest tests per role | A1, A5 | Done | `9d39508` access rule. No case screens yet, so the browser check comes with WP2 |
 | 8 | Security headers, HTTPS outside local | S1 | Done | `b5f9c74` security headers. Admin CSP found by browser walk; details in `docs/technical-note.md` |
 | 9 | Public layout, `public/css/public.css`, language switch, `lang/en.json` and `lang/ne.json`, placeholder home | P2, S9 | Done | `51bfc6b` public shell. Walked at 360 px (JS on and off) and desktop in both languages; axe WCAG 2.2 AA clean |
-| 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | To do | Pest already added in step 4 |
+| 10 | Pest, Larastan, Playwright config and specs, GitHub Actions CI | | Done | `chore(WP0)` tests and CI. Pest came in step 4 |
 | 11 | `docs/technical-note.md`, `docs/requirements-traceability.md` | | Started | Technical note started; the requirement list for traceability is in `docs/rfq-requirements.md` |
 | 12 | Browser walk per role at 360 px and desktop | | To do | |
 | | `/ponytail-review` clean, pull request into `main` | | To do | |
@@ -72,6 +72,8 @@ Made so far (the commit messages have the detail):
 - Language switch (P2): each language has its own address, `/ne/...` and `/en/...`. The header shows both languages in their own script as a labelled nav, the current one marked with `aria-current`, the other a plain link with `lang` and `hreflang`, plus a `rel="alternate"` link in the head. Plain links need no form, no CSRF token and no session, work without JavaScript, keep Back and Forward in the right language, and let the company site or a QR poster link straight to one language. A `locale` cookie (a year, HttpOnly, SameSite=Lax) remembers the last language, so `/` redirects a returning visitor to it; a first visit goes to `/ne`. `SetLocale` runs on public routes only, so the staff panel keeps `APP_LOCALE` (question 14 in `docs/clarification-questions.md`).
 - For WP1: switching language reloads the page, so text typed into the form would be lost. The form either keeps a draft with `public/js/form.js` or offers the language choice before the first field.
 - Tests reset Livewire's static state before each test (`tests/Pest.php`); otherwise a Filament page rendered earlier in the same process makes Livewire inject its assets into the next public page. Real requests never carry it over.
+- Step 10: Larastan at level 8 on application code (config files left out: the one level 7 finding is in the skeleton's `config/filesystems.php`). Playwright's mobile project covers public pages and the desktop project the admin panel. Admin specs that sign in (the S2 idle reload, role menus) need seeded TOTP users and come with step 12 and WP2.
+- Playwright refuses to run anything but `@smoke` against a non-local `BASE_URL` unless `E2E_FULL=1`, so production is only ever smoke-tested.
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:

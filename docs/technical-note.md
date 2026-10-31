@@ -20,6 +20,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `spatie/laravel-activitylog` | runtime | The append-only activity log (S6). Its `activity_log` table has no IP or device columns. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
+| `larastan/larastan` | dev | Static analysis (PHPStan for Laravel) at level 8 on `app/`, `bootstrap/app.php`, `database/` and `routes/`, run in CI. |
 | `laravel/pail` | dev | Skeleton default; tails the local log. |
 | `laravel/pao` | dev | Skeleton default; condenses test and Pint output when an AI agent runs them. Under review, see below. |
 | `laravel/pint` | dev | Code style check (`vendor/bin/pint --test`). |
@@ -36,6 +37,13 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `@playwright/test` | Browser specs tagged by requirement ID (`@P7`), run locally and in CI. |
 | `@playwright/cli` | Named browser sessions per role for walking user flows. |
 | `@axe-core/playwright` | Accessibility checks inside Playwright specs. |
+
+## Tests and CI
+
+- Pest feature tests run against MySQL `ghm_testing`, each tagged with its requirement ID (`php artisan test --group=A5`).
+- Larastan: `vendor/bin/phpstan analyse --memory-limit=1G`. Homebrew PHP's default 128M memory limit is too small for its worker processes. `parseModelCastsMethod` is on, so enum casts such as `role` and `status` are typed.
+- Playwright (`playwright.config.ts`): a `mobile` project (360 px, touch) runs `tests/e2e/public.spec.ts`; a `desktop` project runs `tests/e2e/admin.spec.ts`. Specs carry requirement tags (`npx playwright test --grep @P2`). `BASE_URL` sets the target; locally Playwright starts `php artisan serve` itself. When `BASE_URL` is not this machine, only the read-only `@smoke` specs run, unless `E2E_FULL=1` (staging), so the suite can never write to production.
+- CI (`.github/workflows/ci.yml`) on every push and pull request: Pint, Larastan, Pest against a MySQL 8.4 service, then Playwright against `php artisan serve`. A failed run uploads the Playwright report.
 
 ## HTTPS and security headers (S1)
 

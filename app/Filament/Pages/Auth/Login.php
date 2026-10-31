@@ -72,6 +72,9 @@ class Login extends BaseLogin
 
     /**
      * Filament's own five-per-minute throttle, keyed on the email instead of the IP address.
+     *
+     * @param  string  $method
+     * @param  class-string|null  $component
      */
     protected function getRateLimitKey($method, $component = null): string
     {

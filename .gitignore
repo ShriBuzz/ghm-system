@@ -53,3 +53,8 @@ Thumbs.db
 /public/css/filament
 /public/fonts/filament
 /public/js/filament
+
+# Playwright Test output
+/playwright-report/
+/test-results/
+/blob-report/
