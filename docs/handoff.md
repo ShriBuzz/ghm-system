@@ -12,7 +12,8 @@ Last updated 2026-10-31. WP0 is complete and waiting in pull request #1 for revi
 4. `WP0-kickoff.md`: the WP0 steps.
 5. `docs/progress.md`: what is done, what is next, open questions and decisions.
 6. `docs/local-setup.md`: how to set up a machine.
-7. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
+7. `docs/manual-testing.md`: how to run the app and try everything by hand.
+8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
 
 ## What git does not carry
 

@@ -129,6 +129,8 @@ The first sign-in at `/admin` asks you to set up an authenticator app; every acc
 
 ## Everyday commands
 
+To run the app and try everything by hand, follow `docs/manual-testing.md`.
+
 | What | Command | Works from |
 |---|---|---|
 | Run the app | `php artisan serve`, then http://127.0.0.1:8000 | now |
