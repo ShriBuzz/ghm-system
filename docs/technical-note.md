@@ -42,7 +42,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 
 - Pest feature tests run against MySQL `ghm_testing`, each tagged with its requirement ID (`php artisan test --group=A5`).
 - Larastan: `vendor/bin/phpstan analyse --memory-limit=1G`. Homebrew PHP's default 128M memory limit is too small for its worker processes. `parseModelCastsMethod` is on, so enum casts such as `role` and `status` are typed.
-- Playwright (`playwright.config.ts`): a `mobile` project (360 px, touch) runs `tests/e2e/public.spec.ts`; a `desktop` project runs `tests/e2e/admin.spec.ts`. Specs carry requirement tags (`npx playwright test --grep @P2`). `BASE_URL` sets the target; locally Playwright starts `php artisan serve` itself. When `BASE_URL` is not this machine, only the read-only `@smoke` specs run, unless `E2E_FULL=1` (staging), so the suite can never write to production.
+- Playwright (`playwright.config.ts`): a `mobile` project (360 px, touch) runs `tests/e2e/public.spec.ts`; a `desktop` project runs `tests/e2e/admin.spec.ts`. Specs carry requirement tags (`npx playwright test --grep @P2`). `BASE_URL` sets the target; locally Playwright starts its own `php artisan serve` on port 8001, apart from the usual 8000. When `BASE_URL` is not this machine, only the read-only `@smoke` specs run, unless `E2E_FULL=1` (staging), so the suite can never write to production.
 - CI (`.github/workflows/ci.yml`) on every push and pull request: Pint, Larastan, Pest against a MySQL 8.4 service, then Playwright against `php artisan serve`. A failed run uploads the Playwright report.
 
 ## HTTPS and security headers (S1)

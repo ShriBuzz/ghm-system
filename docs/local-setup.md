@@ -136,7 +136,7 @@ The first sign-in at `/admin` asks you to set up an authenticator app; every acc
 | Code style | `vendor/bin/pint --test` | now |
 | PHP tests | `php artisan test`, or one requirement with `php artisan test --group=A5` | now |
 | Static analysis | `vendor/bin/phpstan analyse --memory-limit=1G` | now |
-| Browser tests | `npx playwright test` (starts `php artisan serve` if it is not running), or `npx playwright test --grep @smoke` | now |
+| Browser tests | `npx playwright test` (runs its own server on port 8001), or `npx playwright test --grep @smoke` | now |
 | Browser session per role | `npx playwright cli -s=focal open http://127.0.0.1:8000/admin` | now |
 
 ## Windows (first machine)

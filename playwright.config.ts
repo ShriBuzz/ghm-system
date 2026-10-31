@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:8000';
+// Playwright runs its own server on 8001, so it never tests whatever else is on the usual 8000.
+const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:8001';
 const local = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(baseURL);
 
 export default defineConfig({
@@ -30,8 +31,10 @@ export default defineConfig({
     ],
     webServer: local
         ? {
-              command: 'php artisan serve --host=127.0.0.1 --port=8000',
-              url: 'http://127.0.0.1:8000/up',
+              command: 'php artisan serve --host=127.0.0.1 --port=8001',
+              url: 'http://127.0.0.1:8001/up',
+              // Several PHP workers, so parallel specs do not queue behind one request.
+              env: { PHP_CLI_SERVER_WORKERS: '4' },
               reuseExistingServer: !process.env.CI,
           }
         : undefined,
