@@ -8,16 +8,21 @@ use App\Models\GrievanceMessage;
 use App\Models\User;
 use GdImage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class AttachmentStore
 {
     private const FOLDER = 'attachments';
+
+    // About 100 MB once decoded; turning a photo upright doubles it, within the 256 MB the host must allow.
+    private const MAX_PIXELS = 25_000_000;
 
     /**
      * The upload rule, shared by every form that takes a file (P5, S4).
@@ -30,17 +35,22 @@ class AttachmentStore
 
     /**
      * Validate, clean and store one file on the private disk (S4), with photo
-     * metadata such as GPS position and phone model removed (S5).
+     * metadata such as GPS position and phone model removed (S5). Errors are
+     * reported under the caller's form field name.
      */
-    public static function store(UploadedFile $file, Grievance $grievance, ?User $uploader = null, ?GrievanceMessage $message = null): Attachment
+    public static function store(UploadedFile $file, Grievance $grievance, ?User $uploader = null, ?GrievanceMessage $message = null, string $field = 'file'): Attachment
     {
-        Validator::validate(['file' => $file], ['file' => ['required', self::rule()]]);
+        // Arr::set, so a dotted Filament name such as "data.attachment" validates the nested value.
+        $data = [];
+        Arr::set($data, $field, $file);
+        Validator::validate($data, [$field => ['required', self::rule()]]);
 
         $mime = (string) $file->getMimeType();
-        $contents = $mime === 'application/pdf' ? (string) $file->get() : self::reencode($file, $mime);
+        $contents = $mime === 'application/pdf' ? (string) $file->get() : self::reencode($file, $mime, $field);
         $storedName = Str::random(40);
 
-        Storage::disk('local')->put(self::FOLDER.'/'.$storedName, $contents);
+        Storage::disk('local')->put(self::FOLDER.'/'.$storedName, $contents)
+            || throw new RuntimeException('Attachment could not be written to the private disk.');
 
         return $grievance->attachments()->create([
             'message_id' => $message?->id,
@@ -63,14 +73,18 @@ class AttachmentStore
     /**
      * Redraw the image with GD, which writes pixels only and drops every
      * metadata block. The EXIF orientation is applied first, or phone photos
-     * would come out sideways.
+     * would come out sideways. The size is read from the header first, so a
+     * small file claiming a huge picture is refused before it is decoded.
      */
-    private static function reencode(UploadedFile $file, string $mime): string
+    private static function reencode(UploadedFile $file, string $mime, string $field): string
     {
-        $image = @imagecreatefromstring((string) $file->get());
+        [$width, $height] = @getimagesize($file->getRealPath()) ?: [0, 0];
+        $image = $width * $height > 0 && $width * $height <= self::MAX_PIXELS
+            ? @imagecreatefromstring((string) $file->get())
+            : false;
 
         if (! $image instanceof GdImage) {
-            throw ValidationException::withMessages(['file' => __('validation.uploaded', ['attribute' => 'file'])]);
+            throw ValidationException::withMessages([$field => __('validation.uploaded', ['attribute' => $field])]);
         }
 
         if ($mime === 'image/jpeg') {

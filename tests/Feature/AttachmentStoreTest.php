@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Attachment;
 use App\Models\Grievance;
 use App\Models\User;
 use App\Support\AttachmentStore;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -86,3 +88,40 @@ it('keeps files on a private disk with no route of its own', function () {
     expect(config('filesystems.disks.local.root'))->not->toStartWith(public_path())
         ->and(Route::has('storage.local'))->toBeFalse();
 })->group('S4');
+
+it('fails loudly and saves no row when the file cannot be written', function () {
+    $disk = Mockery::mock(Filesystem::class);
+    $disk->shouldReceive('put')->andReturn(false);
+    Storage::shouldReceive('disk')->with('local')->andReturn($disk);
+
+    expect(fn () => AttachmentStore::store(UploadedFile::fake()->image('photo.jpg'), Grievance::factory()->create()))
+        ->toThrow(RuntimeException::class);
+
+    expect(Attachment::count())->toBe(0);
+})->group('S4');
+
+/**
+ * A tiny PNG whose header claims a huge picture, as a decompression bomb would.
+ */
+function hugePng(): UploadedFile
+{
+    $chunk = fn (string $type, string $data) => pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
+
+    return fakeUpload('huge.png', "\x89PNG\r\n\x1a\n"
+        .$chunk('IHDR', pack('NNCCCCC', 20000, 20000, 8, 2, 0, 0, 0))
+        .$chunk('IEND', ''));
+}
+
+it('refuses an image too large to redraw, under the caller\'s field name', function (UploadedFile $file) {
+    try {
+        AttachmentStore::store($file, Grievance::factory()->create(), field: 'data.attachment');
+        $this->fail('No validation error');
+    } catch (ValidationException $e) {
+        expect(array_keys($e->errors()))->toBe(['data.attachment']);
+    }
+
+    expect(Storage::disk('local')->allFiles())->toBe([]);
+})->with([
+    'huge picture' => fn () => hugePng(),
+    'broken picture' => fn () => fakeUpload('photo.jpg', "\xFF\xD8\xFF\xE0".str_repeat('x', 300)),
+])->group('S4', 'S5');
