@@ -1,11 +1,18 @@
 <?php
 
-use App\Http\Controllers\Public\LocaleController;
 use App\Http\Middleware\SetLocale;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(SetLocale::class)->group(function () {
-    Route::view('/', 'public.home')->name('home');
+Route::get('/', function (Request $request) {
+    $locale = in_array($request->cookie('locale'), SetLocale::LOCALES, true) ? $request->cookie('locale') : config('app.locale');
+
+    return redirect()->route('home', ['locale' => $locale]);
 });
 
-Route::post('/language', LocaleController::class)->name('language');
+Route::prefix('{locale}')
+    ->where(['locale' => implode('|', SetLocale::LOCALES)])
+    ->middleware(SetLocale::class)
+    ->group(function () {
+        Route::view('/', 'public.home')->name('home');
+    });

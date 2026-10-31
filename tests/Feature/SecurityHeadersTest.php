@@ -14,7 +14,7 @@ it('sends HSTS, no referrer and nosniff over HTTPS', function (string $path) {
         ->assertHeader('Strict-Transport-Security', 'max-age=31536000')
         ->assertHeader('Referrer-Policy', 'no-referrer')
         ->assertHeader('X-Content-Type-Options', 'nosniff');
-})->with(['/', '/up', '/admin/login'])->group('S1');
+})->with(['/ne', '/up', '/admin/login'])->group('S1');
 
 it('marks every cookie Secure over HTTPS', function () {
     $cookies = $this->get('https://localhost/admin/login')->headers->getCookies();
@@ -31,7 +31,7 @@ it('allows public pages to load only their own files', function (string $path) {
         'Content-Security-Policy',
         "default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
     );
-})->with(['/', '/up'])->group('S1');
+})->with(['/ne', '/en', '/up'])->group('S1');
 
 it('allows inline scripts in the panel only with this response\'s nonce', function () {
     $user = User::factory()->create(['app_authentication_secret' => AppAuthentication::make()->generateSecret()]);

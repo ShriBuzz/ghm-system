@@ -25,7 +25,7 @@ A commissioned build against a fixed RFQ, not a market product. What sets it apa
 
 ## Operating Context
 
-- Public pages default to Nepali (`ne`) with English (`en`) as fallback. A language switch sets a cookie and the page `lang` attribute (P2). Categories and A4 statuses and priorities carry labels in both languages.
+- Public pages default to Nepali (`ne`) with English (`en`) as fallback. Each language has its own address (`/ne/...`, `/en/...`); the switch in the header links to the same page in the other language, the page `lang` follows, and a cookie remembers the last language so `/` sends a returning visitor to it (P2). Categories and A4 statuses and priorities carry labels in both languages.
 - Every user-facing flow is checked at 360 px (touch) and at desktop width.
 - A grievance carries a category, a location, a date of incident, whether it happened once, repeatedly or is ongoing, a description and one optional attachment, a photo or PDF up to 5 MB (P5). Demographic fields are optional, each with "prefer not to say" (P6). The PIN length is 6.
 - Sessions expire after 30 idle minutes. This applies to a complainant part-way through a form as well as to staff.
