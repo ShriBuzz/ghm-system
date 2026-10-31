@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-10-31, after WP0 step 5 on the Mac. Step 6 waits on `docs/implementation-plan.md` for its exact columns.
+Last updated 2026-10-31, after WP0 step 5 on the Mac, with `docs/implementation-plan.md` now in the repo.
 
 ## Read first
 

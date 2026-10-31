@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 6, which takes its exact columns from `docs/implementation-plan.md` (not in the repo yet).
+Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: WP0 step 6.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -27,14 +27,13 @@ WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start on
 
 ## Open questions for the project lead
 
-1. `docs/implementation-plan.md` is not in the repo. Step 6 takes its exact columns from plan section 6. The RFQ wording is in `docs/rfq-requirements.md`, which wins if the two disagree.
-2. The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
-3. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
-4. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
-5. `PRODUCT.md` targets WCAG 2.2 AA, which goes beyond the RFQ's basic accessibility (S9). Keep it?
-6. `PRODUCT.md` still has two product questions under "Open, not to be guessed": the company's name on public pages and emails, and what the print views are for. These matter from WP1.
-7. `APP_NAME` is still the skeleton's `Laravel`. It shows as the panel brand, in page titles and as the account name in staff authenticator apps. What should it be?
-8. Admin panel language. Filament follows `APP_LOCALE=ne`, but its Nepali translation is partial, so the MFA screens mix Nepali and English. Should staff get English, Nepali, or a switch?
+1. The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
+2. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
+3. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
+4. `PRODUCT.md` targets WCAG 2.2 AA, which goes beyond the RFQ's basic accessibility (S9). Keep it?
+5. `PRODUCT.md` still has two product questions under "Open, not to be guessed": the company's name on public pages and emails, and what the print views are for. These matter from WP1.
+6. `APP_NAME` is still the skeleton's `Laravel`. It shows as the panel brand, in page titles and as the account name in staff authenticator apps. What should it be?
+7. Admin panel language. Filament follows `APP_LOCALE=ne`, but its Nepali translation is partial, so the MFA screens mix Nepali and English. Should staff get English, Nepali, or a switch?
 
 ## Decisions
 
