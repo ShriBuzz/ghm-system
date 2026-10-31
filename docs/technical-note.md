@@ -24,6 +24,8 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `laravel/pint` | dev | Code style check (`vendor/bin/pint --test`). |
 | `mockery/mockery` | dev | Test doubles. |
 | `nunomaduro/collision` | dev | Readable console errors in tests. |
+| `pestphp/pest` | dev | Test runner; each test is tagged with its requirement ID (`->group('P7')`). Runs against the MySQL `ghm_testing` database. |
+| `pestphp/pest-plugin-laravel` | dev | Laravel helpers for Pest tests (HTTP, auth and database assertions). |
 | `phpunit/phpunit` | dev | Test runner underneath Pest. |
 
 ## npm packages (dev and CI only)
