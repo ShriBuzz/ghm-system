@@ -136,7 +136,42 @@ test.describe('focal person', () => {
         await expect(noCases(page)).toBeVisible();
         expect([403, 404]).toContain((await page.goto(address))!.status());
     });
+
+    test('counts the cases received on a day by status and category, leaving out restricted ones', { tag: ['@N3', '@A5'] }, async ({ page }) => {
+        // A day of its own in the past, so cases from other specs and workers do not land in it.
+        const day = `2021-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const before = await summaryOf(page, day);
+
+        await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
+        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment or abuse', anonymous: true });
+
+        const after = await summaryOf(page, day);
+        expect(after.received).toBe(before.received + 1);
+        expect(after.wages).toBe(before.wages + 1);
+        expect(after.restricted).toBe(0);
+    });
 });
+
+/**
+ * Opens the summary for one day and reads the counts this spec checks.
+ */
+async function summaryOf(page: Page, day: string) {
+    await page.goto('/admin/summary');
+    // Each date goes to the server on change; read the counts only after both answers.
+    for (const field of ['Received from', 'Received until']) {
+        const updated = page.waitForResponse((response) => response.url().includes('/livewire'));
+        await page.getByLabel(field).fill(day);
+        await updated;
+    }
+
+    const count = async (name: string) => {
+        const row = page.getByRole('row').filter({ has: page.getByRole('rowheader', { name, exact: true }) });
+
+        return (await row.count()) ? Number(await row.getByRole('cell').innerText()) : 0;
+    };
+
+    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment or abuse') };
+}
 
 test.describe('administrator', () => {
     test.use({ role: 'administrator' });

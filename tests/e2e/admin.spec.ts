@@ -73,16 +73,16 @@ test.describe('on a server whose sessions last one idle minute', () => {
 });
 
 const menus = {
-    administrator: ['Dashboard', 'Cases', 'Activity log', 'Categories', 'Holidays', 'Locations', 'Users'],
-    focal_person: ['Dashboard', 'Cases'],
-    restricted_officer: ['Dashboard', 'Cases'],
+    administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'Categories', 'Holidays', 'Locations', 'Users'],
+    focal_person: ['Dashboard', 'Cases', 'Summary'],
+    restricted_officer: ['Dashboard', 'Cases', 'Summary'],
 };
 
 for (const role of roles) {
     test.describe(role, () => {
         test.use({ role });
 
-        test('sees only the menu for this role, in English', { tag: ['@A1', '@A7', '@S6'] }, async ({ page }) => {
+        test('sees only the menu for this role, in English', { tag: ['@A1', '@A7', '@S6', '@N3'] }, async ({ page }) => {
             await page.goto('/admin');
 
             await expect(page.getByRole('navigation', { name: 'Sidebar navigation' }).getByRole('link')).toHaveText(menus[role]);
