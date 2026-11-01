@@ -9,7 +9,7 @@ Last updated 2026-10-31. WP0 is complete and waiting in pull request #1 for revi
 1. `CLAUDE.md`: the rules. They win over any skill.
 2. `docs/rfq-requirements.md`: the RFQ requirement wording, P1 to P10, A1 to A7, N1 to N4, S1 to S10.
 3. `docs/clarification-questions.md`: questions for NBI, the assumptions the code follows until they answer, and what to change after.
-4. `WP0-kickoff.md`: the WP0 steps.
+4. `WP0-kickoff.md`: the WP0 steps. `WP2-kickoff.md`: the WP2 (admin side) steps.
 5. `docs/progress.md`: what is done, what is next, open questions and decisions.
 6. `docs/local-setup.md`: how to set up a machine.
 7. `docs/manual-testing.md`: how to run the app and try everything by hand.

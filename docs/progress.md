@@ -25,6 +25,24 @@ Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it do
 
 WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start only after the WP0 pull request is reviewed and merged.
 
+## WP2 Admin side
+
+Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; step 1 is shared with it.
+
+| Step | Work | IDs | Status | Commit or note |
+|---|---|---|---|---|
+| 1 | Reference number, PIN, attachment store (branch `wp2/shared-intake`) | P7, S4, S5 | Done | `App\Support\ReferenceNumber`, `Pin`, `AttachmentStore`; local disk `serve` turned off. Commit in this row once pushed |
+| 2 | Staff panel in English, Filament info widget removed | A1 | Not started | |
+| 3 | Working-day count, nightly recount, `closed_at` | A2 | Not started | |
+| 4 | Settings: categories, locations, holidays, users | A7, A5 | Not started | |
+| 5 | Case list, search, filters, overdue badge | A2, A5 | Not started | |
+| 6 | Case page: submission, status, priority, assign, restriction | A3, A4, A5 | Not started | |
+| 7 | Notes, replies, staff uploads, authorised download | A3, S4 | Not started | |
+| 8 | Offline entry with channel, printable slip | A6 | Not started | |
+| 9 | Activity log events and log page | S6 | Not started | |
+| 10 | Playwright sign-in per role with seeded MFA | A1 | Not started | |
+| 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | Not started | |
+
 ## Open questions for the project lead
 
 Questions for NBI, with what to change once they answer, are in `docs/clarification-questions.md` (email due 2 Nov). Until then the code follows the assumptions listed there. The ones below are internal.
