@@ -36,7 +36,6 @@ class CaseAlert extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject($this->message ? 'New message on a grievance' : 'New grievance received')
             ->line($this->message ? 'A complainant has sent a new message.' : 'A new grievance has been received.')
-            ->line('Log in to view it.')
             ->action('Log in to view', GrievanceResource::getUrl('view', ['record' => $this->grievanceId], panel: 'admin'));
     }
 }

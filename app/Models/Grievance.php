@@ -8,6 +8,7 @@ use App\Enums\Priority;
 use App\Enums\Recurrence;
 use App\Enums\Role;
 use App\Enums\Status;
+use App\Notifications\Acknowledgement;
 use App\Notifications\CaseAlert;
 use App\Observers\GrievanceObserver;
 use Database\Factories\GrievanceFactory;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 
 #[Fillable(['status', 'priority', 'assigned_to', 'manually_restricted'])]
@@ -29,7 +31,7 @@ use Illuminate\Support\Facades\Notification;
 class Grievance extends Model
 {
     /** @use HasFactory<GrievanceFactory> */
-    use HasFactory;
+    use HasFactory, RoutesNotifications;
 
     /**
      * The one rule for which cases a staff member may see (A1, A5). Every
@@ -93,6 +95,25 @@ class Grievance extends Model
             || (! $message && $user->id === $this->created_by));
 
         Notification::send($recipients, new CaseAlert($this->id, $message));
+    }
+
+    /**
+     * Email the reference and PIN to a complainant who gave an email (N2, P7).
+     * Called where the PIN is made: the only moment it exists in clear.
+     */
+    public function acknowledge(string $pin): void
+    {
+        if ($this->email) {
+            $this->notify((new Acknowledgement($pin))->locale($this->locale));
+        }
+    }
+
+    /**
+     * The complainant's email, for the acknowledgement (N2).
+     */
+    public function routeNotificationForMail(): ?string
+    {
+        return $this->email;
     }
 
     /**

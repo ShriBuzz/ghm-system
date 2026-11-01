@@ -51,8 +51,8 @@ No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-
 |---|---|---|---|---|
 | 1 | Queue worked by cron every minute; mail never `log` | N1, N2 | Done | `0e18680` |
 | 2 | Detail-free alerts for new cases and complainant messages | N1 | Done | `CaseAlert`, queued, English, sign-in link only. `APP_NAME` is now "Grievance handling": named "Laravel", Laravel's email header loads a logo from laravel.com. Recipients: active focal persons and restricted-case officers for whom `User::canSee()` is true. Offline cases alert too, except the person who entered it. No Administrator alerts until NBI answers question 13 |
-| 3 | Acknowledgement email in the case's language, reference only | N2 | Next | Wording under Impeccable |
-| 4 | Summary page by status and category for a date range | N3 | | |
+| 3 | Acknowledgement email in the case's language, with reference and PIN | N2, P7 | Done | P7 asks for the PIN in the email too, so it is sent where the PIN is made: `Grievance::acknowledge($pin)`, called by offline entry now and by the WP1 public form. Queued encrypted (`ShouldBeEncrypted`). Links to the public home page until WP1's status page exists. Copy through Impeccable `clarify`; the staff alert lost its repeated line. Mail-server errors are logged without the address they quote. Email header shows the English app name in both languages until the company name is known |
+| 4 | Summary page by status and category for a date range | N3 | Next | |
 | 5 | CSV and XLSX export, personal data for the Administrator only, logged | N4, S6 | | `openspout/openspout` |
 | 6 | Daily backup at 01:00, 14 days, `docs/restore.md` | S7 | | `spatie/laravel-backup`; leaves out `livewire-tmp`; off-server copy waits on hosting (question 1) |
 | 7 | Breach-report template and production-access log; S3 check | S8, S3 | | |
@@ -64,10 +64,14 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 
 1. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
 2. `main` is not protected on GitHub, although `CLAUDE.md` says it is. Checked 2026-11-01: no classic branch protection; a ruleset named "main protection" exists (blocks deletion and force pushes) but is disabled and targets no branch, so nothing is enforced. The repository is also still public. Should `main` require a reviewed pull request (enable the ruleset, target `main`, add "require a pull request"), and should the repository be private?
-3. The Nepali copy on public pages (site name, placeholder line) needs a Nepali speaker's read before UAT (P2 manual check).
+3. The Nepali copy on public pages (site name, placeholder line) and in the acknowledgement email (`acknowledgement.*` in `lang/ne.json`) needs a Nepali speaker's read before UAT (P2 manual check).
 4. The printed offline slip (A6) is in English and includes the staff instruction "Give the reference and PIN to the complainant now". It now prints without the panel menu. RFQ A6 says only that staff can enter offline grievances with a channel field; the plan's A6 row says the slip shows the reference and PIN, which it does. Neither says which language or what wording the complainant's copy needs. Should it be in Nepali, or both languages, and should it say where to check the case (the status page address, once known)? This is a print view, so it falls under Impeccable.
 
+5. A refused email leaves its job in `failed_jobs`, and that table's exception text can quote the recipient's address in clear (`laravel.log` gets a version without it). Keep failed jobs, so they can be retried, and prune them after a few days; or keep none (`QUEUE_FAILED_DRIVER=null`), so a failure leaves only the log line?
+
 ## Decisions
+
+- WP3, for the WP1 public form: after saving a case, call `$case->acknowledge($pin)` with the plain PIN; it emails the reference and PIN if an email was given (P7, N2).
 
 Made so far (the commit messages have the detail):
 
