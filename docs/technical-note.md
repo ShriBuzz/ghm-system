@@ -71,7 +71,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 
 ## Email and queue (N1, N2)
 
-- Emails are queued in the `jobs` table, so a slow or failing mail server never blocks or breaks a submission. The server needs one cron line, `* * * * * php artisan schedule:run`; every minute it starts `queue:work --stop-when-empty --tries=3`, which exits once the queue is empty, never two at a time. A job that fails three times stays in `failed_jobs`.
+- Emails are queued in the `jobs` table, so a slow or failing mail server never blocks or breaks a submission. The server needs one cron line, `* * * * * php artisan schedule:run`; every minute it starts `queue:work --stop-when-empty --tries=3`, which exits once the queue is empty, never two at a time. A job that fails three times stays in `failed_jobs` for 7 days, for `php artisan queue:retry`, then is pruned daily, because a mail server's error can quote the recipient's address.
 - The acknowledgement (N2, P7) carries the PIN, so its queued job is encrypted with `APP_KEY` (`ShouldBeEncrypted`). Staff alerts (N1) carry only the case ID.
 - Mail servers quote the recipient's address when they refuse an email. `bootstrap/app.php` replaces such errors with "An email could not be sent (mail server code …)" before they are logged.
 - The mail driver is never `log`: that driver writes each email, recipient included, into `laravel.log`. Without a `MAIL_MAILER` line the app uses `smtp`, which fails visibly if unset. Locally `.env.example` uses `array`, which drops emails; tests read them from memory.

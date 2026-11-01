@@ -67,10 +67,9 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 3. The Nepali copy on public pages (site name, placeholder line) and in the acknowledgement email (`acknowledgement.*` in `lang/ne.json`) needs a Nepali speaker's read before UAT (P2 manual check).
 4. The printed offline slip (A6) is in English and includes the staff instruction "Give the reference and PIN to the complainant now". It now prints without the panel menu. RFQ A6 says only that staff can enter offline grievances with a channel field; the plan's A6 row says the slip shows the reference and PIN, which it does. Neither says which language or what wording the complainant's copy needs. Should it be in Nepali, or both languages, and should it say where to check the case (the status page address, once known)? This is a print view, so it falls under Impeccable.
 
-5. A refused email leaves its job in `failed_jobs`, and that table's exception text can quote the recipient's address in clear (`laravel.log` gets a version without it). Keep failed jobs, so they can be retried, and prune them after a few days; or keep none (`QUEUE_FAILED_DRIVER=null`), so a failure leaves only the log line?
-
 ## Decisions
 
+- Failed email jobs are kept 7 days for retrying (`queue:failed`, `queue:retry`), then pruned daily: their error text may quote the recipient's address (decided 2026-11-01).
 - WP3, for the WP1 public form: after saving a case, call `$case->acknowledge($pin)` with the plain PIN; it emails the reference and PIN if an email was given (P7, N2).
 
 Made so far (the commit messages have the detail):

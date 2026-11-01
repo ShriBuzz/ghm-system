@@ -43,6 +43,9 @@ Schedule::command('ghm:clear-temporary-uploads')->hourly();
 // Shared hosting has no supervisor: cron's schedule:run starts a worker that exits once the queue is empty.
 Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute()->withoutOverlapping();
 
+// A refused email's error can quote the recipient; keep failed jobs a week for retrying, no longer (S5).
+Schedule::command('queue:prune-failed --hours=168')->daily();
+
 Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $role, string $key) {
     // For the Playwright specs (tests/e2e/support.ts): a fake user with a fresh password and
     // authenticator secret on every call, printed as JSON, so no credential is kept in the repo.
