@@ -15,6 +15,7 @@ use App\Support\AttachmentStore;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -136,3 +137,18 @@ it('deletes the temporary copy of an upload it refuses, too', function () {
     expect(Attachment::count())->toBe(0)
         ->and(Storage::disk('tmp-for-tests')->allFiles())->toBe([]);
 })->group('A3', 'S5');
+
+it('clears temporary uploads older than a day, such as a file from a cancelled dialog', function () {
+    $temporary = Storage::fake('tmp-for-tests');
+    $temporary->put(FileUploadConfiguration::path('cancelled.jpg'), 'photo');
+    $temporary->put(FileUploadConfiguration::path('in-use.jpg'), 'photo');
+    touch($temporary->path(FileUploadConfiguration::path('cancelled.jpg')), now()->subDay()->subMinute()->getTimestamp());
+
+    $this->artisan('ghm:clear-temporary-uploads')->assertSuccessful();
+
+    expect($temporary->allFiles())->toBe([FileUploadConfiguration::path('in-use.jpg')]);
+})->group('S5');
+
+it('schedules the temporary upload clean-up', function () {
+    $this->artisan('schedule:list')->expectsOutputToContain('ghm:clear-temporary-uploads');
+})->group('S5');
