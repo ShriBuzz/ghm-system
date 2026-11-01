@@ -8,6 +8,7 @@ use App\Enums\Priority;
 use App\Enums\Recurrence;
 use App\Enums\Role;
 use App\Enums\Status;
+use App\Notifications\CaseAlert;
 use App\Observers\GrievanceObserver;
 use Database\Factories\GrievanceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Notification;
 
 #[Fillable(['status', 'priority', 'assigned_to', 'manually_restricted'])]
 #[Hidden(['pin_hash'])]
@@ -78,6 +80,19 @@ class Grievance extends Model
                 ->withProperties(['old' => $assignee->id, 'new' => null, 'reason' => 'assignee can no longer see the case'])
                 ->log('Assignment cleared');
         }
+    }
+
+    /**
+     * Alert the staff who can see this case to it, or to a complainant's message (N1).
+     * No Administrator alerts until NBI answers clarification question 13; whoever
+     * entered an offline case already knows about it.
+     */
+    public function alertStaff(bool $message = false): void
+    {
+        $recipients = $this->assignableUsers()->reject(fn (User $user): bool => $user->role === Role::Administrator
+            || (! $message && $user->id === $this->created_by));
+
+        Notification::send($recipients, new CaseAlert($this->id, $message));
     }
 
     /**

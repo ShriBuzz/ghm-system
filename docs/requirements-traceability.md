@@ -47,7 +47,7 @@ Status counts the whole requirement, not the part one work package built:
 
 | ID | Requirement | M/D | Status | Work package | Code | Tests | Notes |
 |---|---|---|---|---|---|---|---|
-| N1 | Detail-free alerts; restricted cases alert only restricted-case officers | M | Not started | WP3 | | | Recipients come from `visibleTo()`. Administrator alerts wait on NBI (question 13). |
+| N1 | Detail-free alerts; restricted cases alert only restricted-case officers | M | Tested | WP3 step 2 | `App\Notifications\CaseAlert`, `Grievance::alertStaff()` from `GrievanceObserver::created` and `GrievanceMessage` (complainant messages) | Pest `CaseAlertTest` | Recipients are `assignableUsers()`, so the same visibility rule. No Administrator alerts until NBI answers question 13; an offline case does not alert the staff member who entered it. The email holds no reference, category, name or description, only a sign-in link, in English. Real inboxes are a UAT check. |
 | N2 | Acknowledgement email to the complainant | M | Not started | WP3 | | | Mail transport waits on NBI (question 3). |
 | N3 | Summary by status and category for a date range | M | Not started | WP3 | | | |
 | N4 | Excel and CSV export; names and contacts only if the Administrator opts in | M | Not started | WP3 | | | Who may export waits on NBI (question 12). |

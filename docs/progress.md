@@ -50,8 +50,8 @@ No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
 | 1 | Queue worked by cron every minute; mail never `log` | N1, N2 | Done | `0e18680` |
-| 2 | Detail-free alerts for new cases and complainant messages | N1 | Next | Recipients: active focal persons and restricted-case officers for whom `User::canSee()` is true. Offline cases alert too, except the person who entered it. No Administrator alerts until NBI answers question 13 |
-| 3 | Acknowledgement email in the case's language, reference only | N2 | | Wording under Impeccable |
+| 2 | Detail-free alerts for new cases and complainant messages | N1 | Done | `CaseAlert`, queued, English, sign-in link only. `APP_NAME` is now "Grievance handling": named "Laravel", Laravel's email header loads a logo from laravel.com. Recipients: active focal persons and restricted-case officers for whom `User::canSee()` is true. Offline cases alert too, except the person who entered it. No Administrator alerts until NBI answers question 13 |
+| 3 | Acknowledgement email in the case's language, reference only | N2 | Next | Wording under Impeccable |
 | 4 | Summary page by status and category for a date range | N3 | | |
 | 5 | CSV and XLSX export, personal data for the Administrator only, logged | N4, S6 | | `openspout/openspout` |
 | 6 | Daily backup at 01:00, 14 days, `docs/restore.md` | S7 | | `spatie/laravel-backup`; leaves out `livewire-tmp`; off-server copy waits on hosting (question 1) |
