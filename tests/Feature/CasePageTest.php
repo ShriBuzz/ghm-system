@@ -92,3 +92,15 @@ it('lets only the Administrator remove a restriction', function () {
 
     expect($case->fresh()->is_restricted)->toBeFalse();
 })->group('A5');
+
+it('keeps a new assignment when the old assignee was loaded and can no longer see the case', function () {
+    $old = User::factory()->create(['role' => Role::FocalPerson]);
+    $new = User::factory()->create(['role' => Role::FocalPerson]);
+    $case = Grievance::factory()->create(['assigned_to' => $old->id]);
+    $old->forceFill(['role' => Role::RestrictedOfficer])->save();
+
+    $case->load('assignee'); // as the case page does, to show the name
+    $case->update(['assigned_to' => $new->id]);
+
+    expect($case->fresh()->assigned_to)->toBe($new->id);
+})->group('A3', 'A5');

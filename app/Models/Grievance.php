@@ -68,7 +68,10 @@ class Grievance extends Model
      */
     public function dropUnseeingAssignee(): void
     {
-        if ($this->assignee && ! $this->assignee->canSee($this)) {
+        // Fresh from the ID: a relation loaded earlier may still hold the previous assignee.
+        $assignee = $this->assignee()->first();
+
+        if ($assignee && ! $assignee->canSee($this)) {
             $this->forceFill(['assigned_to' => null])->saveQuietly();
         }
     }
