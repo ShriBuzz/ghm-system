@@ -32,8 +32,9 @@ class StoreGrievanceRequest extends FormRequest
         return [
             'is_anonymous' => ['required', 'boolean'],
             'name' => ['exclude_if:is_anonymous,true', 'required', 'string', 'max:255'],
-            'phone' => ['exclude_if:is_anonymous,true', 'nullable', 'required_without:email', 'string', 'max:30'],
-            'email' => ['exclude_if:is_anonymous,true', 'nullable', 'required_without:phone', 'email', 'max:255'],
+            // The preferred method is required and is phone or email, so at least one is given.
+            'phone' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,phone', 'string', 'max:30'],
+            'email' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,email', 'email', 'max:255'],
             'preferred_contact' => ['exclude_if:is_anonymous,true', 'required', Rule::enum(ContactMethod::class)],
             'category_id' => ['required', Rule::exists('categories', 'id')->where('is_active', true)],
             'location_id' => ['required', Rule::exists('locations', 'id')->where('is_active', true)],

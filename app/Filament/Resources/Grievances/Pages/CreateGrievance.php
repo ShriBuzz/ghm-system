@@ -9,6 +9,7 @@ use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Grievance;
 use App\Support\Pin;
 use App\Support\ReferenceNumber;
+use BackedEnum;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -76,6 +77,8 @@ class CreateGrievance extends CreateRecord
             'received_at' => ['required', 'date', 'before_or_equal:now'],
         ];
 
+        // Filament's selects hold enum objects; the shared rules compare codes, as the public form sends them.
+        $data = array_map(fn ($value) => $value instanceof BackedEnum ? $value->value : $value, $data);
         $validator = Validator::make($data, $rules);
 
         if ($validator->fails()) {

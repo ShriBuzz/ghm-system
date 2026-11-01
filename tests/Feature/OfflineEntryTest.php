@@ -150,6 +150,8 @@ it('refuses an incomplete or invalid entry', function (array $overrides, string 
     'web is not an offline channel' => [['channel' => Channel::Web->value], 'channel'],
     'named without phone or email' => [['phone' => null, 'email' => null], 'phone'],
     'named without a name' => [['name' => null], 'name'],
+    'prefers email but gave only a phone' => [['preferred_contact' => 'email'], 'email'],
+    'prefers phone but gave only an email' => [['preferred_contact' => 'phone', 'phone' => null, 'email' => 'worker@example.com'], 'phone'],
     'incident in the future' => [['incident_date' => now()->addDay()->toDateString()], 'incident_date'],
     'inactive category' => [fn () => ['category_id' => Category::factory()->create(['is_active' => false])->id], 'category_id'],
     'no description' => [['description' => ''], 'description'],
