@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: review and merge of pull request #1 into `main`; WP1 starts after the merge.
+Last updated: 2026-11-01. Branch in progress: `wp2/admin-side` (pull request #5: steps 2 to 6, 8 and 10). Next: WP2 steps 7 and 9, then step 11.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -41,7 +41,7 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 | 8 | Offline entry with channel, printable slip | A6 | Done | "Enter offline case" on the list. Validation from `StoreGrievanceRequest::caseRules()`, shared with the WP1 public form, plus channel (not web) and received date. Reference and hashed PIN in one transaction. The plain PIN goes to the slip page as a one-time session flash and is shown once; the slip never loads the case, so a focal person entering a restricted case still gets it. New enums `Channel`, `Recurrence`, `ContactMethod` (Recurrence and ContactMethod were planned for WP1; made here so both forms share one list). "Create another" turned off: it would skip the slip. Walked in a browser: anonymous restricted case and named case entered as a focal person, slip shown once. Commit in this row once pushed |
 | 9 | Activity log events and log page | S6 | Not started | |
 | 10 | Playwright sign-in per role with seeded MFA | A1 | Done | `php artisan ghm:e2e-users` (local and testing only) gives one fake user per role a fresh password and authenticator secret on every run, printed as JSON; nothing is kept in the repo. Playwright's `setup` project signs each role in once with a code computed from the secret and saves the session; an authenticator code works only once, so specs share it, and the `desktop` project runs one spec at a time. Specs: each role's menu (A1, A7), settings refused to the other roles (A7, A5), offline entry with the slip shown once (A6, P7), the printed slip (A6), a restricted case entered by a focal person (A5, A6), status, priority and assignment (A3, A4, A5). Locally Playwright now uses `ghm_testing`, as CI does. The S2 idle and S10 enrolment specs are now possible but not written |
-| 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | Not started | |
+| 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | In progress | `/ponytail-review` of the branch (steps 2 to 6, 8 and 10) on 2026-11-01: two must-fix and one nice-to-have, all fixed with a test each (`850286a` closed date, `da997f1` preferred contact, `3aa4f2f` assignees past 1,000 cases); an earlier pass on pull request #5 gave `c97e414` and `074f15a`. Traceability rows A1 to A7, P4 and P7 updated. Still to do once steps 7 and 9 are built: the review of those steps, the walk per role at 360 px and desktop, and the S6 row |
 
 ## Open questions for the project lead
 
@@ -50,6 +50,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 1. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
 2. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
 3. The Nepali copy on public pages (site name, placeholder line) needs a Nepali speaker's read before UAT (P2 manual check).
+4. The printed offline slip (A6) is in English and includes the staff instruction "Give the reference and PIN to the complainant now". It now prints without the panel menu. Should the complainant's copy be in Nepali, or both languages, and should it say where to check the case (the status page address, once known)? This is a print view, so it falls under Impeccable.
 
 ## Decisions
 
