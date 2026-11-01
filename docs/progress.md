@@ -43,6 +43,21 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 | 10 | Playwright sign-in per role with seeded MFA | A1 | Done | `php artisan ghm:e2e-user <role> <key> [--without-mfa]` (local, testing and staging; never production) gives a fake user a fresh password and authenticator secret, printed as JSON; nothing is kept in the repo. Each Playwright worker signs in its own user per role, so specs run in parallel without sharing a session, and reuses a still-valid saved session on the next run. `E2E_ARTISAN` runs the command on staging (for example over ssh). Specs: each role's menu (A1, A7), settings refused to other roles and edited by the Administrator (A7, A5), offline entry and the printed slip (A6, P7), a restricted case (A5, A6), status, priority and assignment (A3, A4, A5), the list filters and overdue badge (A2), first-time MFA setup (S10), the idle tab back at sign-in on a one-minute local server (S2) |
 | 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | Done | `/ponytail-review` of steps 2 to 6, 8 and 10 (teammate): `850286a`, `da997f1`, `3aa4f2f`; earlier on pull request #5: `c97e414`, `074f15a`. `/ponytail-review` of steps 7 and 9: two should-fix, both fixed with a test (`42179f6`: a refused upload's Livewire copy deleted too; failed sign-ins logged only for existing accounts). Playwright specs for notes, replies, documents and the activity log (`75950db`). The suite runs two workers (`a779494`): with four, the local servers fell behind and different specs timed out at random; two passed every run in the same time. Walk per role at 360 px and desktop (Administrator, focal person, restricted-case officer, fake users deleted after): access as expected; the activity log now shows what and which case first on a narrow screen (`e63986b`); the case page's tab bar scrolled sideways at 360 px and hid Documents, so the tabs now read Messages, Notes and Documents, with the full names as each table's heading, and a Playwright check keeps all three on a 360 px screen. Livewire clears a cancelled dialog's temporary upload only when a later upload finishes, which with few staff uploads could take weeks, so `ghm:clear-temporary-uploads` now deletes it hourly once it is a day old (S5). Traceability rows A1 to A7, P4, P7, S4, S5, S6 and S7 updated. Pull request #6 |
 
+## WP3 Alerts, reports, security
+
+No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-security`, made from `wp2/case-work` because N1 message alerts and N4 export logging build on it; rebased onto `main` once pull request #6 is merged.
+
+| Step | Work | IDs | Status | Commit or note |
+|---|---|---|---|---|
+| 1 | Queue worked by cron every minute; mail never `log` | N1, N2 | Done | `0e18680` |
+| 2 | Detail-free alerts for new cases and complainant messages | N1 | Next | Recipients: active focal persons and restricted-case officers for whom `User::canSee()` is true. Offline cases alert too, except the person who entered it. No Administrator alerts until NBI answers question 13 |
+| 3 | Acknowledgement email in the case's language, reference only | N2 | | Wording under Impeccable |
+| 4 | Summary page by status and category for a date range | N3 | | |
+| 5 | CSV and XLSX export, personal data for the Administrator only, logged | N4, S6 | | `openspout/openspout` |
+| 6 | Daily backup at 01:00, 14 days, `docs/restore.md` | S7 | | `spatie/laravel-backup`; leaves out `livewire-tmp`; off-server copy waits on hosting (question 1) |
+| 7 | Breach-report template and production-access log; S3 check | S8, S3 | | |
+| 8 | Playwright, walk per role, `/ponytail-review`, traceability, pull request | | | |
+
 ## Open questions for the project lead
 
 Questions for NBI, with what to change once they answer, are in `docs/clarification-questions.md` (email due 2 Nov). Until then the code follows the assumptions listed there. The ones below are internal.
