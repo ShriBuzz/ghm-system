@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\Channel;
+use App\Enums\ContactMethod;
 use App\Enums\Priority;
+use App\Enums\Recurrence;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Observers\GrievanceObserver;
@@ -136,11 +139,14 @@ class Grievance extends Model
     protected function casts(): array
     {
         return [
+            'channel' => Channel::class,
             'is_anonymous' => 'boolean',
             'name' => 'encrypted',
             'phone' => 'encrypted',
             'email' => 'encrypted',
+            'preferred_contact' => ContactMethod::class,
             'incident_date' => 'date',
+            'recurrence' => Recurrence::class,
             'description' => 'encrypted',
             'complainant_type' => 'encrypted',
             'sex' => 'encrypted',

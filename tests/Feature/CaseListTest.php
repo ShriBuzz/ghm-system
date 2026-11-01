@@ -91,9 +91,9 @@ it('marks open cases past 15 working days and filters them', function () {
         ->assertCanNotSeeTableRecords([$day15, $resolved]);
 })->group('A2');
 
-it('offers no way to create or delete a case from the list yet', function () {
+it('offers offline entry from the list, and no way to edit or delete a case', function () {
     signedInAs(Role::Administrator);
 
-    Livewire::test(ListGrievances::class)->assertActionDoesNotExist('create');
-    expect(array_keys(GrievanceResource::getPages()))->toBe(['index', 'view']);
-})->group('A2');
+    Livewire::test(ListGrievances::class)->assertActionExists('create');
+    expect(array_keys(GrievanceResource::getPages()))->toBe(['index', 'create', 'recorded', 'view']);
+})->group('A2', 'A6');

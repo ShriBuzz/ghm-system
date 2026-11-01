@@ -65,8 +65,8 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 3 | | `MAIL_MAILER=log` locally | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
 | 4 | | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in the technical note | [ ] |
 | 5 | | Five encrypted text columns on `grievances`; no option lists | Enums `ComplainantType`, `Sex`, `AgeGroup`, `Ethnicity`, `Disability` in `app/Enums`, labels in `lang/en.json` and `lang/ne.json`, casts on `Grievance` (WP1, P6) | [ ] |
-| 6 | | `preferred_contact` is plain text; factory uses `phone` | `ContactMethod` enum with the agreed options (WP1, P4) | [ ] |
-| 7 | | `channel` is plain text; factory uses `phone` | `Channel` enum: the online form plus the agreed offline channels (WP2, A6) | [ ] |
+| 6 | | `App\Enums\ContactMethod`: phone, email | Add or remove a case in `ContactMethod`, labels in `lang/en.json` and `lang/ne.json` | [ ] |
+| 7 | | `App\Enums\Channel`: web, phone, email, drop box, in person; offline entry offers all but web | Add a case in `Channel`, labels in `lang/en.json` and `lang/ne.json` | [ ] |
 | 8 | | Nepali is the default (`APP_LOCALE=ne`); BS dates planned for the Nepali form | Date input in the WP1 form (P5); `APP_LOCALE` if English becomes the default | [ ] |
 | 9 | | Anonymous means no name, phone or email | P4 validation in the WP1 form | [ ] |
 | 10 | | `config/ghm.php`: `weekend_days` is Saturday only, `sla_days` is 15; `holidays` table is empty. The clock (`Status::isOpen()`) runs in Received, Under assessment, Under investigation and Reopened, stops at Resolved, Referred and Closed; a reopened case counts from the day it was received; `closed_at` is set at Closed and cleared at Reopened (`GrievanceObserver`) | `weekend_days`; holidays entered in settings (WP2 step 4); clock statuses in `Status::isOpen()`; then run `php artisan ghm:recount-working-days` once | [ ] |

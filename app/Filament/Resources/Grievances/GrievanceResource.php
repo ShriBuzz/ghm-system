@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\Grievances;
 
+use App\Filament\Resources\Grievances\Pages\CreateGrievance;
 use App\Filament\Resources\Grievances\Pages\ListGrievances;
+use App\Filament\Resources\Grievances\Pages\RecordedCase;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
+use App\Filament\Resources\Grievances\Schemas\GrievanceForm;
 use App\Filament\Resources\Grievances\Schemas\GrievanceInfolist;
 use App\Filament\Resources\Grievances\Tables\GrievancesTable;
 use App\Models\Grievance;
@@ -40,6 +43,11 @@ class GrievanceResource extends Resource
         return Grievance::visibleTo($user);
     }
 
+    public static function form(Schema $schema): Schema
+    {
+        return GrievanceForm::configure($schema);
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return GrievanceInfolist::configure($schema);
@@ -54,6 +62,9 @@ class GrievanceResource extends Resource
     {
         return [
             'index' => ListGrievances::route('/'),
+            'create' => CreateGrievance::route('/create'),
+            // Before the {record} route, or "recorded" would be read as a case id.
+            'recorded' => RecordedCase::route('/recorded'),
             'view' => ViewGrievance::route('/{record}'),
         ];
     }
