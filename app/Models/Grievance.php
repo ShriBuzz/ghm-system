@@ -126,6 +126,7 @@ class Grievance extends Model
             'is_restricted' => 'boolean',
             'received_at' => 'datetime',
             'closed_at' => 'datetime',
+            'working_days_open' => 'integer',
         ];
     }
 }

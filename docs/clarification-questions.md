@@ -69,7 +69,7 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 7 | | `channel` is plain text; factory uses `phone` | `Channel` enum: the online form plus the agreed offline channels (WP2, A6) | [ ] |
 | 8 | | Nepali is the default (`APP_LOCALE=ne`); BS dates planned for the Nepali form | Date input in the WP1 form (P5); `APP_LOCALE` if English becomes the default | [ ] |
 | 9 | | Anonymous means no name, phone or email | P4 validation in the WP1 form | [ ] |
-| 10 | | `config/ghm.php`: `weekend_days` is Saturday only, `sla_days` is 15; `holidays` table is empty | `weekend_days`; holiday seeder for the rest of 2026 and 2027 (WP2, A2) | [ ] |
+| 10 | | `config/ghm.php`: `weekend_days` is Saturday only, `sla_days` is 15; `holidays` table is empty. The clock (`Status::isOpen()`) runs in Received, Under assessment, Under investigation and Reopened, stops at Resolved, Referred and Closed; a reopened case counts from the day it was received; `closed_at` is set at Closed and cleared at Reopened (`GrievanceObserver`) | `weekend_days`; holidays entered in settings (WP2 step 4); clock statuses in `Status::isOpen()`; then run `php artisan ghm:recount-working-days` once | [ ] |
 | 11 | | Draft labels in `lang/ne.json` (`status.*`, `priority.*`) | Edit `lang/ne.json` only; mark them confirmed in `docs/requirements-traceability.md` | [ ] |
 | 12 | | `CLAUDE.md` rule: only the Administrator removes a manual restriction; export without names or contacts for other roles | `GrievancePolicy` (step 7) and the export page (WP3, N4) if NBI differs | [ ] |
 | 13 | | Administrator alerts are opt-in; no reply notification to complainants | Alert recipients (WP3, N1); a reply notification only if NBI asks for it | [ ] |

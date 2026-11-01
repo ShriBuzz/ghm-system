@@ -33,7 +33,7 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 |---|---|---|---|---|
 | 1 | Reference number, PIN, attachment store (branch `wp2/shared-intake`) | P7, S4, S5 | Done | `App\Support\ReferenceNumber`, `Pin`, `AttachmentStore`; local disk `serve` turned off. Commit in this row once pushed |
 | 2 | Staff panel in English, Filament info widget removed | A1 | Done | `SetPanelLocale` on the panel (persistent, so Livewire requests stay English). `PublicShellTest` "leaves the staff panel language alone" now expects English: a public `ne` cookie still does not change the panel. Commit in this row once pushed |
-| 3 | Working-day count, nightly recount, `closed_at` | A2 | Not started | |
+| 3 | Working-day count, nightly recount, `closed_at` | A2 | Done | `working_days_open` column, `App\Support\WorkingDays`, clock and `closed_at` in `GrievanceObserver`, `ghm:recount-working-days` daily at 00:30. Tried by hand on the local database and the step 2 panel language in a browser (sign-in error from a Livewire request in English). Commit in this row once pushed |
 | 4 | Settings: categories, locations, holidays, users | A7, A5 | Not started | |
 | 5 | Case list, search, filters, overdue badge | A2, A5 | Not started | |
 | 6 | Case page: submission, status, priority, assign, restriction | A3, A4, A5 | Not started | |
