@@ -18,6 +18,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 |---|---|---|
 | `filament/filament` | runtime | The staff admin panel at `/admin`, with its built-in authenticator-app MFA. Its CSS, JS and the Inter font are published into `public/` by `filament:upgrade` on every `composer install` and are not committed; the font is served locally, so the panel makes no third-party requests. |
 | `laravel/framework` | runtime | The application framework. |
+| `openspout/openspout` | runtime | The CSV and Excel export (N4). Streams rows to the download, so a large export does not fill memory; writes the CSV with a byte-order mark so Excel reads Nepali text as UTF-8. |
 | `spatie/laravel-activitylog` | runtime | The append-only activity log (S6). Its `activity_log` table has no IP or device columns. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
