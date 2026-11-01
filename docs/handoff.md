@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-11-01. WP0 and WP2 (admin side) are merged. WP3 (alerts, reports, security) is built on its branch, not pushed yet. WP1 (public side) is a teammate's, in progress on its own branch.
+Last updated 2026-11-01. WP0 and WP2 (admin side) are merged. WP3 (alerts, reports, security) is in pull request #7, CI green, in review. WP1 (public side) is a teammate's, in progress on its own branch.
 
 ## Where things stand
 
@@ -13,13 +13,13 @@ Last updated 2026-11-01. WP0 and WP2 (admin side) are merged. WP3 (alerts, repor
 | WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
 | WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Merged (pull request #6) |
 | WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
-| WP3 Alerts, reports, security | Branch `wp3/alerts-reports-security`, steps 1 to 8 done, all checks green locally, **not pushed yet** |
+| WP3 Alerts, reports, security | Branch `wp3/alerts-reports-security`, pull request #7, CI green, in review |
 
 Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
 
 ## Next steps
 
-1. When the project lead says so: push `wp3/alerts-reports-security` and open its pull request into `main`. Tell the reviewer: two new packages (`openspout/openspout`, `spatie/laravel-backup`, reasons in `docs/technical-note.md`); the menu specs now include "Summary"; `APP_NAME` is now "Grievance handling"; new `.env` lines `BACKUP_ARCHIVE_PASSWORD`, `BACKUP_DISKS`, `BACKUP_MAIL_TO`, and `MAIL_MAILER` is never `log`. Watch CI, which also runs `mysqldump` for the backup test.
+1. Get pull request #7 (`wp3/alerts-reports-security`) reviewed and merged. Its description tells the reviewer: two new packages (`openspout/openspout`, `spatie/laravel-backup`, reasons in `docs/technical-note.md`); the menu specs now include "Summary"; `APP_NAME` is now "Grievance handling"; new `.env` lines `BACKUP_ARCHIVE_PASSWORD`, `BACKUP_DISKS`, `BACKUP_MAIL_TO`, and `MAIL_MAILER` is never `log`. CI runs `mysqldump` for the backup test and passes.
 2. Still open in WP3: the timed restore drill on staging (`docs/restore.md`), the off-server backup disk (waits on the hosting answer, question 1), and the S8 recipients (kick-off).
 3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, now including the acknowledgement email) and `docs/clarification-questions.md` (the NBI email, still not sent).
 
