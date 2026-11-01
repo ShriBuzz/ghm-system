@@ -19,9 +19,14 @@ class GrievanceMessage extends Model
     {
         static::created(function (GrievanceMessage $message): void {
             $staff = $message->direction === MessageDirection::Staff;
+            $grievance = $message->grievance()->firstOrFail();
 
-            activity()->performedOn($message->grievance()->firstOrFail())->event($staff ? 'reply_sent' : 'message_received')
+            activity()->performedOn($grievance)->event($staff ? 'reply_sent' : 'message_received')
                 ->withProperties(['message_id' => $message->id])->log($staff ? 'Reply sent' : 'Message received');
+
+            if (! $staff) {
+                $grievance->alertStaff(message: true);
+            }
         });
     }
 

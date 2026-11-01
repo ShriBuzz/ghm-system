@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
-import { headingOf, open, test } from './support';
+import { readFileSync } from 'node:fs';
+import { fillInDialog, headingOf, open, test } from './support';
 
 /**
  * Enters a fake offline case and returns what the slip shows.
@@ -136,10 +137,94 @@ test.describe('focal person', () => {
         await expect(noCases(page)).toBeVisible();
         expect([403, 404]).toContain((await page.goto(address))!.status());
     });
+
+    test('counts the cases received on a day by status and category, leaving out restricted ones', { tag: ['@N3', '@A5'] }, async ({ page }) => {
+        // A day of its own in the past, so cases from other specs and workers do not land in it.
+        const day = `2021-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const before = await summaryOf(page, day);
+
+        await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
+        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment or abuse', anonymous: true });
+
+        const after = await summaryOf(page, day);
+        expect(after.received).toBe(before.received + 1);
+        expect(after.wages).toBe(before.wages + 1);
+        expect(after.restricted).toBe(0);
+    });
+
+    test('exports a CSV of the N4 columns without names or contacts, and is not offered them', { tag: ['@N4', '@A5'] }, async ({ page }) => {
+        const day = `2022-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const { reference } = await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
+
+        const csv = await exportCsv(page, day);
+
+        expect(csv.startsWith('\uFEFF')).toBe(true);
+        expect(csv).toContain(N4_HEADER);
+        expect(csv).toContain(`${reference},"${day} 09:00",,Phone,"Wages and benefits","Head office",,Received`);
+        expect(csv).not.toContain('Test Worker');
+        expect(csv).not.toContain('9800000000');
+    });
 });
+
+const N4_HEADER = 'Reference,Received,Closed,Channel,Category,Location,Priority,Status,"Complainant type",Sex,"Age group",Ethnicity,Disability';
+
+/**
+ * Exports the cases received on one day as CSV, with names and contacts if asked and offered,
+ * and returns the file's text.
+ */
+async function exportCsv(page: Page, day: string, { personal = false } = {}) {
+    await page.goto('/admin/grievances');
+    const dialog = page.getByRole('dialog');
+    await open(page.getByRole('button', { name: 'Export' }), headingOf(dialog));
+
+    await fillInDialog(dialog.getByLabel('Received from'), 'from', day);
+    await fillInDialog(dialog.getByLabel('Received until'), 'until', day);
+    const personalData = dialog.getByRole('switch', { name: 'Include names and contact details' });
+    if (personal) {
+        await personalData.click();
+    } else {
+        await expect(personalData).toHaveCount(0);
+    }
+
+    const download = page.waitForEvent('download');
+    await dialog.getByRole('button', { name: 'Download' }).click();
+
+    return readFileSync((await (await download).path())!, 'utf8');
+}
+
+/**
+ * Opens the summary for one day and reads the counts this spec checks.
+ */
+async function summaryOf(page: Page, day: string) {
+    await page.goto('/admin/summary');
+    // Each date goes to the server on change; read the counts only after both answers.
+    for (const field of ['Received from', 'Received until']) {
+        const updated = page.waitForResponse((response) => response.url().includes('/livewire'));
+        await page.getByLabel(field).fill(day);
+        await updated;
+    }
+
+    const count = async (name: string) => {
+        const row = page.getByRole('row').filter({ has: page.getByRole('rowheader', { name, exact: true }) });
+
+        return (await row.count()) ? Number(await row.getByRole('cell').innerText()) : 0;
+    };
+
+    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment or abuse') };
+}
 
 test.describe('administrator', () => {
     test.use({ role: 'administrator' });
+
+    test('includes names and contacts in an export when asked', { tag: ['@N4'] }, async ({ page }) => {
+        const day = `2023-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const { reference } = await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
+
+        const csv = await exportCsv(page, day, { personal: true });
+
+        expect(csv).toContain('Reference,Name,Phone,Email,Received');
+        expect(csv).toContain(`${reference},"Test Worker",9800000000,,"${day} 09:00"`);
+    });
 
     test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page, staff }, testInfo) => {
         // This worker's focal person and restricted-case officer, so both exist to be offered or not.

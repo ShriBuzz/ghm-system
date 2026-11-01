@@ -42,4 +42,12 @@ class GrievancePolicy
     {
         return $user->role === Role::Administrator;
     }
+
+    /**
+     * Names and contact details in an export (N4). Every role exports without them.
+     */
+    public function exportPersonalData(User $user): bool
+    {
+        return $user->role === Role::Administrator;
+    }
 }
