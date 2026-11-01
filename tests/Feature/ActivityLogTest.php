@@ -88,16 +88,16 @@ it('logs a category becoming restricted', function () {
         ->properties->toArray()->toEqual(['old' => false, 'new' => true]);
 })->group('S6', 'A5');
 
-it('logs sign-ins and failed sign-ins without the email typed', function () {
+it('logs sign-ins, and failed sign-ins to an account, without the email typed', function () {
     $user = User::factory()->create(['email' => 'staff@example.com']);
 
     Livewire::test(Login::class)->fillForm(['email' => 'staff@example.com', 'password' => 'wrong-password'])->call('authenticate');
     Livewire::test(Login::class)->fillForm(['email' => 'nobody@example.com', 'password' => 'wrong-password'])->call('authenticate');
 
-    $failures = Activity::where('event', 'login_failed')->orderBy('id')->get();
-    expect($failures)->toHaveCount(2)
+    // Only the account's failure is logged: an unknown email has no one to record, and anyone could send endless ones.
+    $failures = Activity::where('event', 'login_failed')->get();
+    expect($failures)->toHaveCount(1)
         ->and($failures[0]->causer_id)->toBe($user->id)
-        ->and($failures[1]->causer_id)->toBeNull()
         ->and($failures->toJson())->not->toContain('example.com');
 
     $this->actingAs($user);

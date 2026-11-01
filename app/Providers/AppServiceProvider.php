@@ -26,8 +26,12 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, fn (Login $event) => activity()->causedBy($event->user instanceof Model ? $event->user : null)
             ->event('login')->log('Signed in'));
 
-        // No email, IP or device: only the account, when the email belongs to one (S5, S6).
-        Event::listen(Failed::class, fn (Failed $event) => activity()->causedBy($event->user instanceof Model ? $event->user : null)
-            ->event('login_failed')->log('Failed sign-in'));
+        // Only for an existing account, and only the account: no email, IP or device (S5, S6). An unknown
+        // email has no one to record, and the per-email throttle would not stop endless random ones.
+        Event::listen(Failed::class, function (Failed $event): void {
+            if ($event->user instanceof Model) {
+                activity()->causedBy($event->user)->event('login_failed')->log('Failed sign-in');
+            }
+        });
     }
 }

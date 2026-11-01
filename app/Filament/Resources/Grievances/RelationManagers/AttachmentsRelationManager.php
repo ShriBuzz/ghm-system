@@ -65,11 +65,14 @@ class AttachmentsRelationManager extends RelationManager
                         $upload = $data['file'];
                         abort_unless($user instanceof User && $case instanceof Grievance && $upload instanceof TemporaryUploadedFile, 403);
 
-                        AttachmentStore::store($upload, $case, $user, field: "mountedActions.{$action->getNestingIndex()}.data.file");
-
-                        // Livewire's copy is the uncleaned original, and its .json holds the file name; both would stay for a day (S5).
-                        $upload->delete();
-                        FileUploadConfiguration::storage()->delete(FileUploadConfiguration::path($upload->getFilename().'.json'));
+                        try {
+                            AttachmentStore::store($upload, $case, $user, field: "mountedActions.{$action->getNestingIndex()}.data.file");
+                        } finally {
+                            // Livewire's copy is the uncleaned original, and its .json holds the file name; both would
+                            // stay for a day, stored or refused (S5).
+                            $upload->delete();
+                            FileUploadConfiguration::storage()->delete(FileUploadConfiguration::path($upload->getFilename().'.json'));
+                        }
                     }),
             ]);
     }

@@ -119,3 +119,20 @@ it('downloads a document only for staff who can see its case', function () {
         ->assertDownload('evidence.png')
         ->assertHeader('X-Content-Type-Options', 'nosniff');
 })->group('S4', 'A5');
+
+it('deletes the temporary copy of an upload it refuses, too', function () {
+    Storage::fake('local');
+    Storage::fake('tmp-for-tests');
+    signedInAs(Role::FocalPerson);
+
+    // A real PNG header claiming 20,000 × 20,000 pixels: the type check passes, AttachmentStore refuses it.
+    $chunk = fn (string $type, string $data) => pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
+    $huge = UploadedFile::fake()->createWithContent('huge.png', "\x89PNG\r\n\x1a\n".$chunk('IHDR', pack('NNCCCCC', 20000, 20000, 8, 2, 0, 0, 0)).$chunk('IEND', ''));
+
+    onCasePage(AttachmentsRelationManager::class, Grievance::factory()->create())
+        ->callAction(TestAction::make('upload')->table(), data: ['file' => $huge])
+        ->assertHasActionErrors(['file']);
+
+    expect(Attachment::count())->toBe(0)
+        ->and(Storage::disk('tmp-for-tests')->allFiles())->toBe([]);
+})->group('A3', 'S5');
