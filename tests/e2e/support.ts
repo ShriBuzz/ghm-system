@@ -146,3 +146,22 @@ export async function enterCredentials(page: Page, email: string, password: stri
         expect(state).toEqual([email, password]);
     }).toPass({ timeout: 10_000 });
 }
+
+/**
+ * Types into a field of an open dialog until Livewire's copy of the dialog's form holds the
+ * value, as enterCredentials does for sign-in: under load Filament can bind a dialog's field
+ * after it shows, and text typed before then never reaches the server.
+ */
+export async function fillInDialog(field: Locator, statePath: string, value: string): Promise<void> {
+    await expect(async () => {
+        await field.fill(value);
+
+        const state = await field.evaluate((input, path) => {
+            const id = input.closest('[wire\\:id]')!.getAttribute('wire:id');
+
+            return (window as any).Livewire.find(id).$get(`mountedActions.0.data.${path}`);
+        }, statePath);
+
+        expect(state).toBe(value);
+    }).toPass({ timeout: 10_000 });
+}

@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { headingOf, open, test } from './support';
+import { fillInDialog, headingOf, open, test } from './support';
 
 // Staging runs this too, in front of UAT testers, so the spec leaves the lists as it found
 // them: new categories and locations are not offered on the forms, the new user ends
@@ -113,7 +113,7 @@ test('adds a user, changes their role and deactivates them', { tag: ['@A7', '@A1
         await dialog.getByLabel('Name').fill(name);
         await dialog.getByLabel('Email address').fill(`${name.replaceAll(' ', '-').toLowerCase()}@example.com`);
         await dialog.getByLabel('Role').selectOption('Focal person');
-        await dialog.getByRole('textbox', { name: 'Password' }).fill(`spec-${unique()}-${unique()}`);
+        await fillInDialog(dialog.getByRole('textbox', { name: 'Password' }), 'password', `spec-${unique()}-${unique()}`);
     });
     await expect(await rowWith(page, 'users', name)).toContainText('Focal person');
 
