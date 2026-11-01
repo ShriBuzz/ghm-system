@@ -1,0 +1,215 @@
+import { expect, type Page } from '@playwright/test';
+import { headingOf, open, test } from './support';
+
+/**
+ * Enters a fake offline case and returns what the slip shows.
+ */
+async function enterOfflineCase(
+    page: Page,
+    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false } = {},
+) {
+    await page.goto('/admin/grievances/create');
+    await page.getByLabel('Channel').selectOption('Phone');
+
+    if (receivedAt) {
+        await page.getByRole('textbox', { name: 'Received' }).fill(receivedAt);
+    }
+
+    await page.getByLabel('Category').selectOption(category);
+    await page.getByLabel('Location').selectOption(location);
+    await page.getByLabel('When it happened').fill('2026-10-28');
+    await page.getByLabel('How often').selectOption('Once');
+    await page.getByLabel('Description').fill('Fake grievance for a browser spec.');
+
+    if (anonymous) {
+        await page.getByRole('switch', { name: /Anonymous/ }).click();
+        await expect(page.getByRole('textbox', { name: 'Name' })).toBeHidden();
+    } else {
+        await page.getByRole('textbox', { name: 'Name' }).fill('Test Worker');
+        await page.getByLabel('Phone').fill('9800000000');
+        await page.getByLabel('Preferred contact').selectOption('Phone');
+    }
+
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/grievances\/recorded$/);
+
+    const slip = await page.getByRole('main').innerText();
+
+    return { reference: slip.match(/GHM-\d{4}-\d{4}/)![0], pin: slip.match(/PIN\s+(\d{6})\b/)![1] };
+}
+
+/**
+ * Opens the case list, searches it for a reference and returns the link to that case.
+ */
+async function findCase(page: Page, reference: string) {
+    await page.goto('/admin/grievances');
+
+    return search(page, reference);
+}
+
+/**
+ * Searches the list on screen, keeping any filters, and returns the link to that case.
+ */
+async function search(page: Page, reference: string) {
+    await Promise.all([
+        page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+        page.getByRole('searchbox', { name: 'Search', exact: true }).fill(reference),
+    ]);
+
+    return page.getByRole('link', { name: reference, exact: true });
+}
+
+/**
+ * Picks a value in one of the case page's dialogs, such as Set status, and saves it.
+ */
+async function setOnCase(page: Page, action: string, field: string, value: string) {
+    const dialog = page.getByRole('dialog', { name: action });
+    await open(page.getByRole('button', { name: action }), headingOf(dialog));
+    await dialog.getByLabel(field).selectOption(value);
+    await dialog.getByRole('button', { name: 'Submit' }).click();
+    await expect(headingOf(dialog)).toBeHidden();
+}
+
+/**
+ * The list's empty state. Waiting for it, rather than for a missing row, proves the
+ * list has been redrawn after the search.
+ */
+function noCases(page: Page) {
+    return page.getByRole('heading', { name: 'No cases' });
+}
+
+/**
+ * The days-open badge in a case's row of the list.
+ */
+function daysOpenBadge(page: Page, reference: string) {
+    return page.getByRole('row').filter({ has: page.getByRole('link', { name: reference, exact: true }) }).locator('.fi-badge').first();
+}
+
+/**
+ * A date some days back, as the date and date-time fields take it.
+ */
+function daysAgo(days: number) {
+    const date = new Date(Date.now() - days * 86_400_000);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+    return { day, dateTime: `${day}T09:00` };
+}
+
+test.describe('focal person', () => {
+    test.use({ role: 'focal_person' });
+
+    test('enters an offline case and sees its reference and PIN once', { tag: ['@A6', '@P7'] }, async ({ page }) => {
+        const { reference, pin } = await enterOfflineCase(page);
+
+        expect(pin).toMatch(/^\d{6}$/);
+        await expect(await findCase(page, reference)).toBeVisible();
+
+        await page.goBack();
+        await expect(page).toHaveURL(/\/admin\/grievances$/);
+        await expect(page.getByRole('main')).not.toContainText(pin);
+    });
+
+    test('prints the slip without the panel around it', { tag: ['@A6'] }, async ({ page }) => {
+        const { reference, pin } = await enterOfflineCase(page);
+        await page.emulateMedia({ media: 'print' });
+
+        await expect(page.getByRole('navigation', { name: 'Sidebar navigation' })).toBeHidden();
+        await expect(page.getByRole('navigation', { name: 'Topbar' })).toBeHidden();
+        await expect(page.getByRole('button', { name: 'Print slip' })).toBeHidden();
+        await expect(page.getByRole('definition').filter({ hasText: reference })).toBeVisible();
+        await expect(page.getByRole('definition').filter({ hasText: pin })).toBeVisible();
+    });
+
+    test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL, staff }) => {
+        const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment or abuse', anonymous: true });
+        expect(pin).toMatch(/^\d{6}$/);
+
+        const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
+        const officerPage = await officer.newPage();
+        const link = await findCase(officerPage, reference);
+        await expect(link).toBeVisible();
+        const address = (await link.getAttribute('href'))!;
+        await officer.close();
+
+        await findCase(page, reference);
+        await expect(noCases(page)).toBeVisible();
+        expect([403, 404]).toContain((await page.goto(address))!.status());
+    });
+});
+
+test.describe('administrator', () => {
+    test.use({ role: 'administrator' });
+
+    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page, staff }, testInfo) => {
+        // This worker's focal person and restricted-case officer, so both exist to be offered or not.
+        await staff.sessionOf('focal_person');
+        await staff.sessionOf('restricted_officer');
+        const focal = `E2E Focal person ${testInfo.parallelIndex}`;
+        const officer = `E2E Restricted officer ${testInfo.parallelIndex}`;
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+        await expect(page.getByRole('heading', { name: `View ${reference}` })).toBeVisible();
+
+        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await setOnCase(page, 'Set priority', 'Priority', 'High');
+
+        const assign = page.getByRole('dialog', { name: 'Assign' });
+        await open(page.getByRole('button', { name: 'Assign' }), headingOf(assign));
+        const assignTo = assign.getByLabel('Assign to');
+        await expect(assignTo.getByRole('option', { name: focal, exact: true })).toBeAttached();
+        await expect(assignTo.getByRole('option', { name: officer, exact: true })).toHaveCount(0);
+        await assignTo.selectOption(focal);
+        await assign.getByRole('button', { name: 'Submit' }).click();
+
+        const caseSection = page.getByRole('region', { name: 'Case' });
+        await expect(caseSection).toContainText('Under assessment');
+        await expect(caseSection).toContainText('High');
+        await expect(caseSection).toContainText(focal);
+    });
+
+    test('filters the case list and flags cases open past 15 working days', { tag: ['@A2'] }, async ({ page }) => {
+        test.setTimeout(90_000);
+        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Production plant', receivedAt: daysAgo(30).dateTime });
+        const fresh = await enterOfflineCase(page);
+
+        await (await findCase(page, fresh.reference)).click();
+        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await expect(page.getByRole('region', { name: 'Case' })).toContainText('Under assessment');
+
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).toHaveClass(/fi-color-danger/);
+        await findCase(page, fresh.reference);
+        await expect(daysOpenBadge(page, fresh.reference)).not.toHaveClass(/fi-color-danger/);
+
+        const filters: [string, () => Promise<void>, { reference: string }, { reference: string }][] = [
+            ['status', async () => {
+                await page.getByRole('combobox', { name: 'Status' }).click();
+                await page.getByRole('option', { name: 'Under assessment' }).click();
+            }, fresh, old],
+            ['overdue only', () => page.getByRole('switch', { name: /Overdue only/ }).click(), old, fresh],
+            ['category', () => page.getByLabel('Category').selectOption('Discrimination'), old, fresh],
+            ['location', () => page.getByLabel('Location').selectOption('Head office'), fresh, old],
+            ['received dates', async () => {
+                await page.getByLabel('Received from').fill(daysAgo(31).day);
+                await page.getByLabel('Received until').fill(daysAgo(29).day);
+            }, old, fresh],
+        ];
+
+        for (const [name, choose, shown, hidden] of filters) {
+            await test.step(name, async () => {
+                await page.goto('/admin/grievances');
+                await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
+                await choose();
+                await Promise.all([
+                    page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+                    page.getByRole('button', { name: 'Apply filters' }).click(),
+                ]);
+
+                await expect(await search(page, shown.reference)).toBeVisible();
+                await search(page, hidden.reference);
+                await expect(noCases(page)).toBeVisible();
+            });
+        }
+    });
+});

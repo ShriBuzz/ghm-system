@@ -15,5 +15,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(AdministratorSeeder::class);
+
+        if (! app()->isProduction()) {
+            $this->call(PlaceholderListsSeeder::class);
+        }
     }
 }

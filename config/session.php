@@ -47,7 +47,9 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    // Always on, whatever .env says: the offline slip's PIN passes through
+    // the session once (A6, P7), and session files sit on the server's disk.
+    'encrypt' => true,
 
     /*
     |--------------------------------------------------------------------------

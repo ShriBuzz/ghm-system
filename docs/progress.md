@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31. Branch in progress: `wp0/foundations`. Next: review and merge of pull request #1 into `main`; WP1 starts after the merge.
+Last updated: 2026-11-01. Branch in progress: `wp2/admin-side` (pull request #5: steps 2 to 6, 8 and 10). Next: WP2 steps 7 and 9, then step 11.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -32,16 +32,16 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
 | 1 | Reference number, PIN, attachment store (branch `wp2/shared-intake`) | P7, S4, S5 | Done | `App\Support\ReferenceNumber`, `Pin`, `AttachmentStore`; local disk `serve` turned off. Commit in this row once pushed |
-| 2 | Staff panel in English, Filament info widget removed | A1 | Not started | |
-| 3 | Working-day count, nightly recount, `closed_at` | A2 | Not started | |
-| 4 | Settings: categories, locations, holidays, users | A7, A5 | Not started | |
-| 5 | Case list, search, filters, overdue badge | A2, A5 | Not started | |
-| 6 | Case page: submission, status, priority, assign, restriction | A3, A4, A5 | Not started | |
+| 2 | Staff panel in English, Filament info widget removed | A1 | Done | `SetPanelLocale` on the panel (persistent, so Livewire requests stay English). `PublicShellTest` "leaves the staff panel language alone" now expects English: a public `ne` cookie still does not change the panel. Commit in this row once pushed |
+| 3 | Working-day count, nightly recount, `closed_at` | A2 | Done | `working_days_open` column, `App\Support\WorkingDays`, clock and `closed_at` in `GrievanceObserver`, `ghm:recount-working-days` daily at 00:30. Tried by hand on the local database and the step 2 panel language in a browser (sign-in error from a Livewire request in English). Commit in this row once pushed |
+| 4 | Settings: categories, locations, holidays, users | A7, A5 | Done | Simple Filament resources (one page each, create and edit in a modal) under a Settings menu. `SettingsPolicy`: Administrator only, no delete; `HolidayPolicy` also allows delete. An Administrator cannot change their own role or deactivate themselves. `PlaceholderListsSeeder` outside production. Walked in a browser as Administrator and focal person (fake users, deleted after). The category restriction log entry moves to step 9 with the rest of the activity log. Commit in this row once pushed |
+| 5 | Case list, search, filters, overdue badge | A2, A5 | Done | `GrievanceResource::getEloquentQuery()` is `Grievance::visibleTo()`, so list, counts, global search and record addresses share the one rule. Search by reference only (other text is encrypted). Filters: status, category, location, received dates, overdue. Days open sits next to the date: the browser walk found it scrolled out of view at 1280 px when it was the last column. View page holds reference and status until step 6; no create, edit or delete pages. `Status::open()` shared by the filter and the nightly recount. `signedInAs()` test helper moved to `tests/Pest.php`. Commit in this row once pushed |
+| 6 | Case page: submission, status, priority, assign, restriction | A3, A4, A5 | Done | Submission in sections, contact block hidden for anonymous cases. Actions: status, priority, assign (`Grievance::assignableUsers()`: active users for whom `User::canSee()` is true), mark restricted (focal persons warned, then sent back to the list), remove restricted mark (Administrator only). `GrievancePolicy::view()` now calls `User::canSee()`. An assignee who loses sight of a case is cleared, from a case save and from a category flip. Walked in a browser as Administrator and focal person. Channel, recurrence, preferred contact and demographics show their stored codes until their enums exist (step 8, WP1). Commit in this row once pushed |
 | 7 | Notes, replies, staff uploads, authorised download | A3, S4 | Not started | |
-| 8 | Offline entry with channel, printable slip | A6 | Not started | |
+| 8 | Offline entry with channel, printable slip | A6 | Done | "Enter offline case" on the list. Validation from `StoreGrievanceRequest::caseRules()`, shared with the WP1 public form, plus channel (not web) and received date. Reference and hashed PIN in one transaction. The plain PIN goes to the slip page as a one-time session flash and is shown once; the slip never loads the case, so a focal person entering a restricted case still gets it. New enums `Channel`, `Recurrence`, `ContactMethod` (Recurrence and ContactMethod were planned for WP1; made here so both forms share one list). "Create another" turned off: it would skip the slip. Walked in a browser: anonymous restricted case and named case entered as a focal person, slip shown once. Commit in this row once pushed |
 | 9 | Activity log events and log page | S6 | Not started | |
-| 10 | Playwright sign-in per role with seeded MFA | A1 | Not started | |
-| 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | Not started | |
+| 10 | Playwright sign-in per role with seeded MFA | A1 | Done | `php artisan ghm:e2e-user <role> <key> [--without-mfa]` (local, testing and staging; never production) gives a fake user a fresh password and authenticator secret, printed as JSON; nothing is kept in the repo. Each Playwright worker signs in its own user per role, so specs run in parallel without sharing a session, and reuses a still-valid saved session on the next run. `E2E_ARTISAN` runs the command on staging (for example over ssh). Specs: each role's menu (A1, A7), settings refused to other roles and edited by the Administrator (A7, A5), offline entry and the printed slip (A6, P7), a restricted case (A5, A6), status, priority and assignment (A3, A4, A5), the list filters and overdue badge (A2), first-time MFA setup (S10), the idle tab back at sign-in on a one-minute local server (S2) |
+| 11 | Browser walk per role, `/ponytail-review`, traceability, request into `main` | | In progress | `/ponytail-review` of the branch (steps 2 to 6, 8 and 10) on 2026-11-01: two must-fix and one nice-to-have, all fixed with a test each (`850286a` closed date, `da997f1` preferred contact, `3aa4f2f` assignees past 1,000 cases); an earlier pass on pull request #5 gave `c97e414` and `074f15a`. Traceability rows A1 to A7, P4 and P7 updated. Still to do once steps 7 and 9 are built: the review of those steps, the walk per role at 360 px and desktop, and the S6 row |
 
 ## Open questions for the project lead
 
@@ -50,6 +50,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 1. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
 2. `main` is not protected on GitHub (checked 2026-10-31: no branch protection, no rulesets), although `CLAUDE.md` says it is. The repository is also public. Should `main` require a reviewed pull request, and should the repository be private?
 3. The Nepali copy on public pages (site name, placeholder line) needs a Nepali speaker's read before UAT (P2 manual check).
+4. The printed offline slip (A6) is in English and includes the staff instruction "Give the reference and PIN to the complainant now". It now prints without the panel menu. RFQ A6 says only that staff can enter offline grievances with a channel field; the plan's A6 row says the slip shows the reference and PIN, which it does. Neither says which language or what wording the complainant's copy needs. Should it be in Nepali, or both languages, and should it say where to check the case (the status page address, once known)? This is a print view, so it falls under Impeccable.
 
 ## Decisions
 
@@ -98,6 +99,9 @@ Made so far (the commit messages have the detail):
 - `config/session.php` and `config/cache.php` default to the `file` driver and a 30-minute session, so a production `.env` missing those lines still meets S2 and S5.
 - Follow-ups from the review, not blocking: check the category's restricted flag at query time in `visibleTo()` too, closing a millisecond race when a category is restricted while one of its cases is being saved; remove Filament's info widget from the dashboard (WP2 replaces the dashboard).
 - Branch `fix/A5-visibility-and-timezone`: `visibleTo()` now also checks the category's restricted flag at query time (the review follow-up above), and the app timezone is `Asia/Kathmandu`, so working days and dates follow Nepal time (A2).
+- Playwright users are per worker and per role (`e2e-<role>-<worker>@example.com`). The e2e command does not clear the cache: with parallel workers that wiped the lockout spec's counter, and on staging it would reset UAT testers' lockouts; reusing saved sessions keeps reruns under the sign-in limit instead. Filament's dialog element has no size, so specs check a dialog's heading to see whether it is open or closed, and click until a dialog opens, because a click before Livewire has started does nothing.
+- Shared case rules (`StoreGrievanceRequest::caseRules()`, also for WP1): a named complainant's preferred contact must be one they gave; prefers phone requires the phone, prefers email the email. Offline entry turns Filament's enum objects into codes before validating, so rules that compare another field's value (`required_if`) see what the public form sends.
+- Sessions are always encrypted (`config/session.php`, no `.env` switch), so the PIN that passes through the session on its way to the offline slip is never on disk in clear. `SESSION_ENCRYPT` is gone from `.env.example`; an old `.env` line is ignored.
 - `public/js/admin-idle.js` reloads an admin tab when this tab has had no server response for the session lifetime. If the session has expired, the reload lands on the sign-in page; if another tab kept it alive, the page simply reloads.
 
 Planned for the coming steps, as stated at kickoff. Raise any objection before they are built:

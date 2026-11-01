@@ -2,20 +2,26 @@
 
 namespace App\Models;
 
+use App\Enums\Channel;
+use App\Enums\ContactMethod;
 use App\Enums\Priority;
+use App\Enums\Recurrence;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Observers\GrievanceObserver;
 use Database\Factories\GrievanceFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['status', 'priority', 'assigned_to', 'manually_restricted'])]
 #[Hidden(['pin_hash'])]
 #[ObservedBy(GrievanceObserver::class)]
 class Grievance extends Model
@@ -41,6 +47,33 @@ class Grievance extends Model
             Role::FocalPerson => $query->whereNot($restricted),
             Role::RestrictedOfficer => $query->where($restricted),
         };
+    }
+
+    /**
+     * Active staff who may see this case, the only people it can be assigned to (A3, A5).
+     *
+     * shortcut: one visibility query per active user, fine for the RFQ's 3 to 5 staff.
+     *
+     * @return Collection<int, User>
+     */
+    public function assignableUsers(): Collection
+    {
+        return User::where('is_active', true)->orderBy('name')->get()
+            ->filter(fn (User $user): bool => $user->canSee($this))
+            ->values();
+    }
+
+    /**
+     * Clear the assignee once they can no longer see the case, after it became restricted (A5).
+     */
+    public function dropUnseeingAssignee(): void
+    {
+        // Fresh from the ID: a relation loaded earlier may still hold the previous assignee.
+        $assignee = $this->assignee()->first();
+
+        if ($assignee && ! $assignee->canSee($this)) {
+            $this->forceFill(['assigned_to' => null])->saveQuietly();
+        }
     }
 
     /**
@@ -109,11 +142,14 @@ class Grievance extends Model
     protected function casts(): array
     {
         return [
+            'channel' => Channel::class,
             'is_anonymous' => 'boolean',
             'name' => 'encrypted',
             'phone' => 'encrypted',
             'email' => 'encrypted',
+            'preferred_contact' => ContactMethod::class,
             'incident_date' => 'date',
+            'recurrence' => Recurrence::class,
             'description' => 'encrypted',
             'complainant_type' => 'encrypted',
             'sex' => 'encrypted',
@@ -126,6 +162,7 @@ class Grievance extends Model
             'is_restricted' => 'boolean',
             'received_at' => 'datetime',
             'closed_at' => 'datetime',
+            'working_days_open' => 'integer',
         ];
     }
 }

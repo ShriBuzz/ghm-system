@@ -55,6 +55,7 @@ Thumbs.db
 /public/js/filament
 
 # Playwright Test output
+/playwright/.auth/
 /playwright-report/
 /test-results/
 /blob-report/

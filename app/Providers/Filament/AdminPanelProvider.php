@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\Grievances\Pages\RecordedCase;
+use App\Http\Middleware\SetPanelLocale;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -16,7 +18,6 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -40,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ], isRequired: true)
             ->defaultAvatarProvider(InitialsAvatarProvider::class)
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.idle-reload'))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.slip-print'), scopes: RecordedCase::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -51,7 +53,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -64,6 +65,8 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            // Persistent, so Livewire's background requests stay in English too.
+            ->middleware([SetPanelLocale::class], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

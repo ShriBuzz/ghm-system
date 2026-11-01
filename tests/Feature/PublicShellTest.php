@@ -42,7 +42,7 @@ it('offers no other languages', function () {
 })->group('P2');
 
 it('leaves the staff panel language alone', function () {
-    expect($this->withCookie('locale', 'en')->get('/admin/login')->getContent())->toMatch('/<html\s+lang="ne"/');
+    expect($this->withCookie('locale', 'ne')->get('/admin/login')->getContent())->toMatch('/<html\s+lang="en"/');
 })->group('P2');
 
 it('styles public pages from one local stylesheet, with no inline style or script', function () {

@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Policies\SettingsPolicy;
 use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+#[Fillable(['name_en', 'name_ne', 'is_restricted', 'is_active', 'sort'])]
+#[UsePolicy(SettingsPolicy::class)]
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
@@ -22,6 +27,9 @@ class Category extends Model
                 Grievance::where('category_id', $category->id)->update([
                     'is_restricted' => $category->is_restricted ? true : DB::raw('manually_restricted'),
                 ]);
+
+                Grievance::where('category_id', $category->id)->whereNotNull('assigned_to')
+                    ->lazyById()->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
             }
         });
     }

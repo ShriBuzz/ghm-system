@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\Status;
 use App\Models\Grievance;
+use App\Support\WorkingDays;
 
 class GrievanceObserver
 {
@@ -13,5 +15,35 @@ class GrievanceObserver
     {
         $grievance->is_restricted = $grievance->manually_restricted
             || (bool) $grievance->category()->value('is_restricted');
+
+        if ($grievance->isDirty('status')) {
+            $this->updateClock($grievance);
+        }
+    }
+
+    /**
+     * Runs after the save, so the visibility rule reads the case's new restriction.
+     */
+    public function saved(Grievance $grievance): void
+    {
+        if ($grievance->wasChanged(['is_restricted', 'assigned_to'])) {
+            $grievance->dropUnseeingAssignee();
+        }
+    }
+
+    /**
+     * Days open run while the case is open and freeze when it stops (A2).
+     * A reopened case counts again from the day it was received.
+     */
+    private function updateClock(Grievance $grievance): void
+    {
+        $was = $grievance->getOriginal('status');
+
+        // Any status can follow Closed, so the date goes whenever the case leaves it.
+        $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
+
+        if (! $was instanceof Status || $was->isOpen() || $grievance->status->isOpen()) {
+            $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
+        }
     }
 }
