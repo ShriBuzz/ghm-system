@@ -29,3 +29,20 @@ it('keeps deactivated staff out of the panel', function () {
 
     $this->actingAs($user)->get('/admin')->assertForbidden();
 })->group('A1');
+
+it('shows the staff panel in English, whatever the public default language', function () {
+    $user = User::factory()->create([
+        'app_authentication_secret' => AppAuthentication::make()->generateSecret(),
+    ]);
+
+    // First: in tests one app serves every request, and setLocale() also changes config('app.locale').
+    $this->get('/')->assertRedirect('/ne');
+
+    $this->get('/admin/login')->assertOk()->assertSee('lang="en"', false);
+
+    $this->actingAs($user)
+        ->get('/admin')
+        ->assertOk()
+        ->assertSee('lang="en"', false)
+        ->assertDontSee('filamentphp.com');
+})->group('A1');

@@ -73,5 +73,5 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 11 | | Draft labels in `lang/ne.json` (`status.*`, `priority.*`) | Edit `lang/ne.json` only; mark them confirmed in `docs/requirements-traceability.md` | [ ] |
 | 12 | | `CLAUDE.md` rule: only the Administrator removes a manual restriction; export without names or contacts for other roles | `GrievancePolicy` (step 7) and the export page (WP3, N4) if NBI differs | [ ] |
 | 13 | | Administrator alerts are opt-in; no reply notification to complainants | Alert recipients (WP3, N1); a reply notification only if NBI asks for it | [ ] |
-| 14 | | The admin panel follows `APP_LOCALE=ne`; Filament's Nepali is partial, so some screens mix languages | Panel locale in `AdminPanelProvider` (English, or a switch) | [ ] |
+| 14 | | The staff panel is in English (`App\Http\Middleware\SetPanelLocale`); `APP_LOCALE=ne` stays the public default | Nepali: change the locale in `SetPanelLocale`. A switch: a user setting read there instead | [ ] |
 | 15 | | No cleanup job; nothing is deleted | A scheduled cleanup and its note in `docs/technical-note.md` (WP3) | [ ] |
