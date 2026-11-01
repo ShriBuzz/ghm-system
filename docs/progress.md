@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-01. Pull request #5 (WP2 steps 2 to 6, 8 and 10) is merged. Branch `wp2/case-work` holds steps 7, 9 and 11, rebased onto `main`, in pull request #6. Next: its review and merge; then WP3.
+Last updated: 2026-11-01. Pull requests #5 and #6 (all of WP2) are merged. Branch `wp3/alerts-reports-security` holds WP3 steps 1 to 8, rebased onto `main`, all checks green locally, not pushed yet. Next: push and open its pull request when the project lead says so.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -45,7 +45,7 @@ Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; st
 
 ## WP3 Alerts, reports, security
 
-No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-security`, made from `wp2/case-work` because N1 message alerts and N4 export logging build on it; rebased onto `main` once pull request #6 is merged.
+No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-security`, made from `wp2/case-work` because N1 message alerts and N4 export logging build on it; rebased onto `main` after pull request #6 was merged (conflicts in `routes/console.php` and the S5 to S7 traceability rows, both sides kept).
 
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
@@ -56,7 +56,7 @@ No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-
 | 5 | CSV and XLSX export, personal data for the Administrator only, logged | N4, S6 | Done | "Export" on the case list: received-date range, CSV or Excel, and for the Administrator only a switch for names and contacts, checked again on the server (`GrievancePolicy::exportPersonalData()`). Streamed with `openspout/openspout`. The activity log page shows true and false details as yes and no. Walked as Administrator at desktop and 360 px (fake user, deleted after) |
 | 6 | Daily backup at 01:00, 14 days, `docs/restore.md` | S7 | Done | `spatie/laravel-backup`: database and `storage/app/private` without `livewire-tmp`, AES-256 with `BACKUP_ARCHIVE_PASSWORD`, kept 15 days, monitored at 02:00, failure emails to `BACKUP_MAIL_TO`. Off-server copy: a disk added to `BACKUP_DISKS` once hosting is known (question 1). Restore steps tried locally up to unpacking; the timed drill on staging is still to do. A first test run with the package defaults wrote a backup of the whole project, `.env` included, into `storage/app/private`; deleted at once |
 | 7 | Breach-report template and production-access log; S3 check | S8, S3 | Done | Both in `docs/` (decided 2026-11-01: the delivery repository does not exist yet). Recipients wait for kick-off. S3: every encrypted field already has a ciphertext test, messages and notes included; WP3 added the encrypted acknowledgement job and backups, each tested |
-| 8 | Playwright, walk per role, `/ponytail-review`, traceability, pull request | | Next | |
+| 8 | Playwright, walk per role, `/ponytail-review`, traceability, pull request | | Done | After the rebase: Pest 212, Pint, Larastan, Playwright 32, all passing. Walk with fake users per role (deleted after) at 1280 and 360 px: Summary counts and categories follow each role's visibility; only the Administrator gets the names-and-contacts switch in Export. `/ponytail-review`: no must-fix; three should-fix or nice-to-have fixed (`c77ba99`: queue lock expires after 10 minutes; the export is buffered by Livewire, not streamed, now said so; `BACKUP_DISKS` tolerates spaces); repeated summary queries left as is. Pull request not opened yet: waiting for the go-ahead to push |
 
 ## Open questions for the project lead
 
