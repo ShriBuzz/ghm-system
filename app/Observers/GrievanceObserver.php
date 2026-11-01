@@ -22,6 +22,16 @@ class GrievanceObserver
     }
 
     /**
+     * Runs after the save, so the visibility rule reads the case's new restriction.
+     */
+    public function saved(Grievance $grievance): void
+    {
+        if ($grievance->wasChanged(['is_restricted', 'assigned_to'])) {
+            $grievance->dropUnseeingAssignee();
+        }
+    }
+
+    /**
      * Days open run while the case is open and freeze when it stops (A2).
      * A reopened case counts again from the day it was received.
      */

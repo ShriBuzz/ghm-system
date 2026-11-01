@@ -45,6 +45,14 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
+     * Whether this user may see the case, by the one visibility rule (A1, A5).
+     */
+    public function canSee(Grievance $grievance): bool
+    {
+        return Grievance::visibleTo($this)->whereKey($grievance->getKey())->exists();
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

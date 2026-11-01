@@ -19,7 +19,7 @@ class GrievancePolicy
 
     public function view(User $user, Grievance $grievance): bool
     {
-        return Grievance::visibleTo($user)->whereKey($grievance->getKey())->exists();
+        return $user->canSee($grievance);
     }
 
     /**

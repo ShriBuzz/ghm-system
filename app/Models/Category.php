@@ -27,6 +27,9 @@ class Category extends Model
                 Grievance::where('category_id', $category->id)->update([
                     'is_restricted' => $category->is_restricted ? true : DB::raw('manually_restricted'),
                 ]);
+
+                Grievance::where('category_id', $category->id)->whereNotNull('assigned_to')
+                    ->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
             }
         });
     }
