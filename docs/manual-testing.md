@@ -85,6 +85,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 |---|---|
 | Sign in as the focal person | Menu shows Dashboard and Cases only, no Settings. Opening `/admin/categories` shows "Forbidden" |
 | Cases → Enter offline case: channel Phone, category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
+| Print slip, or the browser's print preview | Only the heading and the slip: no menu, no buttons, no staff name |
 | Reload the slip page | Back on the case list: the PIN is shown only once |
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
 | Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
@@ -143,6 +144,6 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 - The staff panel's title reads "Laravel" until the company name arrives at kick-off.
 - The staff panel is in English until NBI answers question 14 in `docs/clarification-questions.md`; `APP_LOCALE=ne` stays the public pages' default.
 - Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
-- "Print slip" prints the whole panel page, menu included.
+- The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are an open question (`docs/progress.md`).
 - Not built yet: internal notes, replies and documents on a case (WP2 step 7) and the activity log (step 9).
 - The public home page is a placeholder until the WP1 grievance form.

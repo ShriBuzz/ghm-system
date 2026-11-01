@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\Grievances\Pages\RecordedCase;
 use App\Http\Middleware\SetPanelLocale;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -40,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ], isRequired: true)
             ->defaultAvatarProvider(InitialsAvatarProvider::class)
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.idle-reload'))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.slip-print'), scopes: RecordedCase::class)
             ->colors([
                 'primary' => Color::Amber,
             ])

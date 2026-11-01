@@ -83,6 +83,16 @@ it('shows the reference and PIN once on the slip page', function () {
     $this->get(RecordedCase::getUrl())->assertRedirect(ListGrievances::getUrl());
 })->group('A6');
 
+it('prints the slip without the panel menu, and leaves other pages as they print', function () {
+    signedInAs(Role::FocalPerson);
+
+    session()->flash('recorded_case', ['reference' => 'GHM-2026-0007', 'pin' => '048213', 'received_at' => '2026-11-01 09:00']);
+    session()->ageFlashData();
+
+    $this->get(RecordedCase::getUrl())->assertSee('@media print', escape: false);
+    $this->get(ListGrievances::getUrl())->assertDontSee('@media print', escape: false);
+})->group('A6');
+
 it('keeps the PIN flashed for the slip out of the session file in clear', function () {
     $dir = storage_path('framework/testing/sessions-'.Str::random(8));
     File::ensureDirectoryExists($dir);
