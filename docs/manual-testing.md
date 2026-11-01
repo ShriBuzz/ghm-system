@@ -126,7 +126,7 @@ npx playwright test --ui                          # the same, in a window where 
 npx playwright show-report                        # after a failure: the report with screenshots and traces
 ```
 
-Playwright starts its own server on port 8001 and stops it afterwards. Pest and Playwright both use the `ghm_testing` database, never `ghm`, so your demo data stays as you left it. Playwright signs in as three fake users (`e2e-administrator@example.com` and so on) that it creates there with fresh passwords on every run, and enters fake cases; the next Pest run wipes them.
+Playwright starts its own servers on ports 8001 and 8002 and stops them afterwards; the full run takes about a minute and a half, because the S2 idle check waits out a one-minute session. Pest and Playwright both use the `ghm_testing` database, never `ghm`, so your demo data stays as you left it. Playwright signs in as fake users (`e2e-focal_person-0@example.com` and so on) that it creates there with fresh passwords, and enters fake cases, categories, locations and users; the next Pest run wipes them. Its saved sessions sit in `playwright/.auth/`; delete that folder to make it sign in afresh.
 
 ## 8. On a real phone (optional)
 
