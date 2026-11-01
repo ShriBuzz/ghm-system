@@ -12,10 +12,8 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('ghm:recount-working-days', function () {
-    $open = array_filter(Status::cases(), fn (Status $status): bool => $status->isOpen());
-
     // Quietly: a system job, not a staff action, so no observer or activity entry.
-    Grievance::whereIn('status', $open)->lazyById()->each(function (Grievance $grievance): void {
+    Grievance::whereIn('status', Status::open())->lazyById()->each(function (Grievance $grievance): void {
         $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
         $grievance->saveQuietly();
     });

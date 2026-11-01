@@ -12,20 +12,8 @@ use App\Models\Location;
 use App\Models\User;
 use Database\Seeders\PlaceholderListsSeeder;
 use Filament\Actions\Testing\TestAction;
-use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
-
-function signedInAs(Role $role): User
-{
-    $user = User::factory()->create([
-        'role' => $role,
-        'app_authentication_secret' => AppAuthentication::make()->generateSecret(),
-    ]);
-    test()->actingAs($user);
-
-    return $user;
-}
 
 dataset('settings pages', [
     'categories' => ['/admin/categories'],
