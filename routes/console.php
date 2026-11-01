@@ -5,7 +5,6 @@ use App\Enums\Status;
 use App\Models\Grievance;
 use App\Models\User;
 use App\Support\WorkingDays;
-use Database\Seeders\PlaceholderListsSeeder;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -26,36 +25,36 @@ Artisan::command('ghm:recount-working-days', function () {
 
 Schedule::command('ghm:recount-working-days')->dailyAt('00:30');
 
-Artisan::command('ghm:e2e-users', function () {
-    // For Playwright's sign-in (tests/e2e/auth.setup.ts): fresh credentials on every
-    // run, so none are kept in the repo, and a fresh secret, so no code is reused.
-    if (! app()->environment('local', 'testing')) {
-        $this->error('Only on a developer machine or in CI.');
+Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $role, string $key) {
+    // For the Playwright specs (tests/e2e/support.ts): a fake user with a fresh password and
+    // authenticator secret on every call, printed as JSON, so no credential is kept in the repo.
+    // Staging holds fake data only and runs the full suite before UAT; production never does.
+    if (! app()->environment('local', 'testing', 'staging')) {
+        $this->error('Never on production.');
 
         return 1;
     }
 
-    // Last run's sign-ins must not count against Filament's five-per-minute limits.
-    $this->callSilently('cache:clear');
-    app(PlaceholderListsSeeder::class)->run();
+    if (! Role::tryFrom($role) || ! preg_match('/^[a-z0-9_-]{1,40}$/', $key)) {
+        $this->error('Usage: ghm:e2e-user <role> <key>, the key in lower-case letters, digits, - and _.');
 
-    $users = collect(Role::cases())->mapWithKeys(function (Role $role): array {
-        $credentials = [
-            'email' => "e2e-{$role->value}@example.com",
-            'password' => Str::password(32),
-            'secret' => AppAuthentication::make()->generateSecret(),
-        ];
+        return 1;
+    }
 
-        User::firstOrNew(['email' => $credentials['email']])->forceFill([
-            'name' => 'E2E '.Str::headline($role->value),
-            'password' => $credentials['password'],
-            'role' => $role,
-            'is_active' => true,
-            'app_authentication_secret' => $credentials['secret'],
-        ])->save();
+    $credentials = [
+        'email' => "e2e-{$key}@example.com",
+        'password' => Str::password(32),
+        'secret' => $this->option('without-mfa') ? null : AppAuthentication::make()->generateSecret(),
+    ];
 
-        return [$role->value => $credentials];
-    });
+    User::firstOrNew(['email' => $credentials['email']])->forceFill([
+        'name' => 'E2E '.Str::of($key)->replace(['_', '-'], ' ')->ucfirst(),
+        'password' => $credentials['password'],
+        'role' => Role::from($role),
+        'is_active' => true,
+        'app_authentication_secret' => $credentials['secret'],
+        'app_authentication_recovery_codes' => null,
+    ])->save();
 
-    $this->line($users->toJson());
-})->purpose('Fake staff, one per role, with fresh passwords and MFA secrets for the Playwright specs (A1)');
+    $this->line((string) json_encode($credentials));
+})->purpose('A fake user with a fresh password and MFA secret for the Playwright specs (A1)');

@@ -1,5 +1,5 @@
-import { expect, type Page, test } from '@playwright/test';
-import { signedInAs } from './support';
+import { expect, type Page } from '@playwright/test';
+import { test } from './support';
 
 /**
  * Enters a fake offline case and returns what the slip shows.
@@ -44,7 +44,7 @@ async function findCase(page: Page, reference: string) {
 }
 
 test.describe('focal person', () => {
-    test.use({ storageState: signedInAs('focal_person') });
+    test.use({ role: 'focal_person' });
 
     test('enters an offline case and sees its reference and PIN once', { tag: ['@A6', '@P7'] }, async ({ page }) => {
         const { reference, pin } = await enterOfflineCase(page);
@@ -68,11 +68,11 @@ test.describe('focal person', () => {
         await expect(page.getByRole('definition').filter({ hasText: pin })).toBeVisible();
     });
 
-    test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL }) => {
+    test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL, staff }) => {
         const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment or abuse', anonymous: true });
         expect(pin).toMatch(/^\d{6}$/);
 
-        const officer = await browser.newContext({ baseURL, storageState: signedInAs('restricted_officer') });
+        const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
         const officerPage = await officer.newPage();
         const link = await findCase(officerPage, reference);
         await expect(link).toBeVisible();
@@ -85,9 +85,14 @@ test.describe('focal person', () => {
 });
 
 test.describe('administrator', () => {
-    test.use({ storageState: signedInAs('administrator') });
+    test.use({ role: 'administrator' });
 
-    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page }) => {
+    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page, staff }, testInfo) => {
+        // This worker's focal person and restricted-case officer, so both exist to be offered or not.
+        await staff.sessionOf('focal_person');
+        await staff.sessionOf('restricted_officer');
+        const focal = `E2E Focal person ${testInfo.parallelIndex}`;
+        const officer = `E2E Restricted officer ${testInfo.parallelIndex}`;
         const { reference } = await enterOfflineCase(page);
         await (await findCase(page, reference)).click();
         await expect(page.getByRole('heading', { name: `View ${reference}` })).toBeVisible();
@@ -102,14 +107,14 @@ test.describe('administrator', () => {
 
         await page.getByRole('button', { name: 'Assign' }).click();
         const assignTo = page.getByRole('dialog', { name: 'Assign' }).getByLabel('Assign to');
-        await expect(assignTo.getByRole('option', { name: 'E2E Focal Person' })).toBeAttached();
-        await expect(assignTo.getByRole('option', { name: 'E2E Restricted Officer' })).toHaveCount(0);
-        await assignTo.selectOption('E2E Focal Person');
+        await expect(assignTo.getByRole('option', { name: focal, exact: true })).toBeAttached();
+        await expect(assignTo.getByRole('option', { name: officer, exact: true })).toHaveCount(0);
+        await assignTo.selectOption(focal);
         await page.getByRole('dialog', { name: 'Assign' }).getByRole('button', { name: 'Submit' }).click();
 
         const caseSection = page.getByRole('region', { name: 'Case' });
         await expect(caseSection).toContainText('Under assessment');
         await expect(caseSection).toContainText('High');
-        await expect(caseSection).toContainText('E2E Focal Person');
+        await expect(caseSection).toContainText(focal);
     });
 });

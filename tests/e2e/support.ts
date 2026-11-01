@@ -1,13 +1,90 @@
+import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { createHmac } from 'node:crypto';
-import { expect, type Page } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
 
 export const roles = ['administrator', 'focal_person', 'restricted_officer'] as const;
 export type Role = (typeof roles)[number];
 
-/** Saved sign-in for a role, written once per run by auth.setup.ts. */
-export function signedInAs(role: Role): string {
-    return `playwright/.auth/${role}.json`;
+export type User = { email: string; password: string; secret: string | null };
+
+/**
+ * A fake user on the server under test, with a fresh password and authenticator secret.
+ * E2E_ARTISAN says how to run artisan on that server: `php artisan` here, or for staging
+ * something like `ssh deploy@staging php /path/to/artisan`. Production refuses the command.
+ */
+export function freshUser(role: Role, key: string, { mfa = true } = {}): User {
+    const artisan = process.env.E2E_ARTISAN ?? 'php artisan';
+    const output = execSync(`${artisan} ghm:e2e-user ${role} ${key}${mfa ? '' : ' --without-mfa'}`, { encoding: 'utf8' });
+
+    // The last line, in case a remote shell prints a banner first.
+    return JSON.parse(output.trim().split('\n').pop()!);
 }
+
+/**
+ * Signs in with the password and the current authenticator code, as staff would.
+ */
+export async function signIn(page: Page, user: User): Promise<void> {
+    await page.goto('/admin/login');
+    await enterCredentials(page, user.email, user.password);
+    await page.locator('form button[type="submit"]').click();
+    // Six one-digit boxes; typing moves to the next box and the last digit submits.
+    await page.getByRole('textbox', { name: /6-digit code/ }).pressSequentially(totp(user.secret!));
+    await expect(page).toHaveURL(/\/admin$/);
+}
+
+/**
+ * Specs set `role` to run signed in. Each worker has its own user per role: a session
+ * shared by parallel specs would lose one-time messages such as the slip's PIN, and an
+ * authenticator code is accepted only once, so specs cannot each sign in. A session saved
+ * by an earlier run is reused while the server accepts it, so quick reruns stay under
+ * Filament's limit of five sign-ins a minute.
+ */
+export const test = base.extend<{ role: Role | undefined }, { staff: { sessionOf(role: Role): Promise<string> } }>({
+    role: [undefined, { option: true }],
+    staff: [
+        async ({ browser }, use, workerInfo) => {
+            const sessions = new Map<Role, Promise<string>>();
+            const baseURL = workerInfo.project.use.baseURL;
+
+            await use({
+                sessionOf(role) {
+                    if (!sessions.has(role)) {
+                        sessions.set(role, (async () => {
+                            const file = `playwright/.auth/${role}-${workerInfo.parallelIndex}.json`;
+
+                            if (existsSync(file)) {
+                                const context = await browser.newContext({ baseURL, storageState: file });
+                                const page = await context.newPage();
+                                await page.goto('/admin');
+                                const accepted = new URL(page.url()).pathname === '/admin';
+                                await context.close();
+
+                                if (accepted) {
+                                    return file;
+                                }
+                            }
+
+                            // Empty on purpose: inside a test, a new context would otherwise get that test's session.
+                            const context = await browser.newContext({ baseURL, storageState: { cookies: [], origins: [] } });
+                            await signIn(await context.newPage(), freshUser(role, `${role}-${workerInfo.parallelIndex}`));
+                            await context.storageState({ path: file });
+                            await context.close();
+
+                            return file;
+                        })());
+                    }
+
+                    return sessions.get(role)!;
+                },
+            });
+        },
+        { scope: 'worker' },
+    ],
+    storageState: async ({ role, staff, storageState }, use) => {
+        await use(role ? await staff.sessionOf(role) : storageState);
+    },
+});
 
 /**
  * The current authenticator code for a base32 secret (RFC 6238: SHA-1, 6 digits,

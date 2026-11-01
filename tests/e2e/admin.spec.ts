@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { enterCredentials, roles, signedInAs } from './support';
+import { expect } from '@playwright/test';
+import { enterCredentials, roles, test } from './support';
 
 test('the staff sign-in page is reachable and locked down', { tag: ['@smoke', '@S1', '@A1'] }, async ({ page }) => {
     const response = await page.goto('/admin');
@@ -37,7 +37,7 @@ const menus = {
 
 for (const role of roles) {
     test.describe(role, () => {
-        test.use({ storageState: signedInAs(role) });
+        test.use({ role });
 
         test('sees only the menu for this role, in English', { tag: ['@A1', '@A7'] }, async ({ page }) => {
             await page.goto('/admin');
@@ -49,7 +49,7 @@ for (const role of roles) {
 
 for (const role of ['focal_person', 'restricted_officer'] as const) {
     test.describe(role, () => {
-        test.use({ storageState: signedInAs(role) });
+        test.use({ role });
 
         test('is refused the settings pages', { tag: ['@A7', '@A5'] }, async ({ page }) => {
             for (const settings of ['categories', 'holidays', 'locations', 'users']) {
