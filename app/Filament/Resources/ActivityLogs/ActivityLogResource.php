@@ -55,13 +55,14 @@ class ActivityLogResource extends Resource
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('created_at')->label('When')->dateTime(),
-                TextColumn::make('causer.name')->label('Who')->placeholder('System or complainant'),
                 TextColumn::make('event')->label('What')->formatStateUsing(fn (string $state): string => str($state)->headline()->toString()),
                 TextColumn::make('subject_id')->label('Case or category')->formatStateUsing(fn (Activity $record): ?string => match (true) {
                     $record->subject instanceof Grievance => $record->subject->reference,
                     $record->subject instanceof Category => "Category: {$record->subject->name_en}",
                     default => null,
                 }),
+                // After what and which case, so a narrow screen shows those first.
+                TextColumn::make('causer.name')->label('Who')->placeholder('System or complainant'),
                 TextColumn::make('properties')->label('Details')->state(fn (Activity $record): string => self::details($record, $staff))->wrap(),
             ])
             ->filters([
