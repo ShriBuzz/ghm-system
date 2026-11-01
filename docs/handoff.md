@@ -11,7 +11,7 @@ Last updated 2026-11-01. WP0 and WP2 (admin side) are built. WP1 (public side) i
 | WP0 Foundations | Merged (pull requests #1, #2, #3) |
 | WP2 step 1: reference number, PIN, attachment store | Merged (pull request #4) |
 | WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
-| WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Branch `wp2/case-work`, all checks green locally, **not pushed yet** |
+| WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Branch `wp2/case-work`, pull request #6, in review |
 | WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore` |
 | WP3 Alerts, reports, security | Not started |
 
@@ -19,8 +19,8 @@ Step-by-step status is in the WP2 table in `docs/progress.md`; which requirement
 
 ## Next steps
 
-1. Push `wp2/case-work` and open its pull request into `main`. Tell the reviewer: the Playwright suite now runs two workers (`playwright.config.ts`), the settings spec uses a new `fillInDialog` helper (`tests/e2e/support.ts`), and the admin menu spec expects "Activity log". Watch CI.
-2. Before WP3, from the WP2 work: export logging for S6 comes with N4; the S7 backup must leave `storage/app/private/livewire-tmp` out (a file chosen in a cancelled upload dialog stays there a day); N1 alert recipients should use `User::canSee()`, the same visibility rule.
+1. Get pull request #6 (`wp2/case-work`) reviewed and merged. Its description tells the reviewer: the Playwright suite now runs two workers (`playwright.config.ts`), the settings spec uses a new `fillInDialog` helper (`tests/e2e/support.ts`), and the admin menu spec expects "Activity log". Watch CI.
+2. Before WP3, from the WP2 work: export logging for S6 comes with N4; the S7 backup must leave `storage/app/private/livewire-tmp` out (a file chosen in a cancelled upload dialog stays there up to a day before the hourly clean-up deletes it); N1 alert recipients should use `User::canSee()`, the same visibility rule.
 3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language) and `docs/clarification-questions.md` (the NBI email, still not sent).
 
 ## Read first
