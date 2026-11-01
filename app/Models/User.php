@@ -46,7 +46,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             if ($user->wasChanged('is_active') && ! $user->is_active) {
                 Grievance::where('assigned_to', $user->id)->update(['assigned_to' => null]);
             } elseif ($user->wasChanged('role')) {
-                Grievance::where('assigned_to', $user->id)->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
+                Grievance::where('assigned_to', $user->id)->lazyById()->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
             }
         });
     }

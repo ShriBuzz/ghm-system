@@ -29,7 +29,7 @@ class Category extends Model
                 ]);
 
                 Grievance::where('category_id', $category->id)->whereNotNull('assigned_to')
-                    ->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
+                    ->lazyById()->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
             }
         });
     }

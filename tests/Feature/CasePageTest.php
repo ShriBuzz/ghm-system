@@ -7,6 +7,7 @@ use App\Filament\Resources\Grievances\Pages\ListGrievances;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\Location;
 use App\Models\User;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -116,6 +117,22 @@ it('drops a user from cases they can no longer see when their role changes', fun
     $user->update(['role' => Role::RestrictedOfficer]);
     expect($open->fresh()->assigned_to)->toBeNull()
         ->and($other->fresh()->assigned_to)->toBeNull();
+})->group('A3', 'A5');
+
+it('drops unseeing assignees past the first thousand cases', function () {
+    $category = Category::factory()->create();
+    $focal = User::factory()->create(['role' => Role::FocalPerson]);
+    Grievance::withoutEvents(fn () => Grievance::factory()->count(1001)->for($category)->for(Location::factory()->create())
+        ->create(['assigned_to' => $focal->id]));
+
+    $category->forceFill(['is_restricted' => true])->save();
+    expect(Grievance::whereNotNull('assigned_to')->count())->toBe(0);
+
+    $officer = User::factory()->create(['role' => Role::RestrictedOfficer]);
+    Grievance::query()->update(['assigned_to' => $officer->id]);
+
+    $officer->update(['role' => Role::FocalPerson]);
+    expect(Grievance::whereNotNull('assigned_to')->count())->toBe(0);
 })->group('A3', 'A5');
 
 it('clears every assignment of a user who is deactivated', function () {
