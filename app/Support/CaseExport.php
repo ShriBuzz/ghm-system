@@ -27,6 +27,7 @@ class CaseExport
             'personal_data' => $personal, 'cases' => $cases->count(),
         ])->log('Cases exported');
 
+        // shortcut: Livewire buffers the whole file to send it; for exports of tens of MB, download from a plain route instead.
         return response()->streamDownload(function () use ($cases, $format, $personal): void {
             // The CSV starts with a byte-order mark (openspout's default), so Excel reads Nepali text as UTF-8.
             $writer = $format === 'xlsx' ? new XlsxWriter : new CsvWriter;

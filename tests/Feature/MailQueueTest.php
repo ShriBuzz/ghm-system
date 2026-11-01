@@ -12,7 +12,8 @@ it('works the mail queue from cron every minute, one worker at a time', function
     expect($worker)->not->toBeNull()
         ->and($worker->command)->toContain('--stop-when-empty')
         ->and($worker->expression)->toBe('* * * * *')
-        ->and($worker->withoutOverlapping)->toBeTrue();
+        ->and($worker->withoutOverlapping)->toBeTrue()
+        ->and($worker->expiresAt)->toBe(10);
 })->group('N1', 'N2');
 
 it('logs a refused email without the address the mail server quoted', function () {

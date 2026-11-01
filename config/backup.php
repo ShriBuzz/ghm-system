@@ -163,7 +163,7 @@ return [
              * The disk names on which the backups will be stored.
              */
             // Add the off-server copy here once hosting is known (BACKUP_DISKS=backups,offsite).
-            'disks' => explode(',', env('BACKUP_DISKS', 'backups')),
+            'disks' => array_map(trim(...), explode(',', env('BACKUP_DISKS', 'backups'))),
 
             /*
              * Determines whether to allow backups to continue when some targets fail instead of failing completely.
@@ -297,7 +297,7 @@ return [
     'monitor_backups' => [
         [
             'name' => 'ghm',
-            'disks' => explode(',', env('BACKUP_DISKS', 'backups')),
+            'disks' => array_map(trim(...), explode(',', env('BACKUP_DISKS', 'backups'))),
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,
