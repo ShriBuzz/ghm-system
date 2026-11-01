@@ -61,7 +61,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - Over HTTPS: `Strict-Transport-Security: max-age=31536000`. Session and CSRF cookies are Secure over HTTPS because `SESSION_SECURE_COOKIE` is left unset; never set it to `false` in production. Cookies stay HttpOnly and SameSite=Lax (Laravel defaults).
 - Every response: `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`, and a Content Security Policy with `frame-ancestors 'none'`.
 - Public pages: `default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`. No inline script or style, nothing from another host.
-- Admin panel: `script-src 'self' 'nonce-…' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:`, otherwise as above. Each allowance was removed in turn during a full browser walk (sign-in, MFA setup, dashboard, sign-out) and each one broke the panel: the nonce covers Filament's and Livewire's inline scripts (a fresh one per response); `'unsafe-eval'` is needed by Alpine; Filament uses inline `style` attributes and `<style>` blocks without a nonce; the MFA QR code and avatars are `data:` images.
+- Admin panel: `script-src 'self' 'nonce-…' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:`, otherwise as above. Each allowance was removed in turn during a full browser walk (sign-in, MFA setup, dashboard, sign-out) and each one broke the panel: the nonce covers Filament's and Livewire's inline scripts (a fresh one per response); `'unsafe-eval'` is needed by Alpine; Filament uses inline `style` attributes and `<style>` blocks without a nonce; the MFA QR code and avatars are `data:` images. `blob:` was added in WP2 step 7: the document upload previews the chosen photo from a `blob:` address the page creates itself; without it the browser blocks the preview.
 - Laravel's `/up` health page links a font on fonts.bunny.net and a script on cdn.jsdelivr.net. The public policy blocks both before any request leaves the browser; an uptime monitor only needs the 200.
 
 ## Sessions
@@ -76,6 +76,8 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - Accepted: JPEG, PNG, WebP and PDF up to `ghm.upload_max_kb` (5 MB). The type is read from the file's content, so a renamed program is refused.
 - Files go to `storage/app/private/attachments/` under a random 40-character name; the original name is kept encrypted in `attachments.original_name`. The `local` disk's `serve` option is off, so Laravel registers no `/storage/...` route; files are reached only through the case-checked download route.
 - Photos are redrawn with GD, which drops every metadata block (GPS position, phone model, time taken). The EXIF orientation is applied first when the `exif` extension is present; without it, a photo taken sideways stays sideways.
+- Staff uploads in the panel go through Livewire's temporary folder (`storage/app/private/livewire-tmp`). The upload action deletes that copy and its `.json` (which holds the file name) as soon as `AttachmentStore` has stored the cleaned file; otherwise Livewire would keep the original, metadata included, for about a day.
+- Downloads go through `App\Http\Controllers\AttachmentController` at `/admin/attachments/{id}`: signed-in staff only, authorised by the case policy, always sent as a download under the original name.
 - Known limit: PDF metadata (author name, creating software) is not removed. There is no light way to do it on shared hosting.
 
 ## Agent tooling (not shipped)

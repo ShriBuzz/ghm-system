@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\MessageDirection;
 use Database\Factories\GrievanceMessageFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['direction', 'author_id', 'body'])]
 class GrievanceMessage extends Model
 {
     /** @use HasFactory<GrievanceMessageFactory> */
@@ -36,6 +39,7 @@ class GrievanceMessage extends Model
     protected function casts(): array
     {
         return [
+            'direction' => MessageDirection::class,
             'body' => 'encrypted',
         ];
     }

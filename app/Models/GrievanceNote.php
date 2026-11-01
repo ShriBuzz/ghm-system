@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Database\Factories\GrievanceNoteFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['user_id', 'body'])]
 class GrievanceNote extends Model
 {
     /** @use HasFactory<GrievanceNoteFactory> */
