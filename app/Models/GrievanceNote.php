@@ -14,6 +14,12 @@ class GrievanceNote extends Model
     /** @use HasFactory<GrievanceNoteFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::created(fn (GrievanceNote $note) => activity()->performedOn($note->grievance()->firstOrFail())->event('note_added')
+            ->withProperties(['note_id' => $note->id])->log('Note added'));
+    }
+
     /**
      * @return BelongsTo<Grievance, $this>
      */

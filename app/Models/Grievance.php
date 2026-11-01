@@ -73,6 +73,10 @@ class Grievance extends Model
 
         if ($assignee && ! $assignee->canSee($this)) {
             $this->forceFill(['assigned_to' => null])->saveQuietly();
+
+            activity()->performedOn($this)->event('assigned')
+                ->withProperties(['old' => $assignee->id, 'new' => null, 'reason' => 'assignee can no longer see the case'])
+                ->log('Assignment cleared');
         }
     }
 

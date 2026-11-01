@@ -80,6 +80,14 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - Downloads go through `App\Http\Controllers\AttachmentController` at `/admin/attachments/{id}`: signed-in staff only, authorised by the case policy, always sent as a download under the original name.
 - Known limit: PDF metadata (author name, creating software) is not removed. There is no light way to do it on shared hosting.
 
+## Activity log (S6)
+
+`spatie/laravel-activitylog` writes to `activity_log`; the Administrator reads it on the "Activity log" page, which cannot edit or delete entries.
+
+- Logged: case created, viewed, status, priority, assignment (including clean-ups when an assignee can no longer see a case), manual restriction, note added, reply sent, message received, document uploaded and viewed, a category's restriction, sign-in and failed sign-in. Exports are logged when N4 is built.
+- Entries hold codes, IDs and flags only, never case text or contact details. A failed sign-in records the account only when the email belongs to one; never the email typed, the IP or the browser.
+- Entries are kept: the package's 365-day clean-up is not scheduled. How long to keep them is clarification question 15.
+
 ## Agent tooling (not shipped)
 
 - Impeccable 4.8.0, installed with `npx impeccable install --providers=claude --scope=project`. Skills and agents live in `.claude/`. The design hook sits in `.claude/settings.local.json`, which is per machine and not committed. The 20 MB engine binary is not committed either; the launcher downloads it on demand and checks it against `engine-checksums.txt`.

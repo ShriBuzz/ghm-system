@@ -43,9 +43,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     protected static function booted(): void
     {
         static::updated(function (User $user): void {
-            if ($user->wasChanged('is_active') && ! $user->is_active) {
-                Grievance::where('assigned_to', $user->id)->update(['assigned_to' => null]);
-            } elseif ($user->wasChanged('role')) {
+            if ($user->wasChanged(['is_active', 'role'])) {
                 Grievance::where('assigned_to', $user->id)->lazyById()->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
             }
         });
@@ -61,10 +59,11 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 
     /**
      * Whether this user may see the case, by the one visibility rule (A1, A5).
+     * A deactivated user sees nothing.
      */
     public function canSee(Grievance $grievance): bool
     {
-        return Grievance::visibleTo($this)->whereKey($grievance->getKey())->exists();
+        return $this->is_active && Grievance::visibleTo($this)->whereKey($grievance->getKey())->exists();
     }
 
     /**

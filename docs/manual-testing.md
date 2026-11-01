@@ -145,5 +145,5 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 - The staff panel is in English until NBI answers question 14 in `docs/clarification-questions.md`; `APP_LOCALE=ne` stays the public pages' default.
 - Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
 - The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are an open question (`docs/progress.md`).
-- Not built yet: the activity log (WP2 step 9). Notes, replies and documents are on the case page as tabs below the submission.
+- Notes, replies and documents are on the case page as tabs below the submission. The Administrator's menu has "Activity log": every case change, view, note, reply, document and sign-in, with who and when.
 - The public home page is a placeholder until the WP1 grievance form.

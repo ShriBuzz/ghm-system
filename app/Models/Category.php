@@ -24,6 +24,10 @@ class Category extends Model
     {
         static::updated(function (Category $category): void {
             if ($category->wasChanged('is_restricted')) {
+                activity()->performedOn($category)->event('category_restriction_changed')
+                    ->withProperties(['old' => (bool) $category->getOriginal('is_restricted'), 'new' => $category->is_restricted])
+                    ->log('Category restriction changed');
+
                 Grievance::where('category_id', $category->id)->update([
                     'is_restricted' => $category->is_restricted ? true : DB::raw('manually_restricted'),
                 ]);

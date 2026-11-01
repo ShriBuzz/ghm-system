@@ -15,6 +15,16 @@ class GrievanceMessage extends Model
     /** @use HasFactory<GrievanceMessageFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::created(function (GrievanceMessage $message): void {
+            $staff = $message->direction === MessageDirection::Staff;
+
+            activity()->performedOn($message->grievance()->firstOrFail())->event($staff ? 'reply_sent' : 'message_received')
+                ->withProperties(['message_id' => $message->id])->log($staff ? 'Reply sent' : 'Message received');
+        });
+    }
+
     /**
      * @return BelongsTo<Grievance, $this>
      */

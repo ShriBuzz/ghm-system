@@ -16,7 +16,11 @@ class AttachmentController
      */
     public function __invoke(Attachment $attachment): StreamedResponse
     {
-        Gate::authorize('view', $attachment->grievance);
+        $case = $attachment->grievance()->firstOrFail();
+        Gate::authorize('view', $case);
+
+        activity()->performedOn($case)->event('attachment_viewed')
+            ->withProperties(['attachment_id' => $attachment->id])->log('Document viewed');
 
         return Storage::disk('local')->download(AttachmentStore::path($attachment), $attachment->original_name);
     }
