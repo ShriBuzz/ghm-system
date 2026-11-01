@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production (`CLAUDE.md`).
 
-Last updated 2026-10-31, at the end of WP0. What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-01, at the WP2 proof-of-concept checkpoint (admin side up to offline entry). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -59,16 +59,47 @@ Open http://127.0.0.1:8000/admin and sign in with the email and password from `.
 | A made-up email with a wrong password, 6 times | The 6th attempt shows "too many login attempts"; that email stays locked for 15 minutes. `php artisan cache:clear` clears locks early |
 | `SESSION_LIFETIME=1` in `.env`, sign in, leave the tab for about 90 seconds | The tab returns to the sign-in page by itself. Set it back to `30` afterwards |
 
-## 5. The other roles
+## 5. Admin side: demo of the proof of concept
 
-There is no user-management screen until WP2, so create the focal person and the restricted-case officer from the terminal, with fake details:
+The staff panel is in English. Start from a clean local database, so the demo shows only what you create. This deletes everything in `ghm`, which is only ever fake data, and loads your Administrator plus placeholder categories and locations:
 
 ```sh
-php artisan tinker --execute 'App\Models\User::create(["name" => "Test Focal", "email" => "focal@example.com", "password" => "pick-a-password", "role" => App\Enums\Role::FocalPerson]);'
-php artisan tinker --execute 'App\Models\User::create(["name" => "Test Officer", "email" => "officer@example.com", "password" => "pick-a-password", "role" => App\Enums\Role::RestrictedOfficer]);'
+php artisan migrate:fresh --seed
+php artisan serve
 ```
 
-Sign in as each one in a private window or another browser, so the sessions stay apart. Each account sets up its own two-factor login at first sign-in. Every role sees only the dashboard until WP2 adds the case screens; which cases each role may see is covered by the automated tests (`php artisan test --group=A5`).
+Use three browser windows that keep their sessions apart, for example a normal window, a private window and another browser: one per role. Each new account sets up its own two-factor login at first sign-in; one authenticator app can hold all three accounts.
+
+**Administrator: settings (A7, A5)**
+
+| Try | Expect |
+|---|---|
+| Sign in, open Settings → Categories | Five placeholder categories; "Sexual harassment or abuse" is restricted |
+| Settings → Users → New user: a focal person and a restricted-case officer, with fake names, `@example.com` emails and a password of at least 8 characters | Both appear in the list with their role |
+| Edit your own user | Role and Active cannot be changed: you cannot lock yourself out |
+| Settings → Holidays → add a date | It appears; holidays can be deleted, other settings cannot (deactivate them instead) |
+
+**Focal person: offline entry (A6)**
+
+| Try | Expect |
+|---|---|
+| Sign in as the focal person | Menu shows Dashboard and Cases only, no Settings. Opening `/admin/categories` shows "Forbidden" |
+| Cases → Enter offline case: channel Phone, category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
+| Reload the slip page | Back on the case list: the PIN is shown only once |
+| Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
+| Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
+| Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
+
+**Restricted-case officer and Administrator: who sees what (A1, A3, A5)**
+
+| Try | Expect |
+|---|---|
+| Sign in as the officer, open Cases | Only the restricted case |
+| Open it, Assign | Only the Administrator and the officer are offered, never a focal person |
+| As the Administrator, open Cases | Every case. Search a reference number; filter by status, category, location or date |
+| Assign a named case to the focal person, then Mark restricted | The assignment is cleared, and the case leaves the focal person's list |
+| Remove restricted mark (Administrator only) | The focal person sees the case again |
+| Settings → Categories → make "Wages and benefits" restricted | Its cases leave the focal person's list at once, past ones included |
 
 ## 6. Encryption in the database
 
@@ -107,9 +138,11 @@ ipconfig getifaddr en0          # macOS: this computer's address on the network
 
 Open `http://<that address>:8000` on the phone. This makes the development server reachable from the local network, so only do it with fake data, and stop the server afterwards.
 
-## Known at the end of WP0
+## Known so far
 
 - The staff panel's title reads "Laravel" until the company name arrives at kick-off.
-- The staff panel is in Nepali because it follows the app's default language, `APP_LOCALE=ne`. The public pages ignore that setting and take their language from the address (`/ne`, `/en`); the panel has no switch of its own yet, because which language staff get is question 14 in `docs/clarification-questions.md`. Filament's Nepali translation is incomplete, so some staff screens mix Nepali and English.
-- To see the staff panel in English locally, set `APP_LOCALE=en` in `.env`. The public pages keep their own addresses; the only side effect is that a first visit to `/` then goes to `/en` instead of `/ne`. Do not set it in production while public pages are meant to open in Nepali.
+- The staff panel is in English until NBI answers question 14 in `docs/clarification-questions.md`; `APP_LOCALE=ne` stays the public pages' default.
+- Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
+- "Print slip" prints the whole panel page, menu included.
+- Not built yet: internal notes, replies and documents on a case (WP2 step 7) and the activity log (step 9).
 - The public home page is a placeholder until the WP1 grievance form.
