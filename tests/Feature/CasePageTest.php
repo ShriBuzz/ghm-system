@@ -104,3 +104,27 @@ it('keeps a new assignment when the old assignee was loaded and can no longer se
 
     expect($case->fresh()->assigned_to)->toBe($new->id);
 })->group('A3', 'A5');
+
+it('drops a user from cases they can no longer see when their role changes', function () {
+    $user = User::factory()->create(['role' => Role::FocalPerson]);
+    $open = Grievance::factory()->create(['assigned_to' => $user->id]);
+    $other = Grievance::factory()->create(['assigned_to' => $user->id]);
+
+    $user->update(['role' => Role::Administrator]);
+    expect($open->fresh()->assigned_to)->toBe($user->id);
+
+    $user->update(['role' => Role::RestrictedOfficer]);
+    expect($open->fresh()->assigned_to)->toBeNull()
+        ->and($other->fresh()->assigned_to)->toBeNull();
+})->group('A3', 'A5');
+
+it('clears every assignment of a user who is deactivated', function () {
+    $user = User::factory()->create(['role' => Role::FocalPerson]);
+    $case = Grievance::factory()->create(['assigned_to' => $user->id]);
+    $untouched = Grievance::factory()->create(['assigned_to' => User::factory()->create()->id]);
+
+    $user->update(['is_active' => false]);
+
+    expect($case->fresh()->assigned_to)->toBeNull()
+        ->and($untouched->fresh()->assigned_to)->not->toBeNull();
+})->group('A3', 'A7');

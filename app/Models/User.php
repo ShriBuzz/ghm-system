@@ -37,6 +37,21 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     ];
 
     /**
+     * A user who is deactivated, or whose new role cannot see a case, stops
+     * being its assignee, so no case looks owned by someone who cannot open it (A3, A5).
+     */
+    protected static function booted(): void
+    {
+        static::updated(function (User $user): void {
+            if ($user->wasChanged('is_active') && ! $user->is_active) {
+                Grievance::where('assigned_to', $user->id)->update(['assigned_to' => null]);
+            } elseif ($user->wasChanged('role')) {
+                Grievance::where('assigned_to', $user->id)->each(fn (Grievance $grievance) => $grievance->dropUnseeingAssignee());
+            }
+        });
+    }
+
+    /**
      * Every active user is staff with a role; what each role may see is decided by policies.
      */
     public function canAccessPanel(Panel $panel): bool
