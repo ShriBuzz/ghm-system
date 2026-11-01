@@ -42,6 +42,15 @@ it('stops the clock at Resolved, Referred or Closed and sets the closed date', f
     expect($case->closed_at)->toBeNull()->and($case->working_days_open)->toBe(12);
 })->group('A2');
 
+it('clears the closed date whenever a case leaves Closed, not only at Reopened', function (Status $next) {
+    $case = Grievance::factory()->create();
+    $case->forceFill(['status' => Status::Closed])->save();
+
+    $case->forceFill(['status' => $next])->save();
+
+    expect($case->closed_at)->toBeNull();
+})->with([Status::UnderInvestigation, Status::Resolved])->group('A2', 'A4');
+
 it('counts an offline case from the day it was received', function () {
     $this->travelTo('2026-11-23 10:00');
 

@@ -39,11 +39,8 @@ class GrievanceObserver
     {
         $was = $grievance->getOriginal('status');
 
-        if ($grievance->status === Status::Closed) {
-            $grievance->closed_at = now();
-        } elseif ($grievance->status === Status::Reopened) {
-            $grievance->closed_at = null;
-        }
+        // Any status can follow Closed, so the date goes whenever the case leaves it.
+        $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
 
         if (! $was instanceof Status || $was->isOpen() || $grievance->status->isOpen()) {
             $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
