@@ -1,14 +1,22 @@
 import { expect, type Page } from '@playwright/test';
-import { test } from './support';
+import { headingOf, open, test } from './support';
 
 /**
  * Enters a fake offline case and returns what the slip shows.
  */
-async function enterOfflineCase(page: Page, { category = 'Wages and benefits', anonymous = false } = {}) {
+async function enterOfflineCase(
+    page: Page,
+    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false } = {},
+) {
     await page.goto('/admin/grievances/create');
     await page.getByLabel('Channel').selectOption('Phone');
+
+    if (receivedAt) {
+        await page.getByRole('textbox', { name: 'Received' }).fill(receivedAt);
+    }
+
     await page.getByLabel('Category').selectOption(category);
-    await page.getByLabel('Location').selectOption('Head office');
+    await page.getByLabel('Location').selectOption(location);
     await page.getByLabel('When it happened').fill('2026-10-28');
     await page.getByLabel('How often').selectOption('Once');
     await page.getByLabel('Description').fill('Fake grievance for a browser spec.');
@@ -31,16 +39,61 @@ async function enterOfflineCase(page: Page, { category = 'Wages and benefits', a
 }
 
 /**
- * Searches the case list for a reference and returns the link to that case.
+ * Opens the case list, searches it for a reference and returns the link to that case.
  */
 async function findCase(page: Page, reference: string) {
     await page.goto('/admin/grievances');
+
+    return search(page, reference);
+}
+
+/**
+ * Searches the list on screen, keeping any filters, and returns the link to that case.
+ */
+async function search(page: Page, reference: string) {
     await Promise.all([
         page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
         page.getByRole('searchbox', { name: 'Search', exact: true }).fill(reference),
     ]);
 
     return page.getByRole('link', { name: reference, exact: true });
+}
+
+/**
+ * Picks a value in one of the case page's dialogs, such as Set status, and saves it.
+ */
+async function setOnCase(page: Page, action: string, field: string, value: string) {
+    const dialog = page.getByRole('dialog', { name: action });
+    await open(page.getByRole('button', { name: action }), headingOf(dialog));
+    await dialog.getByLabel(field).selectOption(value);
+    await dialog.getByRole('button', { name: 'Submit' }).click();
+    await expect(headingOf(dialog)).toBeHidden();
+}
+
+/**
+ * The list's empty state. Waiting for it, rather than for a missing row, proves the
+ * list has been redrawn after the search.
+ */
+function noCases(page: Page) {
+    return page.getByRole('heading', { name: 'No cases' });
+}
+
+/**
+ * The days-open badge in a case's row of the list.
+ */
+function daysOpenBadge(page: Page, reference: string) {
+    return page.getByRole('row').filter({ has: page.getByRole('link', { name: reference, exact: true }) }).locator('.fi-badge').first();
+}
+
+/**
+ * A date some days back, as the date and date-time fields take it.
+ */
+function daysAgo(days: number) {
+    const date = new Date(Date.now() - days * 86_400_000);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+    return { day, dateTime: `${day}T09:00` };
 }
 
 test.describe('focal person', () => {
@@ -79,7 +132,8 @@ test.describe('focal person', () => {
         const address = (await link.getAttribute('href'))!;
         await officer.close();
 
-        await expect(await findCase(page, reference)).toHaveCount(0);
+        await findCase(page, reference);
+        await expect(noCases(page)).toBeVisible();
         expect([403, 404]).toContain((await page.goto(address))!.status());
     });
 });
@@ -97,24 +151,65 @@ test.describe('administrator', () => {
         await (await findCase(page, reference)).click();
         await expect(page.getByRole('heading', { name: `View ${reference}` })).toBeVisible();
 
-        await page.getByRole('button', { name: 'Set status' }).click();
-        await page.getByRole('dialog', { name: 'Set status' }).getByLabel('Status').selectOption('Under assessment');
-        await page.getByRole('dialog', { name: 'Set status' }).getByRole('button', { name: 'Submit' }).click();
+        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await setOnCase(page, 'Set priority', 'Priority', 'High');
 
-        await page.getByRole('button', { name: 'Set priority' }).click();
-        await page.getByRole('dialog', { name: 'Set priority' }).getByLabel('Priority').selectOption('High');
-        await page.getByRole('dialog', { name: 'Set priority' }).getByRole('button', { name: 'Submit' }).click();
-
-        await page.getByRole('button', { name: 'Assign' }).click();
-        const assignTo = page.getByRole('dialog', { name: 'Assign' }).getByLabel('Assign to');
+        const assign = page.getByRole('dialog', { name: 'Assign' });
+        await open(page.getByRole('button', { name: 'Assign' }), headingOf(assign));
+        const assignTo = assign.getByLabel('Assign to');
         await expect(assignTo.getByRole('option', { name: focal, exact: true })).toBeAttached();
         await expect(assignTo.getByRole('option', { name: officer, exact: true })).toHaveCount(0);
         await assignTo.selectOption(focal);
-        await page.getByRole('dialog', { name: 'Assign' }).getByRole('button', { name: 'Submit' }).click();
+        await assign.getByRole('button', { name: 'Submit' }).click();
 
         const caseSection = page.getByRole('region', { name: 'Case' });
         await expect(caseSection).toContainText('Under assessment');
         await expect(caseSection).toContainText('High');
         await expect(caseSection).toContainText(focal);
+    });
+
+    test('filters the case list and flags cases open past 15 working days', { tag: ['@A2'] }, async ({ page }) => {
+        test.setTimeout(90_000);
+        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Production plant', receivedAt: daysAgo(30).dateTime });
+        const fresh = await enterOfflineCase(page);
+
+        await (await findCase(page, fresh.reference)).click();
+        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await expect(page.getByRole('region', { name: 'Case' })).toContainText('Under assessment');
+
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).toHaveClass(/fi-color-danger/);
+        await findCase(page, fresh.reference);
+        await expect(daysOpenBadge(page, fresh.reference)).not.toHaveClass(/fi-color-danger/);
+
+        const filters: [string, () => Promise<void>, { reference: string }, { reference: string }][] = [
+            ['status', async () => {
+                await page.getByRole('combobox', { name: 'Status' }).click();
+                await page.getByRole('option', { name: 'Under assessment' }).click();
+            }, fresh, old],
+            ['overdue only', () => page.getByRole('switch', { name: /Overdue only/ }).click(), old, fresh],
+            ['category', () => page.getByLabel('Category').selectOption('Discrimination'), old, fresh],
+            ['location', () => page.getByLabel('Location').selectOption('Head office'), fresh, old],
+            ['received dates', async () => {
+                await page.getByLabel('Received from').fill(daysAgo(31).day);
+                await page.getByLabel('Received until').fill(daysAgo(29).day);
+            }, old, fresh],
+        ];
+
+        for (const [name, choose, shown, hidden] of filters) {
+            await test.step(name, async () => {
+                await page.goto('/admin/grievances');
+                await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
+                await choose();
+                await Promise.all([
+                    page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+                    page.getByRole('button', { name: 'Apply filters' }).click(),
+                ]);
+
+                await expect(await search(page, shown.reference)).toBeVisible();
+                await search(page, hidden.reference);
+                await expect(noCases(page)).toBeVisible();
+            });
+        }
     });
 });

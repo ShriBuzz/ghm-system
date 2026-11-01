@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createHmac } from 'node:crypto';
-import { test as base, expect, type Page } from '@playwright/test';
+import { test as base, expect, type Locator, type Page } from '@playwright/test';
 
 export const roles = ['administrator', 'focal_person', 'restricted_officer'] as const;
 export type Role = (typeof roles)[number];
@@ -101,6 +101,29 @@ export function totp(secret: string, now = Date.now()): string {
     const offset = hmac[hmac.length - 1] & 0xf;
 
     return String((hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, '0');
+}
+
+/**
+ * Clicks a button until what it opens is shown. A click that lands before Livewire has
+ * started on a new page does nothing, and Filament gives no other sign that it is ready.
+ * Once it shows, the button is not clicked again.
+ */
+export async function open(button: Locator, shownWhenOpen: Locator): Promise<void> {
+    await expect(async () => {
+        if (!(await shownWhenOpen.isVisible())) {
+            await button.click();
+        }
+
+        await expect(shownWhenOpen).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 15_000 });
+}
+
+/**
+ * A Filament dialog's heading. The dialog element itself has no size, so it always counts
+ * as hidden; its heading shows whether the dialog is open.
+ */
+export function headingOf(dialog: Locator): Locator {
+    return dialog.getByRole('heading').first();
 }
 
 /**
