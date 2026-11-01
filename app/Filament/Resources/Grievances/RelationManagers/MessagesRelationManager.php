@@ -19,7 +19,8 @@ class MessagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'messages';
 
-    protected static ?string $title = 'Messages with the complainant';
+    // Short, so all three tabs fit a 360 px screen; the table heading says who reads them.
+    protected static ?string $title = 'Messages';
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
@@ -46,6 +47,7 @@ class MessagesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->heading('Messages with the complainant')
             ->defaultSort('created_at')
             ->columns([
                 TextColumn::make('created_at')->label('Date')->dateTime(),

@@ -18,7 +18,8 @@ class NotesRelationManager extends RelationManager
 {
     protected static string $relationship = 'notes';
 
-    protected static ?string $title = 'Internal notes';
+    // Short, so all three tabs fit a 360 px screen; the table heading says they are internal.
+    protected static ?string $title = 'Notes';
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
@@ -40,6 +41,7 @@ class NotesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->heading('Internal notes')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('created_at')->label('Date')->dateTime(),

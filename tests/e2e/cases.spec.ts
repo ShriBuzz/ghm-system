@@ -265,19 +265,31 @@ test.describe('administrator, working a case', () => {
         const { reference } = await enterOfflineCase(page);
         await (await findCase(page, reference)).click();
 
-        await openTab(page, 'Internal notes');
+        await openTab(page, 'Notes');
         await writeOnCase(page, 'Add note', 'Add internal note', 'Note', 'Spoke to the supervisor.');
-        await expect(page.getByRole('tabpanel', { name: 'Internal notes' })).toContainText('Spoke to the supervisor.');
+        await expect(page.getByRole('tabpanel', { name: 'Notes' })).toContainText('Spoke to the supervisor.');
 
-        await openTab(page, 'Messages with the complainant');
+        await openTab(page, 'Messages');
         await writeOnCase(page, 'Send reply', 'Reply to the complainant', 'Reply', 'Payroll is checking your overtime.');
-        const thread = page.getByRole('tabpanel', { name: 'Messages with the complainant' });
+        const thread = page.getByRole('tabpanel', { name: 'Messages' });
         await expect(thread).toContainText('Payroll is checking your overtime.');
         await expect(thread).toContainText('Staff');
 
         const download = await page.request.get(await uploadDocument(page));
         expect(download.status()).toBe(200);
         expect(download.headers()['content-disposition']).toContain(`attachment; filename=${tinyPng.name}`);
+    });
+
+    test('shows every case page tab on a 360 px screen', { tag: ['@A3'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+        await page.setViewportSize({ width: 360, height: 740 });
+
+        await page.getByRole('tab', { name: 'Messages' }).scrollIntoViewIfNeeded();
+
+        for (const name of ['Messages', 'Notes', 'Documents']) {
+            await expect(page.getByRole('tab', { name })).toBeInViewport({ ratio: 1 });
+        }
     });
 
     test('sees a status change on the activity log', { tag: ['@S6'] }, async ({ page }) => {
