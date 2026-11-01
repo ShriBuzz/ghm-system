@@ -235,8 +235,8 @@ return [
         'notifiable' => Notifiable::class,
 
         'mail' => [
-            // The package checks this address at boot; without BACKUP_MAIL_TO nothing is sent to it.
-            'to' => env('BACKUP_MAIL_TO', 'nobody@example.invalid'),
+            // The package checks this address at boot; without BACKUP_MAIL_TO (unset or empty) nothing is sent to it.
+            'to' => env('BACKUP_MAIL_TO') ?: 'nobody@example.invalid',
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
