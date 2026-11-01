@@ -40,6 +40,9 @@ Artisan::command('ghm:clear-temporary-uploads', function () {
 
 Schedule::command('ghm:clear-temporary-uploads')->hourly();
 
+// Shared hosting has no supervisor: cron's schedule:run starts a worker that exits once the queue is empty.
+Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute()->withoutOverlapping();
+
 Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $role, string $key) {
     // For the Playwright specs (tests/e2e/support.ts): a fake user with a fresh password and
     // authenticator secret on every call, printed as JSON, so no credential is kept in the repo.
