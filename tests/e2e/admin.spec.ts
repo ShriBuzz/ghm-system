@@ -1,4 +1,5 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { enterCredentials, roles, signedInAs } from './support';
 
 test('the staff sign-in page is reachable and locked down', { tag: ['@smoke', '@S1', '@A1'] }, async ({ page }) => {
     const response = await page.goto('/admin');
@@ -28,23 +29,32 @@ test('a sixth failed sign-in shows the lock message', { tag: ['@S2'] }, async ({
     await expect(page.getByRole('alert')).toContainText(/\d/);
 });
 
-/**
- * Fills the sign-in form and waits until Livewire's component state holds both values.
- * Filament can bind its fields after the page has loaded; text typed before then never
- * reaches the server.
- */
-async function enterCredentials(page: Page, email: string, password: string): Promise<void> {
-    await expect(async () => {
-        await page.locator('input[type="email"]').fill(email);
-        await page.locator('input[type="password"]').fill(password);
+const menus = {
+    administrator: ['Dashboard', 'Cases', 'Categories', 'Holidays', 'Locations', 'Users'],
+    focal_person: ['Dashboard', 'Cases'],
+    restricted_officer: ['Dashboard', 'Cases'],
+};
 
-        const state = await page.evaluate(() => {
-            const id = document.querySelector('form')!.closest('[wire\\:id]')!.getAttribute('wire:id');
-            const wire = (window as any).Livewire.find(id);
+for (const role of roles) {
+    test.describe(role, () => {
+        test.use({ storageState: signedInAs(role) });
 
-            return [wire.$get('data.email'), wire.$get('data.password')];
+        test('sees only the menu for this role, in English', { tag: ['@A1', '@A7'] }, async ({ page }) => {
+            await page.goto('/admin');
+
+            await expect(page.getByRole('navigation', { name: 'Sidebar navigation' }).getByRole('link')).toHaveText(menus[role]);
         });
+    });
+}
 
-        expect(state).toEqual([email, password]);
-    }).toPass({ timeout: 10_000 });
+for (const role of ['focal_person', 'restricted_officer'] as const) {
+    test.describe(role, () => {
+        test.use({ storageState: signedInAs(role) });
+
+        test('is refused the settings pages', { tag: ['@A7', '@A5'] }, async ({ page }) => {
+            for (const settings of ['categories', 'holidays', 'locations', 'users']) {
+                expect((await page.goto(`/admin/${settings}`))!.status()).toBe(403);
+            }
+        });
+    });
 }
