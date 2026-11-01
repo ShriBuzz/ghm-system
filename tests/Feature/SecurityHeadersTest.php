@@ -48,3 +48,8 @@ it('allows inline scripts in the panel only with this response\'s nonce', functi
         expect($inlineScripts[0])->not->toBeEmpty()->each->toContain("nonce=\"{$nonce[1]}\"");
     }
 })->group('S1');
+
+it('lets the panel preview a file the user just picked, and keeps public pages without it', function () {
+    expect($this->get('/admin/login')->headers->get('Content-Security-Policy'))->toContain("img-src 'self' data: blob:")
+        ->and($this->get('/ne')->headers->get('Content-Security-Policy'))->not->toContain('blob:');
+})->group('S1');

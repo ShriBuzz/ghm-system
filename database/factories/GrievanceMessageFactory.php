@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\MessageDirection;
 use App\Models\Grievance;
 use App\Models\GrievanceMessage;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +21,7 @@ class GrievanceMessageFactory extends Factory
     {
         return [
             'grievance_id' => Grievance::factory(),
-            'direction' => 'complainant',
+            'direction' => MessageDirection::Complainant,
             'body' => fake()->paragraph(),
         ];
     }

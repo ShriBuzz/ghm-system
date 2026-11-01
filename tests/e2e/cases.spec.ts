@@ -213,3 +213,115 @@ test.describe('administrator', () => {
         }
     });
 });
+
+/**
+ * A 1 × 1 PNG, enough for the document upload to accept and redraw.
+ */
+const tinyPng = { name: 'site-visit.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64') };
+
+/**
+ * Opens one of the case page's tabs (messages, notes, documents). Filament loads each
+ * tab's table only once it is on screen.
+ */
+async function openTab(page: Page, name: string) {
+    await open(page.getByRole('tab', { name }), page.getByRole('tabpanel', { name }));
+}
+
+/**
+ * Opens a case page action that writes text, fills it and creates the record.
+ */
+async function writeOnCase(page: Page, button: string, heading: string, field: string, text: string) {
+    const dialog = page.getByRole('dialog', { name: heading });
+    await open(page.getByRole('button', { name: button }), headingOf(dialog));
+    await dialog.getByLabel(field).fill(text);
+    await dialog.getByRole('button', { name: 'Create', exact: true }).click();
+    await expect(headingOf(dialog)).toBeHidden();
+}
+
+/**
+ * Uploads a document on the case page on screen and returns its download address.
+ */
+async function uploadDocument(page: Page) {
+    await openTab(page, 'Documents');
+    const dialog = page.getByRole('dialog', { name: 'Upload document' });
+    await open(page.getByRole('button', { name: 'Upload document' }), headingOf(dialog));
+    // FilePond's own input, which exists only once its script has started; a file given earlier is lost.
+    await dialog.locator('input.filepond--browser').setInputFiles(tinyPng);
+    // Shown once on screen and once for screen readers.
+    await expect(dialog.getByText('Upload complete').first()).toBeVisible();
+    await dialog.getByRole('button', { name: 'Submit' }).click();
+    await expect(headingOf(dialog)).toBeHidden();
+
+    const link = page.getByRole('tabpanel', { name: 'Documents' }).getByRole('link', { name: tinyPng.name });
+    await expect(link).toBeVisible();
+
+    return (await link.getAttribute('href'))!;
+}
+
+test.describe('administrator, working a case', () => {
+    test.use({ role: 'administrator' });
+
+    test('adds a note, replies to the complainant and uploads a document', { tag: ['@A3', '@S4'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+
+        await openTab(page, 'Notes');
+        await writeOnCase(page, 'Add note', 'Add internal note', 'Note', 'Spoke to the supervisor.');
+        await expect(page.getByRole('tabpanel', { name: 'Notes' })).toContainText('Spoke to the supervisor.');
+
+        await openTab(page, 'Messages');
+        await writeOnCase(page, 'Send reply', 'Reply to the complainant', 'Reply', 'Payroll is checking your overtime.');
+        const thread = page.getByRole('tabpanel', { name: 'Messages' });
+        await expect(thread).toContainText('Payroll is checking your overtime.');
+        await expect(thread).toContainText('Staff');
+
+        const download = await page.request.get(await uploadDocument(page));
+        expect(download.status()).toBe(200);
+        expect(download.headers()['content-disposition']).toContain(`attachment; filename=${tinyPng.name}`);
+    });
+
+    test('shows every case page tab on a 360 px screen', { tag: ['@A3'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+        await page.setViewportSize({ width: 360, height: 740 });
+
+        await page.getByRole('tab', { name: 'Messages' }).scrollIntoViewIfNeeded();
+
+        for (const name of ['Messages', 'Notes', 'Documents']) {
+            await expect(page.getByRole('tab', { name })).toBeInViewport({ ratio: 1 });
+        }
+    });
+
+    test('sees a status change on the activity log', { tag: ['@S6'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+        await setOnCase(page, 'Set status', 'Status', 'Under investigation');
+
+        await page.goto('/admin/activity-log');
+        await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
+        await page.getByLabel('Case reference').fill(reference);
+        await Promise.all([
+            page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+            page.getByRole('button', { name: 'Apply filters' }).click(),
+        ]);
+
+        const entry = page.getByRole('row').filter({ hasText: 'Status Changed' }).filter({ hasText: reference });
+        await expect(entry).toContainText(reference);
+        await expect(entry).toContainText('Received → Under Investigation');
+    });
+});
+
+test.describe('focal person, documents', () => {
+    test.use({ role: 'focal_person' });
+
+    test('cannot download a document from a restricted case', { tag: ['@S4', '@A5'] }, async ({ page, browser, baseURL, staff }) => {
+        const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
+        const officerPage = await officer.newPage();
+        const { reference } = await enterOfflineCase(officerPage, { category: 'Sexual harassment or abuse', anonymous: true });
+        await (await findCase(officerPage, reference)).click();
+        const address = await uploadDocument(officerPage);
+        await officer.close();
+
+        expect((await page.request.get(address)).status()).toBe(403);
+    });
+});

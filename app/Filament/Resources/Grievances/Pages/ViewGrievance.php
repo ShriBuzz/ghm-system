@@ -20,6 +20,13 @@ class ViewGrievance extends ViewRecord
 {
     protected static string $resource = GrievanceResource::class;
 
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+
+        activity()->performedOn($this->getRecord())->event('viewed')->log('Case viewed');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

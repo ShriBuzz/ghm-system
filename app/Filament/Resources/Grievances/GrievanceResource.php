@@ -6,6 +6,9 @@ use App\Filament\Resources\Grievances\Pages\CreateGrievance;
 use App\Filament\Resources\Grievances\Pages\ListGrievances;
 use App\Filament\Resources\Grievances\Pages\RecordedCase;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
+use App\Filament\Resources\Grievances\RelationManagers\AttachmentsRelationManager;
+use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
+use App\Filament\Resources\Grievances\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\Grievances\Schemas\GrievanceForm;
 use App\Filament\Resources\Grievances\Schemas\GrievanceInfolist;
 use App\Filament\Resources\Grievances\Tables\GrievancesTable;
@@ -56,6 +59,15 @@ class GrievanceResource extends Resource
     public static function table(Table $table): Table
     {
         return GrievancesTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            MessagesRelationManager::class,
+            NotesRelationManager::class,
+            AttachmentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

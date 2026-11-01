@@ -3,14 +3,22 @@
 namespace App\Models;
 
 use Database\Factories\GrievanceNoteFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['user_id', 'body'])]
 class GrievanceNote extends Model
 {
     /** @use HasFactory<GrievanceNoteFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::created(fn (GrievanceNote $note) => activity()->performedOn($note->grievance()->firstOrFail())->event('note_added')
+            ->withProperties(['note_id' => $note->id])->log('Note added'));
+    }
 
     /**
      * @return BelongsTo<Grievance, $this>

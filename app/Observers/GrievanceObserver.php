@@ -5,9 +5,21 @@ namespace App\Observers;
 use App\Enums\Status;
 use App\Models\Grievance;
 use App\Support\WorkingDays;
+use BackedEnum;
 
 class GrievanceObserver
 {
+    /**
+     * Case fields whose changes go into the activity log (S6), with the event name.
+     * Only codes, IDs and flags: never encrypted text.
+     */
+    private const LOGGED = [
+        'status' => 'status_changed',
+        'priority' => 'priority_changed',
+        'assigned_to' => 'assigned',
+        'manually_restricted' => 'restriction_changed',
+    ];
+
     /**
      * A case is restricted when its category is restricted or a user marked it so (A5).
      */
@@ -18,6 +30,26 @@ class GrievanceObserver
 
         if ($grievance->isDirty('status')) {
             $this->updateClock($grievance);
+        }
+    }
+
+    public function created(Grievance $grievance): void
+    {
+        activity()->performedOn($grievance)->event('created')
+            ->withProperties(['channel' => $grievance->channel->value])
+            ->log('Case created');
+    }
+
+    public function updated(Grievance $grievance): void
+    {
+        foreach (self::LOGGED as $field => $event) {
+            if ($grievance->wasChanged($field)) {
+                $plain = fn (mixed $value): mixed => $value instanceof BackedEnum ? $value->value : $value;
+
+                activity()->performedOn($grievance)->event($event)
+                    ->withProperties(['old' => $plain($grievance->getOriginal($field)), 'new' => $plain($grievance->getAttribute($field))])
+                    ->log(str($event)->headline()->toString());
+            }
         }
     }
 

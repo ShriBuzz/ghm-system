@@ -18,6 +18,9 @@ const server = (port: number, env: Record<string, string>) => ({
 export default defineConfig({
     testDir: 'tests/e2e',
     fullyParallel: true,
+    // Two, as on CI's runner: with more, the local servers fall behind and waits time out at random.
+    // The run takes as long either way, because the S2 idle spec waits out a one-minute session.
+    workers: 2,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,
     reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

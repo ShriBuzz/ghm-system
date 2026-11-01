@@ -14,6 +14,12 @@ class Attachment extends Model
     /** @use HasFactory<AttachmentFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::created(fn (Attachment $attachment) => activity()->performedOn($attachment->grievance()->firstOrFail())->event('attachment_uploaded')
+            ->withProperties(['attachment_id' => $attachment->id])->log('Document uploaded'));
+    }
+
     /**
      * @return BelongsTo<Grievance, $this>
      */

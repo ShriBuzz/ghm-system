@@ -2,7 +2,26 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-10-31. WP0 is complete and waiting in pull request #1 for review and merge; WP1 starts after the merge.
+Last updated 2026-11-01. WP0 and WP2 (admin side) are built. WP1 (public side) is a teammate's, in progress on its own branch.
+
+## Where things stand
+
+| Work | State |
+|---|---|
+| WP0 Foundations | Merged (pull requests #1, #2, #3) |
+| WP2 step 1: reference number, PIN, attachment store | Merged (pull request #4) |
+| WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
+| WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Branch `wp2/case-work`, pull request #6, in review |
+| WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore` |
+| WP3 Alerts, reports, security | Not started |
+
+Step-by-step status is in the WP2 table in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
+
+## Next steps
+
+1. Get pull request #6 (`wp2/case-work`) reviewed and merged. Its description tells the reviewer: the Playwright suite now runs two workers (`playwright.config.ts`), the settings spec uses a new `fillInDialog` helper (`tests/e2e/support.ts`), and the admin menu spec expects "Activity log". Watch CI.
+2. Before WP3, from the WP2 work: export logging for S6 comes with N4; the S7 backup must leave `storage/app/private/livewire-tmp` out (a file chosen in a cancelled upload dialog stays there up to a day before the hourly clean-up deletes it); N1 alert recipients should use `User::canSee()`, the same visibility rule.
+3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language) and `docs/clarification-questions.md` (the NBI email, still not sent).
 
 ## Read first
 
@@ -29,12 +48,11 @@ Last updated 2026-10-31. WP0 is complete and waiting in pull request #1 for revi
 
 A fresh `APP_KEY` is fine now because no encrypted data exists yet. Once it does, a database copied between machines only decrypts with the same `APP_KEY`. Local data is fake, so recreate it rather than copying it.
 
-## First session on the Mac
+## Starting a new session
 
-1. Work through `docs/local-setup.md`: tools, MySQL, GitHub, the project, agent tooling.
-2. Start Claude Code in the project folder and give it this prompt:
+On a new machine, work through `docs/local-setup.md` first. Then start Claude Code in the project folder and give it this prompt:
 
-   > Read CLAUDE.md, docs/rfq-requirements.md, WP0-kickoff.md, docs/progress.md and docs/handoff.md. We are on branch wp0/foundations; docs/progress.md says which kickoff steps are done. Check this machine against docs/local-setup.md (php -v, the PHP extensions, composer -V, node -v, MySQL reachable as the ghm user, php artisan test, vendor/bin/pint --test) and report anything missing. Then continue with the next open step. Commit and push after each step, and update docs/progress.md as you go. Stop before step 6 if docs/implementation-plan.md is still missing, and bring open questions to me instead of guessing.
+> Read CLAUDE.md, docs/handoff.md, docs/progress.md and WP2-kickoff.md. Check `git status`, the current branch and how it compares with origin/main, then run php artisan test, vendor/bin/pint --test and vendor/bin/phpstan analyse --memory-limit=1G, and report the results. Then tell me the next step from docs/handoff.md and wait for my go-ahead. Work one step at a time: a failing Pest test first, then the code, then check it in a browser with Playwright CLI using fake users you delete afterwards. Commit each step with its requirement IDs; push or open a pull request only when I ask. Bring open questions to me instead of guessing.
 
 ## Keep this current
 

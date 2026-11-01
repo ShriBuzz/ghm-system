@@ -6,6 +6,7 @@ use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Resources\Grievances\Pages\RecordedCase;
+use App\Http\Controllers\AttachmentController;
 use App\Http\Middleware\SetPanelLocale;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -24,6 +25,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -67,6 +69,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             // Persistent, so Livewire's background requests stay in English too.
             ->middleware([SetPanelLocale::class], isPersistent: true)
+            // Behind the panel's sign-in; the controller checks the case policy (S4).
+            ->authenticatedRoutes(fn () => Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download'))
             ->authMiddleware([
                 Authenticate::class,
             ]);

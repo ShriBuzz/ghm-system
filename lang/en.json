@@ -8,6 +8,8 @@
     "contact.phone": "Phone",
     "home.coming_soon": "The grievance form will be available here soon.",
     "language.label": "Language",
+    "message.complainant": "Complainant",
+    "message.staff": "Staff",
     "priority.critical": "Critical",
     "priority.high": "High",
     "priority.low": "Low",
