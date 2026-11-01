@@ -61,6 +61,11 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - Admin panel: `script-src 'self' 'nonce-…' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:`, otherwise as above. Each allowance was removed in turn during a full browser walk (sign-in, MFA setup, dashboard, sign-out) and each one broke the panel: the nonce covers Filament's and Livewire's inline scripts (a fresh one per response); `'unsafe-eval'` is needed by Alpine; Filament uses inline `style` attributes and `<style>` blocks without a nonce; the MFA QR code and avatars are `data:` images.
 - Laravel's `/up` health page links a font on fonts.bunny.net and a script on cdn.jsdelivr.net. The public policy blocks both before any request leaves the browser; an uptime monitor only needs the 200.
 
+## Sessions
+
+- Session files are always encrypted with `APP_KEY`; `config/session.php` sets `encrypt` to `true` and no `.env` line can turn it off. The offline slip's PIN passes through the session once (A6, P7), and session files sit on the server's disk.
+- Changing `APP_KEY` signs every user out, as well as making encrypted fields unreadable; keep the old key in `APP_PREVIOUS_KEYS` when rotating.
+
 ## Files and photos (P5, S4, S5)
 
 `App\Support\AttachmentStore` takes every upload, staff and public.

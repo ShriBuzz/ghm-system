@@ -10,7 +10,9 @@ use App\Models\Category;
 use App\Models\Grievance;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 /**
@@ -80,6 +82,22 @@ it('shows the reference and PIN once on the slip page', function () {
 
     $this->get(RecordedCase::getUrl())->assertRedirect(ListGrievances::getUrl());
 })->group('A6');
+
+it('keeps the PIN flashed for the slip out of the session file in clear', function () {
+    $dir = storage_path('framework/testing/sessions-'.Str::random(8));
+    File::ensureDirectoryExists($dir);
+    config(['session.files' => $dir]);
+
+    $session = app('session')->driver('file');
+    $session->start();
+    $session->flash('recorded_case', ['reference' => 'GHM-2026-0007', 'pin' => '048213']);
+    $session->save();
+
+    $stored = File::get("{$dir}/{$session->getId()}");
+    File::deleteDirectory($dir);
+
+    expect($stored)->not->toContain('048213');
+})->group('A6', 'P7');
 
 it('lets a focal person enter a case into a restricted category and still get the slip', function () {
     signedInAs(Role::FocalPerson);
