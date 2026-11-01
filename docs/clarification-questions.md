@@ -61,7 +61,7 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | # | Answer | Assumption in the repo today | Change once answered | Done |
 |---|---|---|---|---|
 | 1 | | Company host passes; no hosting quoted | Annex A item 5 if it fails; `docs/technical-note.md` hosting line; staging plan | [ ] |
-| 2 | | No categories, locations or notice text in the repo | Seeders for categories (with `is_restricted`) and locations; notice text setting (WP1, P3); kick-off date in `docs/progress.md` | [ ] |
+| 2 | | Placeholder categories ("Sexual harassment or abuse" restricted) and locations in `Database\Seeders\PlaceholderListsSeeder`, run outside production only; no notice text yet | Edit the lists in Settings (or the seeder before go-live); notice text setting (WP1, P3); kick-off date in `docs/progress.md` | [ ] |
 | 3 | | `MAIL_MAILER=log` locally | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
 | 4 | | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in the technical note | [ ] |
 | 5 | | Five encrypted text columns on `grievances`; no option lists | Enums `ComplainantType`, `Sex`, `AgeGroup`, `Ethnicity`, `Disability` in `app/Enums`, labels in `lang/en.json` and `lang/ne.json`, casts on `Grievance` (WP1, P6) | [ ] |
