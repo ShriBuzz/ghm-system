@@ -46,6 +46,11 @@ Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute()->with
 // A refused email's error can quote the recipient; keep failed jobs a week for retrying, no longer (S5).
 Schedule::command('queue:prune-failed --hours=168')->daily();
 
+// S7: the night's backup, then the 14-day cleanup, then a check that a fresh backup exists.
+Schedule::command('backup:run')->dailyAt('01:00')->withoutOverlapping();
+Schedule::command('backup:clean')->dailyAt('01:30');
+Schedule::command('backup:monitor')->dailyAt('02:00');
+
 Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $role, string $key) {
     // For the Playwright specs (tests/e2e/support.ts): a fake user with a fresh password and
     // authenticator secret on every call, printed as JSON, so no credential is kept in the repo.

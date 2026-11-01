@@ -39,6 +39,15 @@ return [
             'report' => false,
         ],
 
+        // Backups (S7): outside the web root, never served.
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backups'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

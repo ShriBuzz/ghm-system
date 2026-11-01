@@ -19,6 +19,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `filament/filament` | runtime | The staff admin panel at `/admin`, with its built-in authenticator-app MFA. Its CSS, JS and the Inter font are published into `public/` by `filament:upgrade` on every `composer install` and are not committed; the font is served locally, so the panel makes no third-party requests. |
 | `laravel/framework` | runtime | The application framework. |
 | `openspout/openspout` | runtime | The CSV and Excel export (N4). Streams rows to the download, so a large export does not fill memory; writes the CSV with a byte-order mark so Excel reads Nepali text as UTF-8. |
+| `spatie/laravel-backup` | runtime | The nightly backup (S7): database dump and attachments in an AES-256 password-protected zip, the 15-day cleanup and a daily check that a fresh backup exists. |
 | `spatie/laravel-activitylog` | runtime | The append-only activity log (S6). Its `activity_log` table has no IP or device columns. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
@@ -76,6 +77,15 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 - The acknowledgement (N2, P7) carries the PIN, so its queued job is encrypted with `APP_KEY` (`ShouldBeEncrypted`). Staff alerts (N1) carry only the case ID.
 - Mail servers quote the recipient's address when they refuse an email. `bootstrap/app.php` replaces such errors with "An email could not be sent (mail server code …)" before they are logged.
 - The mail driver is never `log`: that driver writes each email, recipient included, into `laravel.log`. Without a `MAIL_MAILER` line the app uses `smtp`, which fails visibly if unset. Locally `.env.example` uses `array`, which drops emails; tests read them from memory.
+
+## Backups (S7)
+
+- Every night at 01:00 `backup:run` dumps the database (`mysqldump`, which the host must provide) and copies `storage/app/private` without `livewire-tmp` into one zip, encrypted with AES-256 and `BACKUP_ARCHIVE_PASSWORD`. The code is in Git; `.env` is left out, so `APP_KEY` never sits next to the data it unlocks.
+- Archives go to every disk in `BACKUP_DISKS`: `backups` (`storage/app/backups`, outside the web root) by default. The second copy off the web server is a disk added to that list once the host is known (clarification question 1).
+- `backup:clean` at 01:30 deletes archives older than 15 days, so the one from 14 days ago is always there (RFQ: at least 14). `backup:monitor` at 02:00 reports when the newest backup is older than a day.
+- Failure emails go to `BACKUP_MAIL_TO`; without it nothing is sent. Success sends nothing.
+- **Production must set `BACKUP_ARCHIVE_PASSWORD`.** Without it the archive is not encrypted and the attachments in it are readable. Keep it in the company's password manager with `APP_KEY`: a backup restores only with both.
+- Restore steps: `docs/restore.md`.
 
 ## Files and photos (P5, S4, S5)
 
