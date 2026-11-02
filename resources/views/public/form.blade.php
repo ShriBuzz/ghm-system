@@ -9,6 +9,7 @@
 @section('content')
     <h1>{{ __('form.title') }}</h1>
     <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>
+    <p><a href="{{ route('status.lookup') }}">{{ __('form.check_link') }}</a></p>
 
     <section class="notice" aria-labelledby="notice-heading">
         <h2 id="notice-heading">{{ __('form.notice_heading') }}</h2>

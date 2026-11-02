@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // turns into a 419 before this runs. Send the visitor back to the form by name, with what they typed,
         // instead of "Page expired": no referrer is sent and the old session is gone, so "back" knows nothing.
         $exceptions->render(function (HttpException $e, Request $request) {
-            $form = ['grievance.store' => 'home'][$request->route()?->getName()] ?? null;
+            $form = ['grievance.store' => 'home', 'status.check' => 'status.lookup', 'status.reply' => 'status.lookup'][$request->route()?->getName()] ?? null;
 
             if ($e->getStatusCode() !== 419 || $form === null) {
                 return null;
@@ -35,9 +35,14 @@ return Application::configure(basePath: dirname(__DIR__))
             // The CSRF check runs before SetLocale, so take the language from the address.
             app()->setLocale((string) $request->route('locale'));
 
+            // A reply typed on the status page waits as a draft for the next lookup (P8).
+            if ($request->routeIs('status.reply')) {
+                $request->session()->put('status_draft', (string) $request->input('body'));
+            }
+
             return redirect()->route($form, ['locale' => $request->route('locale')])
-                ->withInput($request->except(['_token', 'attachment', 'website']))
-                ->withErrors(['form' => __('form.errors.expired')]);
+                ->withInput($request->except(['_token', 'attachment', 'website', 'pin', 'body']))
+                ->withErrors([$request->routeIs('grievance.store') ? 'form' : 'lookup' => __($request->routeIs('grievance.store') ? 'form.errors.expired' : 'track.expired')]);
         });
 
         $exceptions->shouldRenderJsonWhen(
