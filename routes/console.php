@@ -42,9 +42,9 @@ Schedule::command('ghm:clear-temporary-uploads')->hourly();
 
 // Shared hosting has no supervisor: cron's schedule:run starts a worker that exits once the queue is empty.
 // The lock expires after 10 minutes, so a worker killed by the host does not stop email for a day.
-// A failed email is tried again after 1 and then 10 minutes, so a short mail-server outage or a
+// A failed email is tried again after 1 minute, 10 minutes and an hour, so a mail-server outage or a
 // host's hourly sending limit delays an alert instead of losing it; a later cron run picks it up.
-Schedule::command('queue:work --stop-when-empty --tries=3 --backoff=60,600')->everyMinute()->withoutOverlapping(10);
+Schedule::command('queue:work --stop-when-empty --tries=4 --backoff=60,600,3600')->everyMinute()->withoutOverlapping(10);
 
 // Failed jobs are kept a week for `php artisan queue:retry`, no longer. Their error never holds a
 // refused email's address (App\Support\FailedJobStore), and an acknowledgement's job is encrypted.

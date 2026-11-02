@@ -45,14 +45,14 @@ function refuseEmails(): void
     config(['mail.mailers.refusing' => ['transport' => 'refusing'], 'mail.default' => 'refusing', 'queue.default' => 'database']);
 }
 
-it('tries a refused email again after a minute, then after ten, before giving up on it', function () {
+it('tries a refused email again after a minute, ten minutes and an hour, before giving up on it', function () {
     refuseEmails();
     $this->freezeTime();
     Grievance::factory()->create(['email' => 'complainant@example.com'])->acknowledge('048213');
     // The command cron runs; --sleep=0 only skips the worker's 3-second pause before it exits.
     $cron = 'queue:work'.Str::after(mailWorker()->command, 'queue:work').' --sleep=0';
 
-    foreach ([60, 600] as $wait) {
+    foreach ([60, 600, 3600] as $wait) {
         $this->artisan($cron)->assertSuccessful();
 
         expect(DB::table('jobs')->sole()->available_at)->toBe(now()->addSeconds($wait)->getTimestamp())
