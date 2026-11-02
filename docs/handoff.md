@@ -21,8 +21,7 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 
 1. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
 2. Before the staging deploy (plan: 16 to 18 Nov): a deployment guide for the company's host, `docs/deploy.md` (release build, cron line, `.env` lines, folder layout), and a full local run of `docs/restore.md`, which WP3 tried only up to unpacking. The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
-3. `/ponytail-review` of the three review fixes on pull request #7 (`2b63fc2`, `fc6acb3`, `3678420`) was not run: the Ponytail plugin was not installed on that machine.
-4. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
+3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
 
 ## Read first
 
