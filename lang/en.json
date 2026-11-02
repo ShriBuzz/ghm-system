@@ -38,6 +38,7 @@
     "language.label": "Language",
     "message.complainant": "Complainant",
     "message.staff": "Staff",
+    "notice.default": "[Draft: the company replaces this wording in Settings.] What you tell us is kept confidential: only the staff who handle grievances can read it, and you can stay anonymous.\n\nNo one will be punished or treated unfairly for raising a grievance.\n\nWhen you send it, you get a reference number and a PIN. Use them on this site to see what is happening and to read our replies.",
     "priority.critical": "Critical",
     "priority.high": "High",
     "priority.low": "Low",
