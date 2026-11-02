@@ -6,7 +6,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 
 | Part | Version | Notes |
 |---|---|---|
-| PHP | 8.4.1 or newer | The locked packages need it (Symfony 8, `spatie/laravel-activitylog` 5). Extensions and `php.ini` settings for a server: `docs/deploy.md`, section 1; `gd` and `exif` redraw photos |
+| PHP | 8.4.1 or newer | Required in `composer.json`, as the locked packages need it (Symfony 8, `spatie/laravel-activitylog` 5). `composer.json` also requires `gd` and `exif`, which redraw photos without their metadata. Every extension and `php.ini` setting a server needs: `docs/deploy.md`, section 1 |
 | Laravel | 13.39 | From the `laravel/laravel` 13.x skeleton, with Vite and Tailwind removed |
 | Admin panel | Filament 5.11, Livewire 4.4 | Staff panel at `/admin`; its assets are published on `composer install` |
 | Database | MySQL 8 or MariaDB 10.6+ | |
