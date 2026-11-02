@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ContactMethod;
 use App\Enums\Recurrence;
+use App\Models\Grievance;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -39,8 +40,12 @@ class StoreGrievanceRequest extends FormRequest
             'category_id' => ['required', Rule::exists('categories', 'id')->where('is_active', true)],
             'location_id' => ['required', Rule::exists('locations', 'id')->where('is_active', true)],
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
+            // False when only the month is remembered; the date then holds the first of that month.
+            'incident_date_exact' => ['sometimes', 'boolean'],
             'recurrence' => ['required', Rule::enum(Recurrence::class)],
             'description' => ['required', 'string', 'max:5000'],
+            // Optional (P6): blank or one of the question's codes, "prefer not to say" among them.
+            ...array_map(fn (string $enum): array => ['nullable', Rule::enum($enum)], Grievance::OPTIONAL_ANSWERS),
         ];
     }
 }

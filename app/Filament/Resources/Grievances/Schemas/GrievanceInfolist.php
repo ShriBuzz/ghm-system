@@ -37,7 +37,10 @@ class GrievanceInfolist
                     ->schema([
                         TextEntry::make('category.name_en')->label('Category'),
                         TextEntry::make('location.name_en')->label('Location'),
-                        TextEntry::make('incident_date')->label('When it happened')->date(),
+                        TextEntry::make('incident_date')->label('When it happened')
+                            ->formatStateUsing(fn (Grievance $record): string => $record->incident_date_exact
+                                ? $record->incident_date->format('j M Y')
+                                : $record->incident_date->format('F Y').', exact day not remembered'),
                         TextEntry::make('recurrence')->label('How often'),
                         TextEntry::make('description')->columnSpanFull(),
                     ]),
@@ -60,11 +63,11 @@ class GrievanceInfolist
                 Section::make('About the complainant (optional answers)')
                     ->columns(['default' => 1, 'lg' => 3])
                     ->schema([
-                        TextEntry::make('complainant_type')->label('Complainant type')->placeholder('Not given'),
-                        TextEntry::make('sex')->placeholder('Not given'),
-                        TextEntry::make('age_group')->label('Age group')->placeholder('Not given'),
-                        TextEntry::make('ethnicity')->placeholder('Not given'),
-                        TextEntry::make('disability')->placeholder('Not given'),
+                        TextEntry::make('complainant_type')->label('Complainant type')->state(fn (Grievance $record) => $record->answerLabel('complainant_type'))->placeholder('Not given'),
+                        TextEntry::make('sex')->state(fn (Grievance $record) => $record->answerLabel('sex'))->placeholder('Not given'),
+                        TextEntry::make('age_group')->label('Age group')->state(fn (Grievance $record) => $record->answerLabel('age_group'))->placeholder('Not given'),
+                        TextEntry::make('ethnicity')->state(fn (Grievance $record) => $record->answerLabel('ethnicity'))->placeholder('Not given'),
+                        TextEntry::make('disability')->state(fn (Grievance $record) => $record->answerLabel('disability'))->placeholder('Not given'),
                     ]),
             ]);
     }

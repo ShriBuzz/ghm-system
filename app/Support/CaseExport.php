@@ -56,11 +56,10 @@ class CaseExport
      */
     private static function row(Grievance $case, bool $personal): array
     {
-        // Demographic fields hold their codes until WP1 adds their enums.
         return [$case->reference, ...($personal ? [(string) $case->name, (string) $case->phone, (string) $case->email] : []),
             $case->received_at->format('Y-m-d H:i'), (string) $case->closed_at?->format('Y-m-d H:i'), $case->channel->getLabel(),
             (string) $case->category?->name_en, (string) $case->location?->name_en, (string) $case->priority?->getLabel(), $case->status->getLabel(),
-            (string) $case->complainant_type, (string) $case->sex, (string) $case->age_group, (string) $case->ethnicity, (string) $case->disability];
+            ...array_map(fn (string $field): string => (string) $case->answerLabel($field), array_keys(Grievance::OPTIONAL_ANSWERS))];
     }
 
     /**

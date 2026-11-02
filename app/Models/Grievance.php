@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\AgeGroup;
 use App\Enums\Channel;
+use App\Enums\ComplainantType;
 use App\Enums\ContactMethod;
+use App\Enums\Disability;
+use App\Enums\Ethnicity;
 use App\Enums\Priority;
 use App\Enums\Recurrence;
 use App\Enums\Role;
+use App\Enums\Sex;
 use App\Enums\Status;
 use App\Notifications\Acknowledgement;
 use App\Notifications\CaseAlert;
@@ -32,6 +37,20 @@ class Grievance extends Model
 {
     /** @use HasFactory<GrievanceFactory> */
     use HasFactory, RoutesNotifications;
+
+    /**
+     * The optional questions about the complainant (P6) and their options. Each column holds
+     * the chosen code, encrypted; the form, the rules, the case page and the export read this list.
+     *
+     * @var array<string, class-string<AgeGroup|ComplainantType|Disability|Ethnicity|Sex>>
+     */
+    public const OPTIONAL_ANSWERS = [
+        'complainant_type' => ComplainantType::class,
+        'sex' => Sex::class,
+        'age_group' => AgeGroup::class,
+        'ethnicity' => Ethnicity::class,
+        'disability' => Disability::class,
+    ];
 
     /**
      * The one rule for which cases a staff member may see (A1, A5). Every
@@ -106,6 +125,16 @@ class Grievance extends Model
         if ($this->email) {
             $this->notify((new Acknowledgement($pin))->locale($this->locale));
         }
+    }
+
+    /**
+     * An optional answer (P6) by its label, or null when the complainant gave none.
+     */
+    public function answerLabel(string $field): ?string
+    {
+        $code = $this->getAttribute($field);
+
+        return $code === null ? null : (self::OPTIONAL_ANSWERS[$field]::tryFrom($code)?->getLabel() ?? $code);
     }
 
     /**
@@ -189,6 +218,7 @@ class Grievance extends Model
             'email' => 'encrypted',
             'preferred_contact' => ContactMethod::class,
             'incident_date' => 'date',
+            'incident_date_exact' => 'boolean',
             'recurrence' => Recurrence::class,
             'description' => 'encrypted',
             'complainant_type' => 'encrypted',
