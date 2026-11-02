@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Support\FailedJobStore;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
+use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Failed jobs keep their error without a refused email's address (S3, S5). Laravel's own
+        // store for the configured driver is swapped for the same store with that one change.
+        $this->app->extend('queue.failer', fn (FailedJobProviderInterface $failer, Application $app) => $failer instanceof DatabaseUuidFailedJobProvider
+            ? new FailedJobStore($app->make('db'), config('queue.failed.database'), config('queue.failed.table'))
+            : $failer);
     }
 
     /**

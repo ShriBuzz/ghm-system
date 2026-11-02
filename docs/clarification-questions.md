@@ -1,11 +1,15 @@
 # Clarification questions for NBI
 
-Questions for the RFQ clarification email, due **2 Nov 2026** (RFQ section 1), and what to change in the repo once NBI answers. They gather plan section 11's questions and the ones found while building WP0.
+Questions for NBI, and what to change in the repo once NBI answers. They gather plan section 11's questions and the ones found while building.
+
+They were planned for the RFQ clarification email, due 2 Nov 2026 (RFQ section 1). Decided 2026-11-02: they are asked after contract signing instead. Until NBI answers, the code follows the assumptions in "Apply when answered" below, and the work continues on what does not depend on them.
 
 | Email | Status |
 |---|---|
-| Clarification email | Not sent |
+| Questions to NBI | Not sent; to be asked after contract signing |
 | NBI's answers | Waiting |
+
+The email text below was written to go before the quotation; adjust its opening and question 1 (which mentions quoting new hosting) when it is sent.
 
 When the answers arrive: record each one in the "Answer" column below, apply the change listed for it, tick it off, and move any decision into `docs/progress.md`.
 
@@ -71,7 +75,7 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 9 | | Anonymous means no name, phone or email | P4 validation in the WP1 form | [ ] |
 | 10 | | `config/ghm.php`: `weekend_days` is Saturday only, `sla_days` is 15; `holidays` table is empty. The clock (`Status::isOpen()`) runs in Received, Under assessment, Under investigation and Reopened, stops at Resolved, Referred and Closed; a reopened case counts from the day it was received; `closed_at` is set at Closed and cleared whenever the case leaves Closed, at Reopened or any other status (`GrievanceObserver`) | `weekend_days`; holidays entered in settings (WP2 step 4); clock statuses in `Status::isOpen()`; then run `php artisan ghm:recount-working-days` once | [ ] |
 | 11 | | Draft labels in `lang/ne.json` (`status.*`, `priority.*`) | Edit `lang/ne.json` only; mark them confirmed in `docs/requirements-traceability.md` | [ ] |
-| 12 | | `CLAUDE.md` rule: only the Administrator removes a manual restriction; export without names or contacts for other roles | `GrievancePolicy` (step 7) and the export page (WP3, N4) if NBI differs | [ ] |
-| 13 | | Administrator alerts are opt-in; no reply notification to complainants | Alert recipients (WP3, N1); a reply notification only if NBI asks for it | [ ] |
+| 12 | | `CLAUDE.md` rule: only the Administrator removes a manual restriction; export without names or contacts for other roles | `GrievancePolicy` (step 7; `exportPersonalData()` for exports) if NBI differs | [ ] |
+| 13 | | Administrator alerts are opt-in; no reply notification to complainants | `Grievance::alertStaff()` (drop the Administrator exclusion); a reply notification only if NBI asks for it | [ ] |
 | 14 | | The staff panel is in English (`App\Http\Middleware\SetPanelLocale`); `APP_LOCALE=ne` stays the public default | Nepali: change the locale in `SetPanelLocale`. A switch: a user setting read there instead | [ ] |
 | 15 | | No cleanup job; nothing is deleted | A scheduled cleanup and its note in `docs/technical-note.md` (WP3) | [ ] |

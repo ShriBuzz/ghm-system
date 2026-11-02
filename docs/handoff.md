@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-11-01. WP0 and WP2 (admin side) are built. WP1 (public side) is a teammate's, in progress on its own branch.
+Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, security) are merged. WP1 (public side) is a teammate's, in progress on its own branch.
 
 ## Where things stand
 
@@ -11,17 +11,17 @@ Last updated 2026-11-01. WP0 and WP2 (admin side) are built. WP1 (public side) i
 | WP0 Foundations | Merged (pull requests #1, #2, #3) |
 | WP2 step 1: reference number, PIN, attachment store | Merged (pull request #4) |
 | WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
-| WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Branch `wp2/case-work`, pull request #6, in review |
-| WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore` |
-| WP3 Alerts, reports, security | Not started |
+| WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Merged (pull request #6) |
+| WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
+| WP3 Alerts, reports, security | Merged (pull request #7, with three review fixes). Still open: the timed restore drill on staging, the off-server backup copy, the S8 recipients |
 
-Step-by-step status is in the WP2 table in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
+Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
 
 ## Next steps
 
-1. Get pull request #6 (`wp2/case-work`) reviewed and merged. Its description tells the reviewer: the Playwright suite now runs two workers (`playwright.config.ts`), the settings spec uses a new `fillInDialog` helper (`tests/e2e/support.ts`), and the admin menu spec expects "Activity log". Watch CI.
-2. Before WP3, from the WP2 work: export logging for S6 comes with N4; the S7 backup must leave `storage/app/private/livewire-tmp` out (a file chosen in a cancelled upload dialog stays there up to a day before the hourly clean-up deletes it); N1 alert recipients should use `User::canSee()`, the same visibility rule.
-3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language) and `docs/clarification-questions.md` (the NBI email, still not sent).
+1. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
+2. Before the staging deploy (plan: 16 to 18 Nov): a deployment guide for the company's host, `docs/deploy.md` (release build, cron line, `.env` lines, folder layout), and a full local run of `docs/restore.md`, which WP3 tried only up to unpacking. The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
+3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
 
 ## Read first
 
@@ -31,7 +31,7 @@ Step-by-step status is in the WP2 table in `docs/progress.md`; which requirement
 4. `WP0-kickoff.md`: the WP0 steps. `WP2-kickoff.md`: the WP2 (admin side) steps.
 5. `docs/progress.md`: what is done, what is next, open questions and decisions.
 6. `docs/local-setup.md`: how to set up a machine.
-7. `docs/manual-testing.md`: how to run the app and try everything by hand.
+7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/restore.md`: restoring a backup.
 8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
 
 ## What git does not carry
@@ -52,7 +52,7 @@ A fresh `APP_KEY` is fine now because no encrypted data exists yet. Once it does
 
 On a new machine, work through `docs/local-setup.md` first. Then start Claude Code in the project folder and give it this prompt:
 
-> Read CLAUDE.md, docs/handoff.md, docs/progress.md and WP2-kickoff.md. Check `git status`, the current branch and how it compares with origin/main, then run php artisan test, vendor/bin/pint --test and vendor/bin/phpstan analyse --memory-limit=1G, and report the results. Then tell me the next step from docs/handoff.md and wait for my go-ahead. Work one step at a time: a failing Pest test first, then the code, then check it in a browser with Playwright CLI using fake users you delete afterwards. Commit each step with its requirement IDs; push or open a pull request only when I ask. Bring open questions to me instead of guessing.
+> Read CLAUDE.md, docs/handoff.md and docs/progress.md. Check `git status`, the current branch and how it compares with origin/main, then run php artisan test, vendor/bin/pint --test and vendor/bin/phpstan analyse --memory-limit=1G, and report the results. Then tell me the next step from docs/handoff.md and wait for my go-ahead. Work one step at a time: a failing Pest test first, then the code, then check it in a browser with Playwright CLI using fake users you delete afterwards. Commit each step with its requirement IDs; push or open a pull request only when I ask. Bring open questions to me instead of guessing.
 
 ## Keep this current
 

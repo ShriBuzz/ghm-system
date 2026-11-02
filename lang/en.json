@@ -1,4 +1,11 @@
 {
+    "All rights reserved.": "All rights reserved.",
+    "acknowledgement.check": "Keep both safe. To see progress or send us more information, go to :url and enter them. Do not share them: anyone who has both can see your grievance.",
+    "acknowledgement.greeting": "Thank you",
+    "acknowledgement.pin": "PIN: **:pin**",
+    "acknowledgement.reference": "Your grievance has been received. Reference number: **:reference**",
+    "acknowledgement.salutation": "Grievance handling team",
+    "acknowledgement.subject": "We have received your grievance",
     "channel.drop_box": "Drop box",
     "channel.email": "Email",
     "channel.in_person": "In person",

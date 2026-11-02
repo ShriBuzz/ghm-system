@@ -39,7 +39,7 @@ class ActivityLogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function canAccess(): bool
     {
@@ -99,7 +99,7 @@ class ActivityLogResource extends Resource
             return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '');
         }
 
-        return $properties->map(fn (mixed $value, string $key): string => "{$key}: {$value}")->implode(', ');
+        return $properties->map(fn (mixed $value, string $key): string => $key.': '.(is_bool($value) ? ($value ? 'yes' : 'no') : $value))->implode(', ');
     }
 
     public static function getPages(): array

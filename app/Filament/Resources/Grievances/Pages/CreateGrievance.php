@@ -44,6 +44,7 @@ class CreateGrievance extends CreateRecord
                 'locale' => 'ne',
                 'created_by' => auth()->id(),
             ])->save();
+            $case->acknowledge($pin);
 
             // One request only: the slip page reads it once, and it is never stored on the case.
             session()->flash('recorded_case', [

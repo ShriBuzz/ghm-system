@@ -1,4 +1,11 @@
 {
+    "All rights reserved.": "सर्वाधिकार सुरक्षित।",
+    "acknowledgement.check": "यी दुवै सुरक्षित राख्नुहोस्। प्रगति हेर्न वा थप जानकारी पठाउन :url मा गएर यी दुवै हाल्नुहोस्। यी अरूलाई नदिनुहोस्: दुवै भएको जो कोहीले तपाईंको गुनासो हेर्न सक्छ।",
+    "acknowledgement.greeting": "धन्यवाद",
+    "acknowledgement.pin": "पिन: **:pin**",
+    "acknowledgement.reference": "तपाईंको गुनासो प्राप्त भएको छ। सन्दर्भ नम्बर: **:reference**",
+    "acknowledgement.salutation": "गुनासो सुनुवाइ टोली",
+    "acknowledgement.subject": "तपाईंको गुनासो प्राप्त भयो",
     "channel.drop_box": "उजुरी पेटी",
     "channel.email": "इमेल",
     "channel.in_person": "प्रत्यक्ष",

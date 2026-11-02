@@ -8,6 +8,8 @@ use App\Enums\Priority;
 use App\Enums\Recurrence;
 use App\Enums\Role;
 use App\Enums\Status;
+use App\Notifications\Acknowledgement;
+use App\Notifications\CaseAlert;
 use App\Observers\GrievanceObserver;
 use Database\Factories\GrievanceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +22,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\RoutesNotifications;
+use Illuminate\Support\Facades\Notification;
 
 #[Fillable(['status', 'priority', 'assigned_to', 'manually_restricted'])]
 #[Hidden(['pin_hash'])]
@@ -27,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Grievance extends Model
 {
     /** @use HasFactory<GrievanceFactory> */
-    use HasFactory;
+    use HasFactory, RoutesNotifications;
 
     /**
      * The one rule for which cases a staff member may see (A1, A5). Every
@@ -78,6 +82,38 @@ class Grievance extends Model
                 ->withProperties(['old' => $assignee->id, 'new' => null, 'reason' => 'assignee can no longer see the case'])
                 ->log('Assignment cleared');
         }
+    }
+
+    /**
+     * Alert the staff who can see this case to it, or to a complainant's message (N1).
+     * No Administrator alerts until NBI answers clarification question 13; whoever
+     * entered an offline case already knows about it.
+     */
+    public function alertStaff(bool $message = false): void
+    {
+        $recipients = $this->assignableUsers()->reject(fn (User $user): bool => $user->role === Role::Administrator
+            || (! $message && $user->id === $this->created_by));
+
+        Notification::send($recipients, new CaseAlert($this->id, $message));
+    }
+
+    /**
+     * Email the reference and PIN to a complainant who gave an email (N2, P7).
+     * Called where the PIN is made: the only moment it exists in clear.
+     */
+    public function acknowledge(string $pin): void
+    {
+        if ($this->email) {
+            $this->notify((new Acknowledgement($pin))->locale($this->locale));
+        }
+    }
+
+    /**
+     * The complainant's email, for the acknowledgement (N2).
+     */
+    public function routeNotificationForMail(): ?string
+    {
+        return $this->email;
     }
 
     /**

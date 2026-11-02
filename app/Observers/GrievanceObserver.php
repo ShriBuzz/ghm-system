@@ -38,6 +38,8 @@ class GrievanceObserver
         activity()->performedOn($grievance)->event('created')
             ->withProperties(['channel' => $grievance->channel->value])
             ->log('Case created');
+
+        $grievance->alertStaff();
     }
 
     public function updated(Grievance $grievance): void

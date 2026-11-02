@@ -40,6 +40,21 @@ Artisan::command('ghm:clear-temporary-uploads', function () {
 
 Schedule::command('ghm:clear-temporary-uploads')->hourly();
 
+// Shared hosting has no supervisor: cron's schedule:run starts a worker that exits once the queue is empty.
+// The lock expires after 10 minutes, so a worker killed by the host does not stop email for a day.
+// A failed email is tried again after 1 minute, 10 minutes and an hour, so a mail-server outage or a
+// host's hourly sending limit delays an alert instead of losing it; a later cron run picks it up.
+Schedule::command('queue:work --stop-when-empty --tries=4 --backoff=60,600,3600')->everyMinute()->withoutOverlapping(10);
+
+// Failed jobs are kept a week for `php artisan queue:retry`, no longer. Their error never holds a
+// refused email's address (App\Support\FailedJobStore), and an acknowledgement's job is encrypted.
+Schedule::command('queue:prune-failed --hours=168')->daily();
+
+// S7: the night's backup, then the 14-day cleanup, then a check that a fresh backup exists.
+Schedule::command('backup:run')->dailyAt('01:00')->withoutOverlapping();
+Schedule::command('backup:clean')->dailyAt('01:30');
+Schedule::command('backup:monitor')->dailyAt('02:00');
+
 Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $role, string $key) {
     // For the Playwright specs (tests/e2e/support.ts): a fake user with a fresh password and
     // authenticator secret on every call, printed as JSON, so no credential is kept in the repo.
