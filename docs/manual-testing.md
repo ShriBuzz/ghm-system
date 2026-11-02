@@ -46,6 +46,18 @@ Open http://127.0.0.1:8000. It sends you to `/ne`, the Nepali page.
 | DevTools, Cmd+Shift+P, "Disable JavaScript", reload | The page and the language switch still work |
 | DevTools, Network tab, the page request | `Content-Security-Policy`, `Referrer-Policy: no-referrer` and `X-Content-Type-Options: nosniff` headers |
 
+The page is the grievance form (P1 to P9). Fill it with fake details only.
+
+| Try | Expect |
+|---|---|
+| Press "Send grievance" with nothing filled in | A box at the top lists what needs fixing, each line a link to its field |
+| Choose "Yes, give my name and contact", then "No, stay anonymous" | The contact fields appear, then go away; with JavaScript off too |
+| Day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
+| Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
+| Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
+| Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |
+| Send six or more grievances in a row | Each goes through; the 11th within an hour is refused with what you typed kept (P9). `php artisan cache:clear` resets the count |
+
 ## 4. Staff panel
 
 Open http://127.0.0.1:8000/admin and sign in with the email and password from `.env`.
