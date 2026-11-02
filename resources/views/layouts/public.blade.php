@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@hasSection('title')@yield('title') · @endif{{ __('site.name') }}</title>
     <link rel="stylesheet" href="{{ asset('css/public.css') }}">
+    @stack('head')
     @foreach ($languages->except(app()->getLocale()) as $code => $language)
         <link rel="alternate" hreflang="{{ $code }}" href="{{ $language['url'] }}">
     @endforeach

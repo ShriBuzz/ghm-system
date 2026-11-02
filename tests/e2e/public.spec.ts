@@ -23,7 +23,7 @@ test('opens in Nepali and switches to English and back', { tag: ['@P2', '@S9'] }
     await page.getByRole('link', { name: 'English' }).click();
     await expect(page).toHaveURL(/\/en$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Grievance handling');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Send a grievance');
 
     await page.getByRole('link', { name: 'नेपाली' }).click();
     await expect(page).toHaveURL(/\/ne$/);

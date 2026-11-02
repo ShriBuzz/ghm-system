@@ -11,6 +11,8 @@
     --line: #c9d3d7;
     --accent: #0a5c70;
     --accent-wash: #e3eef1;
+    --accent-strong: #07465a;
+    --error: #b42318;
 
     --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", "Nirmala UI", "Kohinoor Devanagari", sans-serif;
     --measure: 40rem;
@@ -137,4 +139,301 @@ h1 {
 p {
     margin: 0 0 1rem;
     max-width: 65ch;
+}
+
+h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.375rem;
+    line-height: 1.35;
+    text-wrap: balance;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* The notice (P3): the company's own words, set apart by a quiet band, not a coloured edge. */
+.notice {
+    margin: 0 0 2.5rem;
+    padding: 1.25rem;
+    background: var(--band);
+    border-radius: 0.5rem;
+}
+
+.notice h2 {
+    font-size: 1.125rem;
+}
+
+.notice p:last-child {
+    margin-bottom: 0;
+}
+
+/* The form: one column of sections, each a short group, more room between groups than inside them. */
+form[data-grievance] {
+    display: grid;
+    gap: 2.5rem;
+}
+
+.section {
+    display: grid;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+}
+
+.section h2,
+.section > .hint {
+    margin: 0;
+}
+
+.section > .hint {
+    margin-top: -1rem;
+}
+
+fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+legend {
+    padding: 0;
+}
+
+.field,
+.choices,
+.contact,
+.date-parts-group {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.contact {
+    gap: 1.25rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+}
+
+.contact > legend {
+    float: left;
+    width: 100%;
+    font-size: 1.125rem;
+}
+
+label,
+legend {
+    font-weight: 600;
+}
+
+.hint {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    min-height: var(--target);
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--ink-soft);
+    border-radius: 0.375rem;
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+}
+
+textarea {
+    min-height: 10rem;
+    resize: vertical;
+}
+
+input[type="file"] {
+    max-width: 100%;
+    font: inherit;
+    font-size: 1rem;
+}
+
+input[type="file"]::file-selector-button {
+    min-height: var(--target);
+    margin-right: 0.75rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--accent);
+    border-radius: 0.375rem;
+    background: var(--paper);
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Choices: the whole row is the target, and the chosen one is marked by more than colour. */
+.choice {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    min-height: var(--target);
+    padding: 0.625rem 0.875rem;
+    border: 2px solid var(--line);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.choice input {
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: 0.2rem 0 0;
+}
+
+.choice .hint {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.choice:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+}
+
+/* Anonymous: the contact fields go away. Browsers without :has() show them, and the server drops them. */
+form:has(#is_anonymous-1:checked) .contact {
+    display: none;
+}
+
+.date-parts {
+    display: grid;
+    /* The year keeps the width its four digits need; day and month share the rest. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) max-content;
+    gap: 0.5rem;
+}
+
+.date-parts label {
+    font-weight: 400;
+    font-size: 1rem;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--accent);
+    border-radius: 0.5rem;
+    background: var(--paper);
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button-primary {
+    background: var(--accent);
+    color: var(--paper);
+}
+
+.button:hover {
+    border-color: var(--accent-strong);
+    background: var(--accent-wash);
+    color: var(--accent-strong);
+}
+
+.button-primary:hover {
+    background: var(--accent-strong);
+    color: var(--paper);
+}
+
+@media (max-width: 40rem) {
+    .button-primary {
+        width: 100%;
+    }
+}
+
+/* Errors: words first, colour second, and the summary links to each field. */
+.error {
+    margin: 0;
+    color: var(--error);
+    font-weight: 600;
+}
+
+.field-error input,
+.field-error select,
+.field-error textarea {
+    border-color: var(--error);
+}
+
+.error-summary {
+    padding: 1.25rem;
+    border: 3px solid var(--error);
+    border-radius: 0.5rem;
+}
+
+.error-summary h2 {
+    color: var(--error);
+    font-size: 1.25rem;
+}
+
+.error-summary ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.error-summary li + li {
+    margin-top: 0.375rem;
+}
+
+.error-summary a {
+    color: var(--error);
+    font-weight: 600;
+}
+
+/* The received page: the two things to keep, large, spaced and easy to copy (P7). */
+.keep {
+    margin: 0 0 2rem;
+    padding: 1.25rem;
+    border: 3px solid var(--accent);
+    border-radius: 0.75rem;
+}
+
+.keep dl {
+    margin: 0 0 1rem;
+}
+
+.keep dt {
+    color: var(--ink-soft);
+    font-size: 1rem;
+}
+
+.code {
+    margin: 0 0 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: clamp(1.75rem, 1.4rem + 2vw, 2.5rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+}
+
+.keep p:last-child {
+    margin-bottom: 0;
+}
+
+.done {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    margin-top: 2rem;
 }

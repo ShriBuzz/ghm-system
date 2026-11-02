@@ -37,7 +37,7 @@ export default defineConfig({
     projects: [
         {
             name: 'mobile',
-            testMatch: /public\.spec\.ts/,
+            testMatch: /(public|form|status)\.spec\.ts/,
             use: { ...devices['Pixel 5'], viewport: { width: 360, height: 740 } },
         },
         {

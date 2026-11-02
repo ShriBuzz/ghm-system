@@ -51,10 +51,10 @@ composer -V
 node -v      # v20 or later
 ```
 
-Attachments go up to 5 MB, and PHP's default upload limit is 2 MB. Raise it for this machine, then restart any running `php artisan serve`:
+Attachments go up to 5 MB, and PHP's default upload limit is 2 MB. Raise it for this machine, then restart any running `php artisan serve`. `post_max_size` is much higher than the file limit on purpose: above it PHP drops the whole form, typed text included, instead of refusing just the file:
 
 ```sh
-printf 'upload_max_filesize = 6M\npost_max_size = 8M\n' > "$(brew --prefix)/etc/php/8.4/conf.d/ghm.ini"
+printf 'upload_max_filesize = 6M\npost_max_size = 32M\n' > "$(brew --prefix)/etc/php/8.4/conf.d/ghm.ini"
 php -r 'echo ini_get("upload_max_filesize"), "\n";'   # 6M
 ```
 
@@ -152,7 +152,7 @@ To run the app and try everything by hand, follow `docs/manual-testing.md`.
 
 How the Windows laptop was set up, for reference:
 
-- PHP 8.4 (non-thread-safe) from windows.php.net through `winget install --id PHP.PHP.NTS.8.4 --scope user`. The zip ships without a `php.ini`: copy `php.ini-development` to `php.ini`, set `extension_dir` to the absolute `ext` path written with forward slashes, and enable curl, exif, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium and zip. Set `upload_max_filesize = 6M` and `post_max_size = 8M` there too: attachments go up to 5 MB, and PHP's default limit is 2 MB.
+- PHP 8.4 (non-thread-safe) from windows.php.net through `winget install --id PHP.PHP.NTS.8.4 --scope user`. The zip ships without a `php.ini`: copy `php.ini-development` to `php.ini`, set `extension_dir` to the absolute `ext` path written with forward slashes, and enable curl, exif, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium and zip. Set `upload_max_filesize = 6M` and `post_max_size = 32M` there too: attachments go up to 5 MB, and PHP's default limit is 2 MB.
 - Composer from the official installer (signature checked) in `%LOCALAPPDATA%\Programs\Composer`, with a `composer.bat` wrapper, added to the user PATH.
 - GitHub CLI through `winget install --id GitHub.cli`.
 - MySQL 8.0 as the `MySQL80` service. It starts manually: run `Start-Service MySQL80` in an admin PowerShell after a reboot.

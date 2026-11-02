@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\ContactMethod;
 use App\Enums\Recurrence;
 use App\Models\Grievance;
+use App\Support\AttachmentStore;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,11 +16,42 @@ use Illuminate\Validation\Rule;
 class StoreGrievanceRequest extends FormRequest
 {
     /**
+     * Back to the form by name: public pages send no referrer, so Laravel's "back" has nothing to go on.
+     */
+    protected $redirectRoute = 'home';
+
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        return self::caseRules();
+        return self::caseRules() + [
+            'attachment' => ['nullable', AttachmentStore::rule()],
+        ];
+    }
+
+    /**
+     * The form sends strings: "1" or "0" for the anonymous choice, which the shared rules compare
+     * as a boolean, and the incident date as day, month and year, the day possibly "unknown" (P5).
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('is_anonymous')) {
+            $this->merge(['is_anonymous' => filter_var($this->input('is_anonymous'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE)]);
+        }
+
+        $day = $this->string('incident_day')->toString();
+        $month = $this->integer('incident_month');
+        $year = $this->integer('incident_year');
+
+        if ($day !== '' && $month > 0 && $year > 0) {
+            $exact = $day !== 'unknown';
+            // An impossible day such as 30 February stays impossible here, so the date rule refuses it.
+            $this->merge([
+                'incident_date' => sprintf('%04d-%02d-%02d', $year, $month, $exact ? (int) $day : 1),
+                'incident_date_exact' => $exact,
+            ]);
+        }
     }
 
     /**
