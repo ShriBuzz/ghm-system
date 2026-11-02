@@ -124,6 +124,7 @@
     "track.closed": "Closed. Enter your reference number and PIN to look again.",
     "track.errors.locked": "This reference number is locked for 15 minutes after 5 wrong PINs. Try again later.",
     "track.errors.too_many": "Too many attempts from this connection. Try again in an hour.",
+    "track.errors.too_many_messages": "You have sent many messages in the last hour. Staff will read them; please wait before sending more. What you typed is still here.",
     "track.errors.wrong": "The reference number or PIN is not right. Check both and try again.",
     "track.expired": "For your safety, your grievance closes after 10 minutes without use. Enter the reference number and PIN again.",
     "track.intro": "Enter the reference number and PIN you got when you sent your grievance.",

@@ -21,11 +21,4 @@ class StatusLookupRequest extends FormRequest
             'pin' => ['required', 'string', 'max:20'],
         ];
     }
-
-    /**
-     * Keep the reference on a refusal, never the PIN.
-     *
-     * @var list<string>
-     */
-    protected $dontFlash = ['pin'];
 }

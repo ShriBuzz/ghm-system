@@ -29,6 +29,9 @@ class StatusController
 
     private const IDLE_SECONDS = 10 * 60;
 
+    /** Each complainant message alerts staff by email (N1), so one case cannot flood the mail server. */
+    private const MESSAGES_PER_HOUR = 10;
+
     public function lookup(): View
     {
         return view('public.status-lookup');
@@ -87,23 +90,32 @@ class StatusController
             'case' => $case,
             // Messages only: internal notes are never loaded on a public page.
             'messages' => $case->messages()->oldest()->oldest('id')->get(),
-            'draft' => $request->session()->pull('status_draft'),
+            'draft' => $this->draftFor($request, $case),
         ])->header('Cache-Control', 'no-store, private')->header('X-Robots-Tag', 'noindex');
     }
 
     public function reply(ComplainantReplyRequest $request): RedirectResponse
     {
+        $opened = $request->session()->get('status.case');
         $case = $this->openCase($request);
 
         if (! $case) {
-            // Kept for the next lookup, so a reply typed while the page sat open is not lost.
-            $request->session()->put('status_draft', $request->validated('body'));
+            // Kept for the next lookup of this same grievance only: on a shared phone, someone else may open theirs next.
+            if ($opened !== null) {
+                $request->session()->put('status_draft', ['case' => (int) $opened, 'body' => $request->validated('body')]);
+            }
 
             return $this->expired();
         }
 
+        $limit = "status-messages:{$case->id}";
+        if (RateLimiter::tooManyAttempts($limit, self::MESSAGES_PER_HOUR)) {
+            return redirect()->route('status.show')->withInput()->withErrors(['body' => __('track.errors.too_many_messages')]);
+        }
+
         // Its created hook alerts the staff who can see the case (N1).
         $case->messages()->create(['direction' => MessageDirection::Complainant, 'body' => $request->validated('body')]);
+        RateLimiter::hit($limit, 3600);
 
         return redirect()->route('status.show')->with('status_notice', __('track.sent'));
     }
@@ -132,6 +144,22 @@ class StatusController
         $request->session()->put('status.seen', now()->getTimestamp());
 
         return Grievance::whereKey($open['case'])->first();
+    }
+
+    /**
+     * A reply typed after access expired, only for the grievance it was written for.
+     */
+    private function draftFor(Request $request, Grievance $case): ?string
+    {
+        $draft = $request->session()->get('status_draft');
+
+        if (! is_array($draft) || $draft['case'] !== $case->id) {
+            return null;
+        }
+
+        $request->session()->forget('status_draft');
+
+        return $draft['body'];
     }
 
     private function expired(): RedirectResponse

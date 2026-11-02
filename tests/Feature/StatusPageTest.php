@@ -141,3 +141,44 @@ it('needs a reference and a PIN, and a reply with something in it', function () 
     $this->get('/en/status/case')->assertSee('Write your message');
     expect(GrievanceMessage::count())->toBe(0);
 })->group('P8', 'S9');
+
+it('keeps a late reply only for its own grievance, never showing it on another one opened on the same phone', function () {
+    $first = Grievance::factory()->create();
+    $second = Grievance::factory()->create();
+
+    lookUp($first);
+    $this->travel(11)->minutes();
+    $this->post('/en/status/case', ['body' => 'Private words about the first grievance.']);
+
+    lookUp($second);
+    $this->get('/en/status/case')->assertDontSee('Private words about the first grievance.');
+
+    lookUp($first);
+    $this->get('/en/status/case')->assertSee('Private words about the first grievance.');
+})->group('P8', 'S5');
+
+it('never sends the PIN back to the page, even when the form comes back with an error', function () {
+    $this->from('/en/status')->post('/en/status', ['reference' => '', 'pin' => '482913']);
+
+    $this->get('/en/status')->assertSee('Write the reference number')->assertDontSee('482913');
+})->group('P8');
+
+it('takes 10 messages an hour for a grievance, then asks the complainant to wait, keeping the text', function () {
+    $case = Grievance::factory()->create();
+    $focal = User::factory()->create(['role' => Role::FocalPerson]); // After the case, so only message alerts count.
+    lookUp($case);
+
+    foreach (range(1, 10) as $number) {
+        $this->post('/en/status/case', ['body' => "Message {$number}"]);
+    }
+    $this->post('/en/status/case', ['body' => 'The eleventh message']);
+
+    expect(GrievanceMessage::count())->toBe(10);
+    Notification::assertSentToTimes($focal, CaseAlert::class, 10);
+    $this->get('/en/status/case')->assertSee('The eleventh message')->assertSee('many messages');
+
+    $this->travel(61)->minutes();
+    lookUp($case);
+    $this->post('/en/status/case', ['body' => 'An hour later']);
+    expect(GrievanceMessage::count())->toBe(11);
+})->group('P8', 'N1');

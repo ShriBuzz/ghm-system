@@ -35,15 +35,13 @@ return Application::configure(basePath: dirname(__DIR__))
             // The CSRF check runs before SetLocale, so take the language from the address.
             app()->setLocale((string) $request->route('locale'));
 
-            // A reply typed on the status page waits as a draft for the next lookup (P8).
-            if ($request->routeIs('status.reply')) {
-                $request->session()->put('status_draft', (string) $request->input('body'));
-            }
-
             return redirect()->route($form, ['locale' => $request->route('locale')])
                 ->withInput($request->except(['_token', 'attachment', 'website', 'pin', 'body']))
                 ->withErrors([$request->routeIs('grievance.store') ? 'form' : 'lookup' => __($request->routeIs('grievance.store') ? 'form.errors.expired' : 'track.expired')]);
         });
+
+        // A PIN typed on the status page never comes back in a refused form's old input (P8).
+        $exceptions->dontFlash(['pin']);
 
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
