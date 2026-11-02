@@ -79,6 +79,6 @@ Cases and messages received after the backup was made are lost. Tell NBI and the
 
 The steps above use the copy on the server. When the server is gone, its copy is gone too:
 
-1. Set up the application on the new server from Git, with the `.env` values and the same `APP_KEY` from the password manager (deployment steps: `docs/deploy.md`, written once the host is known).
+1. Set up the application on the new server from Git, with the `.env` values and the same `APP_KEY` from the password manager (`docs/deploy.md`, sections 3 to 5).
 2. Copy the newest archive from the off-server copy (a disk in `BACKUP_DISKS`) into `storage/app/backups/ghm/`.
 3. Follow the steps above from step 1.

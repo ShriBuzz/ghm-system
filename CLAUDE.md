@@ -23,7 +23,7 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 ## Stack (fixed)
 
-- PHP 8.3+, Laravel 13.x, Filament 5.x admin panel at `/admin`, MySQL 8 or MariaDB 10.6+.
+- PHP 8.4.1+ (required in `composer.json`; Symfony 8 needs it), Laravel 13.x, Filament 5.x admin panel at `/admin`, MySQL 8 or MariaDB 10.6+.
 - Public pages: Blade, one hand-written stylesheet `public/css/public.css`, vanilla JS in `public/js/form.js` for progressive enhancement only. No Vite build, no Tailwind, no JS framework, no web fonts, no third-party requests. Every public form works with JavaScript off.
 - Sessions and cache use the `file` driver. Queue uses the `database` driver, worked by cron through `schedule:run`.
 - Sensitive fields use Laravel's `encrypted` cast.

@@ -23,7 +23,7 @@ Subject: Clarification questions: RFQ NBI/GHM/RFQ/01 – [your company name]
 >
 > **Hosting and timing**
 >
-> 1. Can the company's current hosting run PHP 8.3 or newer, MySQL 8 or MariaDB 10.6 or newer, a cron job every minute, SSH or Git deployment, a subdomain with free SSL, and outgoing email (SMTP)? This decides whether we need to quote new hosting (Annex A item 5).
+> 1. Can the company's current hosting run PHP 8.4 or newer, MySQL 8 or MariaDB 10.6 or newer, a cron job every minute, SSH or Git deployment, a subdomain with free SSL, and outgoing email (SMTP)? This decides whether we need to quote new hosting (Annex A item 5).
 > 2. Kick-off on 8 Nov falls on Laxmi Puja. Could it move to 6 Nov or 12 Nov? And could draft lists of categories (marking which are restricted, A5), locations, and the notice text above the form (P3) be shared before signing, so we can load them early?
 > 3. Will alert and acknowledgement emails (N1, N2) go through the company's own mail server or a transactional email service paid by the company?
 > 4. Can the host turn off or shorten web server access logs for the grievance subdomain? These logs record visitors' IP addresses outside the application (S5).

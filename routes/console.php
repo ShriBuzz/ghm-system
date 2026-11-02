@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
+use Symfony\Component\Console\Output\OutputInterface;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -86,5 +87,6 @@ Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $
         'app_authentication_recovery_codes' => null,
     ])->save();
 
-    $this->line((string) json_encode($credentials));
+    // Raw: the console formatter would read a "\<" in the password as an escaped "<" and break the JSON.
+    $this->output->writeln((string) json_encode($credentials), OutputInterface::OUTPUT_RAW);
 })->purpose('A fake user with a fresh password and MFA secret for the Playwright specs (A1)');
