@@ -27,9 +27,9 @@ it('deletes expired cache entries, which the file cache would otherwise keep for
     }
 })->group('S2', 'S5');
 
-it('prunes the cache every night', function () {
+it('prunes the cache every hour, so files a bot leaves cannot pile up for a day', function () {
     $prune = collect(app(Schedule::class)->events())
         ->first(fn (Event $event) => str_contains((string) $event->command, 'ghm:prune-cache'));
 
-    expect($prune?->expression)->toBe('15 3 * * *');
+    expect($prune?->expression)->toBe('15 * * * *');
 })->group('S2', 'S5');

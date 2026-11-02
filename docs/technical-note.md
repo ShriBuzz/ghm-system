@@ -73,7 +73,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 ## Sessions
 
 - Session files are always encrypted with `APP_KEY`; `config/session.php` sets `encrypt` to `true` and no `.env` line can turn it off. The offline slip's PIN passes through the session once (A6, P7), and session files sit on the server's disk.
-- The cache uses the `file` driver, which deletes an expired entry only when its key is read again. Sign-in counters are kept per email, so `ghm:prune-cache` deletes expired entries at 03:15 each night; otherwise a bot trying many emails would leave files behind until the host's file quota ran out (S2).
+- The cache uses the `file` driver, which deletes an expired entry only when its key is read again. Sign-in counters are kept per email, so `ghm:prune-cache` deletes expired entries every hour, walking the folder without listing it first; otherwise a bot trying many emails would leave files behind until the host's file quota ran out (S2). A test run deleted 200,000 files with under 8 MB of memory.
 - Changing `APP_KEY` signs every user out, as well as making encrypted fields unreadable; keep the old key in `APP_PREVIOUS_KEYS` when rotating.
 
 ## Email and queue (N1, N2)
