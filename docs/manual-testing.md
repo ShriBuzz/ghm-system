@@ -58,6 +58,16 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |
 | Send six or more grievances in a row | Each goes through; the 11th within an hour is refused with what you typed kept (P9). `php artisan cache:clear` resets the count |
 
+The status page (P8), at http://127.0.0.1:8000/en/status or from the link on the form:
+
+| Try | Expect |
+|---|---|
+| Enter a reference and PIN you noted when sending | The status, the received date and the messages. A staff reply from the case page in the panel shows as "Grievance team", never a staff name; internal notes never show |
+| Write in "Add information or reply" and send | "Your message was sent." and the message in the thread as "You". The case page's Messages tab in the panel shows it, and the staff who can see the case get an alert (in the queue) |
+| A wrong PIN five times | The fifth says the reference is locked for 15 minutes; the right PIN is refused until then. An unknown reference gets the same message as a wrong PIN |
+| Leave the status page untouched for 10 minutes, then reload | Back on the lookup, asked for the reference and PIN again |
+| Close | Back on the lookup; the status page needs the PIN again |
+
 ## 4. Staff panel
 
 Open http://127.0.0.1:8000/admin and sign in with the email and password from `.env`.
