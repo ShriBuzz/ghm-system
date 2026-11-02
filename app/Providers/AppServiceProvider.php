@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Support\Facades\Event;
@@ -31,6 +32,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // `php artisan about` is the first check after a deploy (docs/deploy.md). Without the password
+        // the nightly archive is made unencrypted, and nothing else would say so (S7).
+        AboutCommand::add('Backups', fn (): array => [
+            'Archive password' => filled(config('backup.backup.password')) ? 'set' : '<fg=red;options=bold>NOT SET: archives are not encrypted</>',
+        ]);
+
         Event::listen(Login::class, fn (Login $event) => activity()->causedBy($event->user instanceof Model ? $event->user : null)
             ->event('login')->log('Signed in'));
 

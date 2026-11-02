@@ -8,10 +8,13 @@ use App\Support\WorkingDays;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -40,6 +43,23 @@ Artisan::command('ghm:clear-temporary-uploads', function () {
 })->purpose('Delete temporary uploads older than a day (S5)');
 
 Schedule::command('ghm:clear-temporary-uploads')->hourly();
+
+Artisan::command('ghm:prune-cache', function () {
+    // The file cache deletes an expired entry only when its key is read again. Sign-in counters for
+    // emails never tried twice would stay on disk for good, and a bot trying many emails could fill
+    // the host's file quota (S2). Each file starts with its expiry time; 0 or unreadable is skipped.
+    // Walked lazily, not listed and sorted first, so a folder a bot filled cannot exhaust memory.
+    foreach (Finder::create()->files()->in(Config::string('cache.stores.file.path')) as $file) {
+        $expires = (int) file_get_contents($file->getPathname(), length: 10);
+
+        if ($expires > 0 && $expires <= now()->getTimestamp()) {
+            File::delete($file->getPathname());
+        }
+    }
+})->purpose('Delete expired file-cache entries (S2)');
+
+// Hourly: a bot trying a new email each time leaves two files per attempt.
+Schedule::command('ghm:prune-cache')->hourlyAt(15);
 
 // Shared hosting has no supervisor: cron's schedule:run starts a worker that exits once the queue is empty.
 // The lock expires after 10 minutes, so a worker killed by the host does not stop email for a day.

@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, security) are merged. WP1 (public side) is a teammate's, in progress on its own branch.
+Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, security) are built, and the whole repo has been through `/ponytail-audit` with every finding fixed. WP1 (public side) is next.
 
 ## Where things stand
 
@@ -12,16 +12,17 @@ Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, securit
 | WP2 step 1: reference number, PIN, attachment store | Merged (pull request #4) |
 | WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
 | WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Merged (pull request #6) |
-| WP1 Public side | Teammate. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
-| WP3 Alerts, reports, security | Merged (pull request #7, with three review fixes). Still open: the timed restore drill on staging, the off-server backup copy, the S8 recipients |
+| WP1 Public side | Next. It was a teammate's; no branch was pushed by 2026-11-02. It should use `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
+| WP3 Alerts, reports, security | Merged (pull requests #7 to #9), then the `/ponytail-audit` fixes (WP3 step 12, branch `wp3/audit-fixes`). Still open: the timed restore drill on staging, the off-server backup copy, the S8 recipients |
 
 Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
 
 ## Next steps
 
-1. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
-2. The staging deploy (plan: 16 to 18 Nov) follows `docs/deploy.md`, rehearsed locally (WP3 step 11), once the host is known; its section 1 checks the host first, PHP 8.4.1 included. `docs/restore.md` was run end to end locally (WP3 step 10). The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
-3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
+1. WP1, the public form (P1 to P10, S4, S5, S9). Check first that the teammate who had it has not started. It reuses `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and calls `$case->acknowledge($pin)` after saving a case. Public pages follow `CLAUDE.md`: Blade, `public/css/public.css`, no JavaScript needed, Impeccable for design.
+2. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
+3. The staging deploy (plan: 16 to 18 Nov) follows `docs/deploy.md`, rehearsed locally (WP3 step 11), once the host is known; its section 1 checks the host first, PHP 8.4.1 included. `docs/restore.md` was run end to end locally (WP3 step 10). The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
+4. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
 
 ## Read first
 

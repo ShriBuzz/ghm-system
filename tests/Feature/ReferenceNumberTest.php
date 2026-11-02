@@ -2,8 +2,10 @@
 
 use App\Support\Pin;
 use App\Support\ReferenceNumber;
+use Illuminate\Process\Pool;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
 
 it('numbers cases GHM-YYYY-NNNN in order', function () {
     $this->travelTo('2026-11-20 10:00');
@@ -26,6 +28,29 @@ it('never hands out the same number twice, inside an outer transaction too', fun
     $numbers = collect(range(1, 50))->map(fn () => DB::transaction(fn () => ReferenceNumber::next()));
 
     expect($numbers->unique())->toHaveCount(50);
+})->group('P7');
+
+it('gives every case its own number when many are made at the same moment', function () {
+    // Separate processes, each with its own database connection as real requests have. They see
+    // committed rows only, so this test ends its transaction, works in 2099, and removes that year.
+    DB::commit();
+    $code = 'Illuminate\Support\Carbon::setTestNow("2099-06-01 12:00"); for ($i = 0; $i < 20; $i++) { echo App\Support\ReferenceNumber::next(), PHP_EOL; }';
+
+    try {
+        $results = Process::pool(function (Pool $pool) use ($code): void {
+            foreach (range(1, 8) as $worker) {
+                $pool->path(base_path())->command([PHP_BINARY, 'artisan', 'tinker', '--execute='.$code]);
+            }
+        })->start()->wait();
+    } finally {
+        DB::table('reference_counters')->where('year', 2099)->delete();
+    }
+
+    $numbers = $results->collect()->flatMap(fn ($result) => preg_grep('/^GHM-2099-\d{4}$/', preg_split('/\R/', $result->output())));
+
+    expect($numbers)->toHaveCount(160)
+        ->and($numbers->unique())->toHaveCount(160)
+        ->and($numbers->sort()->last())->toBe('GHM-2099-0160');
 })->group('P7');
 
 it('makes a random PIN of the configured length', function () {

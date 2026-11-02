@@ -93,6 +93,15 @@ it('holds case details in the backup only as ciphertext, which the app key alone
         ->and(fn () => $otherKey->decryptString($stored))->toThrow(DecryptException::class);
 })->group('X2', 'S3', 'S7');
 
+it('says in php artisan about, the first check after a deploy, whether backups are encrypted', function () {
+    config(['backup.backup.password' => null]);
+    $this->artisan('about', ['--only' => 'backups'])->expectsOutputToContain('NOT SET')->assertSuccessful();
+
+    config(['backup.backup.password' => 'an-archive-password']);
+    $this->artisan('about', ['--only' => 'backups'])->expectsOutputToContain('Archive password')
+        ->doesntExpectOutputToContain('NOT SET')->assertSuccessful();
+})->group('S7');
+
 it('keeps backups for 14 days', function () {
     Storage::fake('backups');
     $this->travelTo('2026-11-20 01:30');
