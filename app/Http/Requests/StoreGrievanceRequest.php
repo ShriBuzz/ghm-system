@@ -69,12 +69,22 @@ class StoreGrievanceRequest extends FormRequest
     private function sentTooSoon(): bool
     {
         try {
-            $shownAt = (int) Crypt::decryptString($this->string('form_started')->toString());
+            $shownAt = (int) Crypt::decryptString($this->text('form_started'));
         } catch (DecryptException) {
             return true;
         }
 
         return now()->getTimestamp() - $shownAt < Config::integer('ghm.public.min_fill_seconds');
+    }
+
+    /**
+     * A form field as text; a crafted list in its place reads as empty, so the usual message answers it.
+     */
+    private function text(string $key): string
+    {
+        $value = $this->input($key);
+
+        return is_string($value) ? $value : '';
     }
 
     /**
@@ -87,7 +97,7 @@ class StoreGrievanceRequest extends FormRequest
             $this->merge(['is_anonymous' => filter_var($this->input('is_anonymous'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE)]);
         }
 
-        $day = $this->string('incident_day')->toString();
+        $day = $this->text('incident_day');
         $month = $this->integer('incident_month');
         $year = $this->integer('incident_year');
 

@@ -52,7 +52,9 @@ it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both unt
     $this->post('/ne', formInput())->assertRedirect(route('grievance.received', ['locale' => 'ne']));
     $case = Grievance::sole();
 
-    $page = $this->get('/ne/received')->assertOk()->assertHeader('Cache-Control')->getContent();
+    $received = $this->get('/ne/received')->assertOk();
+    expect($received->headers->get('Cache-Control'))->toContain('no-store');
+    $page = $received->getContent();
     preg_match('/data-pin>(\d{6})</', $page, $pin);
 
     expect($case->reference)->toMatch('/^GHM-2026-\d{4}$/')
@@ -155,3 +157,10 @@ it('sends a form posted after the session ended back to it, with what was typed'
         ->and(session()->getOldInput('website'))->toBeNull()
         ->and(session('errors')->getBag('default')->first('form'))->toStartWith('Your session ended before the grievance was sent');
 })->group('S2', 'P1');
+
+it('refuses crafted list values in place of text, without an error page', function () {
+    $this->post('/en', formInput(['incident_day' => ['1']]))->assertRedirect()->assertSessionHasErrors('incident_date');
+    $this->post('/en', formInput(['form_started' => ['x']]))->assertRedirect()->assertSessionHasErrors('form');
+
+    expect(Grievance::count())->toBe(0);
+})->group('P9', 'P5');

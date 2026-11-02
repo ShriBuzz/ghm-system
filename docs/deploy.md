@@ -159,7 +159,7 @@ GHM_ADMIN_PASSWORD=
 | `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
 
-If the host puts the site behind a proxy or load balancer that ends HTTPS (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy, or the HTTPS redirect loops (technical note, HTTPS).
+If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups) count all visitors as one, so real complainants get refused.
 
 ## 6. Updating to a new version
 
