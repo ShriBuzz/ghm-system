@@ -4,9 +4,11 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production (`CLAUDE.md`).
 
-Last updated 2026-11-01, at the WP2 proof-of-concept checkpoint (admin side up to offline entry). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-02, after WP3 (alerts, summary, export, backups). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
+
+A `.env` made before WP3 still has `APP_NAME=Laravel` and `MAIL_MAILER=log`. Change them to `.env.example`'s values, `APP_NAME="Grievance handling"` and `MAIL_MAILER=array`: with `log`, every email the app makes, PINs and addresses included, is written into `storage/logs/laravel.log`.
 
 Give yourself an Administrator in `.env`, with fake details and a password you will remember:
 
@@ -113,7 +115,64 @@ mysql -u ghm -p ghm -e "SELECT reference, LEFT(name, 40), LEFT(email, 40) FROM g
 
 The password `mysql` asks for is `DB_PASSWORD` in `.env`. Name and email show as ciphertext; the app decrypts them only when it reads them (S3).
 
-## 7. Automated checks
+## 7. Summary, export and emails (N1 to N4)
+
+Carry on with the users and cases from section 5.
+
+| Try | Expect |
+|---|---|
+| Summary in the menu, as each role | Cases received this month, counted by status and by category. The focal person's counts leave out restricted cases, the officer's count only those, the Administrator's count all |
+| On Summary, set the end date before the start date | An error, and no counts |
+| Cases → Export as the focal person: this month, CSV | A file of the cases they can see: reference, received and closed dates, channel, category, location, priority, status and the five demographic columns. No names or contacts, and no option to add them |
+| The same as the Administrator, with "Include names and contact details" on | Name, phone and email columns after the reference. Opened in Excel or Numbers, Nepali text shows correctly |
+| Activity log, as the Administrator | "Cases exported", with the dates, the format and whether personal data was included |
+
+Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, never the Administrator) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
+
+```sh
+php artisan queue:work --stop-when-empty
+```
+
+Each email shows a `RUNNING` line, then one ending in `DONE`; the worker stops once the queue is empty. To see what the two emails look like, render them for the newest case and open them in a browser (`open` is macOS; elsewhere open the files by hand):
+
+```sh
+php artisan tinker --execute '$case = App\Models\Grievance::latest("id")->firstOrFail(); app()->setLocale($case->locale); file_put_contents(storage_path("app/email-acknowledgement.html"), (new App\Notifications\Acknowledgement("123456"))->toMail($case)->render()); app()->setLocale("en"); file_put_contents(storage_path("app/email-alert.html"), (new App\Notifications\CaseAlert($case->id, message: false))->toMail(App\Models\User::firstOrFail())->render());'
+open storage/app/email-acknowledgement.html storage/app/email-alert.html
+```
+
+| Look at | Expect |
+|---|---|
+| The acknowledgement | In the case's language (Nepali for offline cases): the reference, the PIN (here a made-up `123456`) and the public site's address. Nothing the complainant wrote |
+| The alert | In English: "A new grievance has been received" and a "Log in to view" button. No reference, category, name or description |
+| Both | The app's name as plain text at the top; no image or anything else from another site |
+
+Delete the two files afterwards: `rm storage/app/email-*.html`.
+
+## 8. Backup and restore (S7, X2)
+
+Make a backup the way the server does each night at 01:00. Locally any archive password will do:
+
+```sh
+BACKUP_ARCHIVE_PASSWORD=local-test php artisan backup:run
+ls storage/app/backups/ghm/
+```
+
+Then add a note to one of your cases, so you can tell the restore really happened, and follow `docs/restore.md` steps 1 to 8 with that zip and password. Locally the database host is `127.0.0.1`, and the user and database are both `ghm`. The restore replaces your local database with the backup's copy; that is only ever fake data.
+
+| Try | Expect |
+|---|---|
+| Each step of `docs/restore.md` | Each command succeeds; step 3 prints `0` |
+| Sign in, open the case you added the note to | The description reads normally and its documents download; the note is gone, because it came after the backup |
+| Step 3 again with a wrong password | It prints `2` and unpacks nothing |
+
+Step 6 caches the configuration, as a server should. On your machine, clear it afterwards, or the tests may read `.env`'s database settings instead of `ghm_testing`:
+
+```sh
+php artisan config:clear
+rm storage/app/backups/ghm/*.zip
+```
+
+## 9. Automated checks
 
 The same checks CI runs on every push:
 
@@ -128,7 +187,7 @@ npx playwright show-report                        # after a failure: the report 
 
 Playwright starts its own servers on ports 8001 and 8002 and stops them afterwards; the full run takes about a minute and a half, because the S2 idle check waits out a one-minute session. Pest and Playwright both use the `ghm_testing` database, never `ghm`, so your demo data stays as you left it. Playwright signs in as fake users (`e2e-focal_person-0@example.com` and so on) that it creates there with fresh passwords, and enters fake cases, categories, locations and users; the next Pest run wipes them. Its saved sessions sit in `playwright/.auth/`; delete that folder to make it sign in afresh.
 
-## 8. On a real phone (optional)
+## 10. On a real phone (optional)
 
 With the phone on the same Wi-Fi as the computer:
 
@@ -141,7 +200,9 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 
 ## Known so far
 
-- The staff panel's title reads "Laravel" until the company name arrives at kick-off.
+- The staff panel's title and the emails show `APP_NAME` ("Grievance handling" in `.env.example`) until the company name arrives at kick-off.
+- The acknowledgement email's Nepali wording needs a native speaker's check (open question 3 in `docs/progress.md`).
+- Backups stay on the same machine until the off-server copy is set up, once the host is known.
 - The staff panel is in English until NBI answers question 14 in `docs/clarification-questions.md`; `APP_LOCALE=ne` stays the public pages' default.
 - Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
 - The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are an open question (`docs/progress.md`).
