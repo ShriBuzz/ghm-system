@@ -73,6 +73,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 ## Sessions
 
 - Session files are always encrypted with `APP_KEY`; `config/session.php` sets `encrypt` to `true` and no `.env` line can turn it off. The offline slip's PIN passes through the session once (A6, P7), and session files sit on the server's disk.
+- The cache uses the `file` driver, which deletes an expired entry only when its key is read again. Sign-in counters are kept per email, so `ghm:prune-cache` deletes expired entries at 03:15 each night; otherwise a bot trying many emails would leave files behind until the host's file quota ran out (S2).
 - Changing `APP_KEY` signs every user out, as well as making encrypted fields unreadable; keep the old key in `APP_PREVIOUS_KEYS` when rotating.
 
 ## Email and queue (N1, N2)
@@ -89,6 +90,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 - `backup:clean` at 01:30 deletes archives older than 15 days, so the one from 14 days ago is always there (RFQ: at least 14). `backup:monitor` at 02:00 reports when the newest backup is older than a day.
 - Failure emails go to `BACKUP_MAIL_TO`; without it nothing is sent. Success sends nothing.
 - **Production must set `BACKUP_ARCHIVE_PASSWORD`.** Without it the archive is not encrypted and the attachments in it are readable. Keep it in the company's password manager with `APP_KEY`: a backup restores only with both.
+- `php artisan about` shows under Backups whether the archive password is set; the deploy checks read it after every deploy.
 - Restore steps: `docs/restore.md`.
 
 ## Files and photos (P5, S4, S5)

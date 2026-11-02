@@ -190,8 +190,9 @@ To go back, deploy the previous version the same way. If the new version changed
 
 | Check | Expect |
 |---|---|
-| `php artisan about` | Environment `production` (or `staging`), Debug Mode `OFF`; Config, Events, Routes and Views `CACHED` |
-| `php artisan schedule:list` | Seven tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount, failed-job pruning and the upload clean-up |
+| `php artisan about` | Environment `production` (or `staging`), Debug Mode `OFF`; Config, Events, Routes and Views `CACHED`; under Backups, Archive password `set` (a red `NOT SET` means the nightly archive is not encrypted) |
+| `php artisan schedule:list` | Eight tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount, failed-job pruning, the upload clean-up and the cache clean-up at 03:15 |
+| Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, nobody is told about a restricted case until NBI answers question 13 |
 | From a developer machine: `BASE_URL=https://<subdomain> npx playwright test` | The `@smoke` specs pass: pages load over HTTPS with the security headers, and the staff sign-in is reachable. Against a non-local address Playwright runs nothing else |
 | `http://<subdomain>` in a browser | It moves to `https://` |
 | [SSL Labs](https://www.ssllabs.com/ssltest/) for the subdomain | Grade A (S1) |
