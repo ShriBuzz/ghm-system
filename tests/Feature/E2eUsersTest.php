@@ -5,6 +5,7 @@ use App\Models\User;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use PragmaRX\Google2FAQRCode\Google2FA;
 
 /**
  * @return array{email: string, password: string, secret: ?string}
@@ -30,6 +31,20 @@ it('gives Playwright a user who signs in with the printed password and code', fu
 
     $this->actingAs($user);
     expect(AppAuthentication::make()->verifyCode(AppAuthentication::make()->getCurrentCode($user)))->toBeTrue();
+})->group('A1');
+
+it('prints the credentials exactly, whatever characters they hold', function () {
+    // Str::password() can give "\<", which the console's formatter turned into "<", so now and
+    // then the printed JSON did not decode and a test or Playwright run failed at random.
+    $this->app->bind(AppAuthentication::class, fn () => new class(app(Google2FA::class)) extends AppAuthentication
+    {
+        public function generateSecret(): string
+        {
+            return 'A\<B<info>C</info>';
+        }
+    });
+
+    expect(e2eUser('focal_person', 'raw-output')['secret'])->toBe('A\<B<info>C</info>');
 })->group('A1');
 
 it('can leave MFA off, for the first-time setup spec', function () {
