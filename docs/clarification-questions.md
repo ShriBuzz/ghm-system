@@ -1,11 +1,15 @@
 # Clarification questions for NBI
 
-Questions for the RFQ clarification email, due **2 Nov 2026** (RFQ section 1), and what to change in the repo once NBI answers. They gather plan section 11's questions and the ones found while building WP0.
+Questions for NBI, and what to change in the repo once NBI answers. They gather plan section 11's questions and the ones found while building.
+
+They were planned for the RFQ clarification email, due 2 Nov 2026 (RFQ section 1). Decided 2026-11-02: they are asked after contract signing instead. Until NBI answers, the code follows the assumptions in "Apply when answered" below, and the work continues on what does not depend on them.
 
 | Email | Status |
 |---|---|
-| Clarification email | Not sent |
+| Questions to NBI | Not sent; to be asked after contract signing |
 | NBI's answers | Waiting |
+
+The email text below was written to go before the quotation; adjust its opening and question 1 (which mentions quoting new hosting) when it is sent.
 
 When the answers arrive: record each one in the "Answer" column below, apply the change listed for it, tick it off, and move any decision into `docs/progress.md`.
 
