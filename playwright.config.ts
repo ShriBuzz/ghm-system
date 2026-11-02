@@ -23,6 +23,8 @@ export default defineConfig({
     workers: 2,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,
+    // A test that passes only on its retry still fails CI, so a flaky test is seen and fixed.
+    failOnFlakyTests: !!process.env.CI,
     reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
     // Away from this machine only the read-only @smoke specs run, because production
     // holds real grievances (CLAUDE.md). Staging sets E2E_FULL=1 for the full suite.
