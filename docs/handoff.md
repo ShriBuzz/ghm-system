@@ -20,8 +20,8 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 ## Next steps
 
 1. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
-2. Before the staging deploy (plan: 16 to 18 Nov): a deployment guide for the company's host, `docs/deploy.md` (release build, cron line, `.env` lines, folder layout). `docs/restore.md` was run end to end locally (WP3 step 10, branch `wp3/restore-drill`); `docs/restore.md` points to `docs/deploy.md` for a lost server. The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
-3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
+2. The staging deploy (plan: 16 to 18 Nov) follows `docs/deploy.md`, rehearsed locally (WP3 step 11), once the host is known; its section 1 checks the host first, PHP 8.4.1 included. `docs/restore.md` was run end to end locally (WP3 step 10). The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
+3. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email; PHP 8.4 as the minimum).
 
 ## Read first
 
@@ -31,7 +31,7 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 4. `WP0-kickoff.md`: the WP0 steps. `WP2-kickoff.md`: the WP2 (admin side) steps.
 5. `docs/progress.md`: what is done, what is next, open questions and decisions.
 6. `docs/local-setup.md`: how to set up a machine.
-7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/restore.md`: restoring a backup.
+7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/deploy.md`: putting it on a server. `docs/restore.md`: restoring a backup.
 8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
 
 ## What git does not carry
