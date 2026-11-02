@@ -1,7 +1,12 @@
 <?php
 
+use App\Models\Grievance;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -53,6 +58,40 @@ it('writes a password-protected archive of the database and private files, witho
         ->and($entries->reject(fn (array $entry) => str_ends_with($entry['name'], '/'))
             ->every(fn (array $entry) => $entry['encryption_method'] === ZipArchive::EM_AES_256))->toBeTrue();
 })->group('S7', 'S4');
+
+it('holds case details in the backup only as ciphertext, which the app key alone decrypts', function () {
+    Storage::fake('backups');
+    config(['backup.backup.password' => 'test-archive-password']);
+    app()->forgetInstance(Config::class);
+
+    // mysqldump reads through its own connection and cannot see the test's open transaction,
+    // so this case is committed, then deleted again whatever happens.
+    $case = Grievance::factory()->create(['name' => 'Backup Test Complainant', 'description' => 'Backup test: wages unpaid']);
+    DB::commit();
+
+    try {
+        $stored = DB::table('grievances')->where('id', $case->id)->value('description');
+        $this->artisan('backup:run --only-db --disable-notifications')->assertSuccessful();
+    } finally {
+        DB::table('activity_log')->where('subject_type', $case->getMorphClass())->where('subject_id', $case->id)->delete();
+        DB::table('grievances')->where('id', $case->id)->delete();
+        DB::table('categories')->where('id', $case->category_id)->delete();
+        DB::table('locations')->where('id', $case->location_id)->delete();
+    }
+
+    $zip = new ZipArchive;
+    $zip->open(Storage::disk('backups')->path(Storage::disk('backups')->allFiles()[0]));
+    $zip->setPassword('test-archive-password');
+    $dump = (string) $zip->getFromName('db-dumps/mysql-'.config('database.connections.mysql.database').'.sql');
+    $otherKey = new Encrypter(Encrypter::generateKey(config('app.cipher')), config('app.cipher'));
+
+    expect($dump)->toContain('INSERT INTO `grievances`')
+        ->toContain($stored)
+        ->not->toContain('Backup test: wages unpaid')
+        ->not->toContain('Backup Test Complainant')
+        ->and(Crypt::decryptString($stored))->toBe('Backup test: wages unpaid')
+        ->and(fn () => $otherKey->decryptString($stored))->toThrow(DecryptException::class);
+})->group('X2', 'S3', 'S7');
 
 it('keeps backups for 14 days', function () {
     Storage::fake('backups');

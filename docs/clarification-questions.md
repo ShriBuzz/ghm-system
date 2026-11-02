@@ -53,7 +53,7 @@ Subject: Clarification questions: RFQ NBI/GHM/RFQ/01 – [your company name]
 
 The RFQ names the company only to the selected vendor, so these wait for the award:
 
-- The company's name and logo for public pages, emails and the admin panel. It also replaces `APP_NAME`, which today is the skeleton's `Laravel` and shows in staff authenticator apps.
+- The company's name and logo for public pages, emails and the admin panel. It also replaces `APP_NAME`, which today is the placeholder "Grievance handling" (since WP3) and shows in emails and staff authenticator apps.
 - Final category, location and notice text, if not shared earlier (question 2).
 - Name and email of the company's first Administrator for production.
 - Admin panel colour, if the company wants its own (plan section 7: Filament keeps its default theme apart from logo and colour).
@@ -66,7 +66,7 @@ What the code assumes until NBI answers, and what to change after. Everything no
 |---|---|---|---|---|
 | 1 | | Company host passes; no hosting quoted | Annex A item 5 if it fails; `docs/technical-note.md` hosting line; staging plan | [ ] |
 | 2 | | Placeholder categories ("Sexual harassment or abuse" restricted) and locations in `Database\Seeders\PlaceholderListsSeeder`, run outside production only; no notice text yet | Edit the lists in Settings (or the seeder before go-live); notice text setting (WP1, P3); kick-off date in `docs/progress.md` | [ ] |
-| 3 | | `MAIL_MAILER=log` locally | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
+| 3 | | `MAIL_MAILER=array` locally (`.env.example`); never `log`, which writes recipients into `laravel.log` | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
 | 4 | | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in the technical note | [ ] |
 | 5 | | Five encrypted text columns on `grievances`; no option lists | Enums `ComplainantType`, `Sex`, `AgeGroup`, `Ethnicity`, `Disability` in `app/Enums`, labels in `lang/en.json` and `lang/ne.json`, casts on `Grievance` (WP1, P6) | [ ] |
 | 6 | | `App\Enums\ContactMethod`: phone, email | Add or remove a case in `ContactMethod`, labels in `lang/en.json` and `lang/ne.json` | [ ] |

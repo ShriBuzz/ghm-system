@@ -2,6 +2,8 @@
 
 For whoever restores the grievance system after data loss. Try it on staging first; the timed drill before go-live follows these steps on staging with fake data.
 
+Last tried end to end: locally on 2026-11-02 with fake data (steps 1 to 6 took 12 seconds for a 9 KB backup). On staging: not yet.
+
 ## What a backup holds
 
 - One encrypted zip per night, made at 01:00 Nepal time, in `storage/app/backups/ghm/` (named `YYYY-MM-DD-HH-MM-SS.zip`), plus any off-server copy listed in `BACKUP_DISKS`.
@@ -41,17 +43,18 @@ Run these from the application folder on the server.
    unset BACKUP_ARCHIVE_PASSWORD
    ```
 
-   `0` means it worked. `2` means the password is wrong.
+   `0` means it worked. `2` means the password is wrong, and nothing was unpacked. `1` means the zip could not be opened: check its name.
 
 4. Load the database. This replaces every table with the backup's copy:
 
    ```sh
-   mysql -u <DB_USERNAME> -p <DB_DATABASE> < ~/restore/db-dumps/mysql-<database>.sql
+   mysql -h <DB_HOST> -u <DB_USERNAME> -p <DB_DATABASE> < ~/restore/db-dumps/mysql-<database>.sql
    ```
 
 5. Put the attachments back:
 
    ```sh
+   mkdir -p storage/app/private/attachments
    cp -R ~/restore/attachments/. storage/app/private/attachments/
    ```
 
@@ -71,3 +74,11 @@ Run these from the application folder on the server.
    ```
 
 Cases and messages received after the backup was made are lost. Tell NBI and the company which day was restored.
+
+## If the server itself is lost
+
+The steps above use the copy on the server. When the server is gone, its copy is gone too:
+
+1. Set up the application on the new server from Git, with the `.env` values and the same `APP_KEY` from the password manager (deployment steps: `docs/deploy.md`, written once the host is known).
+2. Copy the newest archive from the off-server copy (a disk in `BACKUP_DISKS`) into `storage/app/backups/ghm/`.
+3. Follow the steps above from step 1.
