@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\SecurityHeaders;
+use App\Support\FailedJobStore;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Mail servers quote the recipient's address when they refuse an email; it never reaches the log (S5).
-        $exceptions->map(TransportExceptionInterface::class, fn (TransportExceptionInterface $e) => new RuntimeException('An email could not be sent (mail server code '.$e->getCode().').'));
+        $exceptions->map(TransportExceptionInterface::class, fn (TransportExceptionInterface $e) => FailedJobStore::withoutAddress($e));
 
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

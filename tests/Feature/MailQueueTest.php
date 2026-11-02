@@ -97,7 +97,17 @@ it('logs a refused email without the address the mail server quoted', function (
         && ! str_contains($message, 'complainant@example.com'));
 })->group('N1', 'N2', 'S5');
 
-it('deletes failed jobs after 7 days, since their error text may quote an address', function () {
+it('records a failed email without the address the mail server quoted', function () {
+    refuseEmails();
+    Grievance::factory()->create(['email' => 'complainant@example.com'])->acknowledge('048213');
+
+    $this->artisan('queue:work --stop-when-empty --tries=1 --sleep=0')->assertSuccessful();
+
+    expect(DB::table('failed_jobs')->sole()->exception)->toContain('mail server code 550')
+        ->not->toContain('complainant@example.com');
+})->group('N2', 'S3', 'S5');
+
+it('deletes failed jobs after 7 days', function () {
     $prune = collect(app(Schedule::class)->events())
         ->first(fn (Event $event) => str_contains((string) $event->command, 'queue:prune-failed'));
 

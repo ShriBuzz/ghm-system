@@ -46,7 +46,8 @@ Schedule::command('ghm:clear-temporary-uploads')->hourly();
 // host's hourly sending limit delays an alert instead of losing it; a later cron run picks it up.
 Schedule::command('queue:work --stop-when-empty --tries=3 --backoff=60,600')->everyMinute()->withoutOverlapping(10);
 
-// A refused email's error can quote the recipient; keep failed jobs a week for retrying, no longer (S5).
+// Failed jobs are kept a week for `php artisan queue:retry`, no longer. Their error never holds a
+// refused email's address (App\Support\FailedJobStore), and an acknowledgement's job is encrypted.
 Schedule::command('queue:prune-failed --hours=168')->daily();
 
 // S7: the night's backup, then the 14-day cleanup, then a check that a fresh backup exists.
