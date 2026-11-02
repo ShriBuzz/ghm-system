@@ -20,6 +20,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `laravel/framework` | runtime | The application framework. |
 | `openspout/openspout` | runtime | The CSV and Excel export (N4). Writes the rows as it reads the cases; Livewire then holds the whole file in memory to send it, fine for this project's few thousand cases a year. Writes the CSV with a byte-order mark so Excel reads Nepali text as UTF-8. |
 | `spatie/laravel-backup` | runtime | The nightly backup (S7): database dump and attachments in an AES-256 password-protected zip, the 15-day cleanup and a daily check that a fresh backup exists. |
+| `chillerlan/php-qrcode` | runtime | The QR poster (P10). Already installed with Filament's two-factor sign-in; declared because the app now uses it directly. Makes the code as SVG for print and PNG for download, and its decoder lets the test read the code back. |
 | `spatie/laravel-activitylog` | runtime | The append-only activity log (S6). Its `activity_log` table has no IP or device columns. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
