@@ -25,6 +25,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public form and status page limits (P8, P9)
+    |--------------------------------------------------------------------------
+    |
+    | Per visitor key (App\Support\VisitorKey, never the IP itself). Factory
+    | Wi-Fi and phone carriers put many people behind one address, so the
+    | submission limit is generous. The Playwright test server raises them.
+    |
+    */
+
+    'public' => [
+        'submissions_per_hour' => (int) env('GHM_SUBMISSIONS_PER_HOUR', 10),
+        'failed_lookups_per_hour' => (int) env('GHM_FAILED_LOOKUPS_PER_HOUR', 10),
+        'min_fill_seconds' => (int) env('GHM_MIN_FILL_SECONDS', 3),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | First Administrator
     |--------------------------------------------------------------------------
     |

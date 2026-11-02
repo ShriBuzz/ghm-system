@@ -6,8 +6,15 @@ use App\Enums\ContactMethod;
 use App\Enums\Recurrence;
 use App\Models\Grievance;
 use App\Support\AttachmentStore;
+use App\Support\VisitorKey;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 /**
  * A new grievance from the public form (WP1). Offline entry (A6) uses the
@@ -28,6 +35,46 @@ class StoreGrievanceRequest extends FormRequest
         return self::caseRules() + [
             'attachment' => ['nullable', AttachmentStore::rule()],
         ];
+    }
+
+    /**
+     * Spam protection (P9): a trap field people never see, a minimum time to fill the form, and a
+     * limit per visitor per hour. A refusal keeps what was typed and says so in plain words.
+     *
+     * @return list<callable(Validator): void>
+     */
+    public function after(): array
+    {
+        return [function (Validator $validator): void {
+            if (filled($this->input('website')) || $this->sentTooSoon()) {
+                $validator->errors()->add('form', __('form.errors.not_sent'));
+            } elseif (RateLimiter::tooManyAttempts(self::limiterKey($this), Config::integer('ghm.public.submissions_per_hour'))) {
+                $validator->errors()->add('form', __('form.errors.too_many'));
+            }
+        }];
+    }
+
+    /**
+     * The rate-limit key for this visitor's submissions; hit once per accepted grievance.
+     */
+    public static function limiterKey(Request $request): string
+    {
+        return 'grievance-submissions:'.VisitorKey::for($request);
+    }
+
+    /**
+     * The form carries the time it was shown, encrypted, so it cannot be forged and survives an
+     * expired session. Missing, forged or too recent means a script, not a person.
+     */
+    private function sentTooSoon(): bool
+    {
+        try {
+            $shownAt = (int) Crypt::decryptString($this->string('form_started')->toString());
+        } catch (DecryptException) {
+            return true;
+        }
+
+        return now()->getTimestamp() - $shownAt < Config::integer('ghm.public.min_fill_seconds');
     }
 
     /**

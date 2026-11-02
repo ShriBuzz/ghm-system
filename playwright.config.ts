@@ -11,7 +11,16 @@ const server = (port: number, env: Record<string, string>) => ({
     command: `php artisan serve --host=127.0.0.1 --port=${port}`,
     url: `http://127.0.0.1:${port}/up`,
     // Several PHP workers, so parallel specs do not queue behind one request.
-    env: { PHP_CLI_SERVER_WORKERS: '4', APP_LOCALE: 'ne', ...env },
+    // The public limits (P8, P9) would refuse a test that fills the form in milliseconds and sends dozens
+    // an hour from one address; Pest checks the limits themselves.
+    env: {
+        PHP_CLI_SERVER_WORKERS: '4',
+        APP_LOCALE: 'ne',
+        GHM_MIN_FILL_SECONDS: '0',
+        GHM_SUBMISSIONS_PER_HOUR: '1000',
+        GHM_FAILED_LOOKUPS_PER_HOUR: '1000',
+        ...env,
+    },
     reuseExistingServer: !process.env.CI,
 });
 

@@ -308,6 +308,11 @@ input[type="file"]::file-selector-button {
     background: var(--accent-wash);
 }
 
+/* The spam trap (P9): no one sees it or reaches it, so only scripts fill it. */
+.trap {
+    display: none;
+}
+
 /* Anonymous: the contact fields go away. Browsers without :has() show them, and the server drops them. */
 form:has(#is_anonymous-1:checked) .contact {
     display: none;

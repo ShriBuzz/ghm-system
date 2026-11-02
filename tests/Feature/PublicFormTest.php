@@ -1,12 +1,13 @@
 <?php
 
 use App\Models\Attachment;
-use App\Models\Category;
 use App\Models\Grievance;
-use App\Models\Location;
 use App\Models\Setting;
 use App\Notifications\Acknowledgement;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -15,26 +16,6 @@ beforeEach(function () {
     $this->travelTo('2026-11-02 10:00');
     Notification::fake();
 });
-
-/**
- * What the public form sends for a valid anonymous grievance, as strings, like a browser.
- *
- * @return array<string, mixed>
- */
-function formInput(array $overrides = []): array
-{
-    return [
-        'is_anonymous' => '1',
-        'category_id' => (string) Category::factory()->create()->id,
-        'location_id' => (string) Location::factory()->create()->id,
-        'incident_day' => '28',
-        'incident_month' => '10',
-        'incident_year' => '2026',
-        'recurrence' => 'once',
-        'description' => 'Wages unpaid for three months',
-        ...$overrides,
-    ];
-}
 
 it('opens the form to anyone, with the notice above the first question, escaped', function () {
     $this->get('/en')->assertOk()->assertSee('[Draft:', false)->assertSee('name="is_anonymous"', false);
@@ -155,3 +136,22 @@ it('stores no IP address anywhere the submission writes', function () {
         ->flatMap(fn (string $table) => DB::table($table)->get()->map(fn ($row) => json_encode($row)))->implode(' ');
     expect(Grievance::count())->toBe(1)->and($everything)->not->toContain('203.0.113.7');
 })->group('S5');
+
+it('sends a form posted after the session ended back to it, with what was typed', function () {
+    // Browsers that send Sec-Fetch-Site pass the forgery check without the session; older ones fail it
+    // with a token mismatch, which reaches the exception handler as a 419 for this route.
+    $request = Request::create('/en', 'POST', formInput(['description' => 'Typed before the session ended', 'website' => 'x']));
+    $route = app('router')->getRoutes()->match($request);
+    $route->bind($request);
+    $request->setRouteResolver(fn () => $route);
+
+    $response = app(ExceptionHandler::class)->render($request, new TokenMismatchException);
+
+    // What the redirect flashes; the form refills from old input as in the test above.
+    expect($response->getStatusCode())->toBe(302)
+        ->and($response->headers->get('Location'))->toBe(url('/en'))
+        ->and(session()->getOldInput('description'))->toBe('Typed before the session ended')
+        ->and(session()->getOldInput('form_started'))->not->toBeNull()
+        ->and(session()->getOldInput('website'))->toBeNull()
+        ->and(session('errors')->getBag('default')->first('form'))->toStartWith('Your session ended before the grievance was sent');
+})->group('S2', 'P1');

@@ -16,8 +16,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 /**
@@ -35,6 +37,8 @@ class GrievanceController
             'notice' => preg_split('/\R{2,}/', trim($notice)),
             'categories' => Category::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
             'locations' => Location::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
+            // When the form was shown (P9). After a refusal or an expired session, the first showing still counts.
+            'started' => old('form_started') ?: Crypt::encryptString((string) now()->getTimestamp()),
         ]);
     }
 
@@ -63,6 +67,7 @@ class GrievanceController
         });
 
         $case->acknowledge($pin);
+        RateLimiter::hit(StoreGrievanceRequest::limiterKey($request), 3600);
 
         // Until Done or the session ends, so a reload on the phone does not lose the PIN. Sessions are encrypted.
         session()->put('received', ['reference' => $case->reference, 'pin' => $pin, 'emailed' => filled($case->email)]);

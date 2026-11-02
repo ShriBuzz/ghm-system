@@ -73,6 +73,50 @@ test.describe('with JavaScript off', () => {
         await expect(page.locator('.error-summary')).toContainText('5 MB');
         await expect(page.getByLabel('Describe what happened')).toHaveValue('Test grievance kept after a refused file');
     });
+
+    test('sends the grievance even when the session ended while it was being typed', { tag: ['@S2', '@P1'] }, async ({ page }) => {
+        await expectTypedTextSurvivesAnEndedSession(page);
+    });
+});
+
+/**
+ * Fill the form, lose the session (cookies gone, as after 30 idle minutes), and send. A browser that sends
+ * Sec-Fetch-Site passes Laravel's forgery check on that header, so nothing typed is lost; an older one gets
+ * the form back with its text (PublicFormTest covers that path).
+ */
+async function expectTypedTextSurvivesAnEndedSession(page: Page): Promise<void> {
+    await page.goto('/en');
+    await fillRequired(page, 'Test grievance typed before the session ended');
+    await page.context().clearCookies();
+    await page.getByRole('button', { name: 'Send grievance' }).click();
+
+    await expect(page).toHaveURL(/\/en\/received$/);
+    await expect(page.locator('[data-pin]')).toHaveText(/^\d{6}$/);
+}
+
+test('sends the grievance even when the session ended while it was being typed, with JavaScript on', { tag: ['@S2', '@P1'] }, async ({ page }) => {
+    await expectTypedTextSurvivesAnEndedSession(page);
+});
+
+test('hides the spam trap from people and from screen readers', { tag: ['@P9', '@S9'] }, async ({ page }) => {
+    await page.goto('/en');
+
+    await expect(page.locator('#website')).toBeHidden();
+    expect(await page.locator('form[data-grievance]').ariaSnapshot()).not.toContain('Leave this empty');
+});
+
+test('carries what was typed across a language switch, then forgets the copy', { tag: ['@P2', '@P1'] }, async ({ page }) => {
+    await page.goto('/en');
+    await page.getByText('Yes, give my name and contact').click();
+    await page.getByLabel('Your name').fill('Test Complainant');
+    await page.getByLabel('Describe what happened').fill('Test grievance typed before switching language');
+
+    await page.getByRole('link', { name: 'नेपाली' }).click();
+
+    await expect(page).toHaveURL(/\/ne$/);
+    await expect(page.getByLabel('के भयो, लेख्नुहोस्')).toHaveValue('Test grievance typed before switching language');
+    await expect(page.getByLabel('तपाईंको नाम')).toHaveValue('Test Complainant');
+    expect(await page.evaluate(() => sessionStorage.getItem('grievance-draft'))).toBeNull();
 });
 
 test('turns away a file over 5 MB before it is sent', { tag: ['@P5'] }, async ({ page }) => {

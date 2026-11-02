@@ -8,6 +8,7 @@
 
 @section('content')
     <h1>{{ __('form.title') }}</h1>
+    <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>
 
     <section class="notice" aria-labelledby="notice-heading">
         <h2 id="notice-heading">{{ __('form.notice_heading') }}</h2>
@@ -18,8 +19,15 @@
 
     <form method="post" action="{{ route('grievance.store') }}" enctype="multipart/form-data" novalidate data-grievance>
         @csrf
+        <input type="hidden" name="form_started" value="{{ $started }}">
+        {{-- A trap for scripts that fill every field (P9); people never see it. --}}
+        <div class="trap" aria-hidden="true">
+            <label for="website">{{ __('form.trap') }}</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
 
         <x-form.errors :anchors="[
+            'form' => 'send',
             'is_anonymous' => 'is_anonymous-1',
             'preferred_contact' => 'preferred_contact-phone',
             'incident_date' => 'incident_day',
@@ -63,6 +71,6 @@
             @endforeach
         </div>
 
-        <button type="submit" class="button button-primary">{{ __('form.submit') }}</button>
+        <button type="submit" id="send" class="button button-primary">{{ __('form.submit') }}</button>
     </form>
 @endsection
