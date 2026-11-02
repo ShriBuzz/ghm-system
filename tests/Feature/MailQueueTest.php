@@ -1,9 +1,25 @@
 <?php
 
+use App\Models\Grievance;
+use App\Models\User;
+use App\Notifications\Acknowledgement;
+use App\Notifications\CaseAlert;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Mailer\Exception\TransportException;
+
+it('loads nothing from another site in an email, whatever the app is called', function () {
+    // Laravel's own mail header shows a logo from laravel.com while the app is named "Laravel",
+    // which tells laravel.com the reader's IP address when the email is opened.
+    config(['app.name' => 'Laravel']);
+    $case = Grievance::factory()->create(['email' => 'complainant@example.com']);
+
+    $emails = (string) (new CaseAlert($case->id, message: false))->toMail(User::factory()->create())->render()
+        .(string) (new Acknowledgement('048213'))->toMail($case)->render();
+
+    expect($emails)->not->toContain('laravel.com')->not->toContain('<img');
+})->group('N1', 'N2', 'S5');
 
 it('works the mail queue from cron every minute, one worker at a time', function () {
     $worker = collect(app(Schedule::class)->events())
