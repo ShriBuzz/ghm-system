@@ -59,7 +59,7 @@ it('gives the reference, PIN and where to check them, never what the complainant
     expect($mail->subject)->toBe($subject)
         ->and($html)->toContain($case->reference)
         ->toContain('048213')
-        ->toContain(route('home', ['locale' => $locale]))
+        ->toContain(route('status.lookup', ['locale' => $locale]))
         ->not->toContain((string) $case->name)
         ->not->toContain('Wages unpaid')
         ->not->toContain('laravel.com');

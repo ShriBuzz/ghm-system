@@ -6,6 +6,9 @@ return [
     'uploaded' => 'The file could not be used. Choose another photo or PDF, up to 5 MB.',
 
     'custom' => [
+        'reference' => ['required' => 'Write the reference number, for example GHM-2026-0001.'],
+        'pin' => ['required' => 'Write the PIN.'],
+        'body' => ['required' => 'Write your message.', 'max' => 'Shorten the message to 5,000 characters or fewer.'],
         'is_anonymous' => ['required' => 'Choose whether to give your name.'],
         'name' => ['required' => 'Write your name, or choose to stay anonymous.'],
         'phone' => ['required_if' => 'Write the phone number we should call.'],
