@@ -226,7 +226,7 @@
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Ending actions (Done, Close), under a hint that says what they do.",
+      "description": "Ending actions (Done, Finish and hide), under a hint that says what they do.",
       "html": "<button type=\"submit\" class=\"ds-btn-secondary\">Done</button>",
       "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: 0.75rem 1.5rem; border: 2px solid var(--accent, #0a5c70); border-radius: 0.5rem; font-family: var(--font, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Noto Sans\", \"Noto Sans Devanagari\", \"Nirmala UI\", \"Kohinoor Devanagari\", sans-serif); font-size: 1.125rem; font-weight: 600; cursor: pointer; background: var(--paper, #ffffff); color: var(--accent, #0a5c70); } .ds-btn-secondary:hover { border-color: var(--accent-strong, #07465a); background: var(--accent-wash, #e3eef1); color: var(--accent-strong, #07465a); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--accent, #0a5c70); outline-offset: 2px; }"
     },
