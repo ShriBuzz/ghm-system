@@ -9,9 +9,11 @@ use App\Filament\Resources\Grievances\Pages\RecordedCase;
 use App\Models\Category;
 use App\Models\Grievance;
 use App\Models\Location;
+use App\Notifications\Acknowledgement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 
@@ -57,11 +59,42 @@ it('records an offline case with its channel, reference and a hashed PIN', funct
         ->and($case->status)->toBe(Status::Received)
         ->and($case->reference)->toBe('GHM-2026-0001')
         ->and($case->name)->toBe('Test Worker')
+        ->and($case->incident_date->toDateString())->toBe('2026-10-28')
+        ->and($case->incident_date_exact)->toBeTrue()
+        ->and($case->locale)->toBe('ne')
         ->and($slip['reference'])->toBe('GHM-2026-0001')
         ->and($slip['pin'])->toMatch('/^\d{6}$/')
         ->and(Hash::check($slip['pin'], $case->pin_hash))->toBeTrue()
         ->and(DB::table('grievances')->value('pin_hash'))->not->toBe($slip['pin']);
 })->group('A6', 'P7');
+
+it('keeps the month and year only when the complainant does not remember the day', function () {
+    $this->travelTo('2026-11-02 10:00');
+    signedInAs(Role::FocalPerson);
+
+    Livewire::test(CreateGrievance::class)
+        ->fillForm(offlineCase(['incident_date' => '2026-09-17', 'day_unknown' => true]))
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $case = Grievance::sole();
+    expect($case->incident_date->toDateString())->toBe('2026-09-01')
+        ->and($case->incident_date_exact)->toBeFalse();
+})->group('A6', 'P5');
+
+it('emails the acknowledgement in the language the complainant chose', function () {
+    Notification::fake();
+    signedInAs(Role::FocalPerson);
+
+    Livewire::test(CreateGrievance::class)
+        ->fillForm(offlineCase(['email' => 'worker@example.com', 'locale' => 'en']))
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $case = Grievance::sole();
+    expect($case->locale)->toBe('en');
+    Notification::assertSentTo($case, Acknowledgement::class, fn (Acknowledgement $mail) => $mail->locale === 'en');
+})->group('A6', 'N2');
 
 it('offers no "create another", which would skip the slip and lose the PIN', function () {
     signedInAs(Role::FocalPerson);
@@ -155,4 +188,5 @@ it('refuses an incomplete or invalid entry', function (array $overrides, string 
     'incident in the future' => [['incident_date' => now()->addDay()->toDateString()], 'incident_date'],
     'inactive category' => [fn () => ['category_id' => Category::factory()->create(['is_active' => false])->id], 'category_id'],
     'no description' => [['description' => ''], 'description'],
+    'a language the site does not have' => [['locale' => 'fr'], 'locale'],
 ])->group('A6', 'P4', 'P5');

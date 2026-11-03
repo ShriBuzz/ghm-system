@@ -5,11 +5,13 @@ namespace App\Filament\Resources\Grievances\Pages;
 use App\Enums\Channel;
 use App\Enums\Status;
 use App\Filament\Resources\Grievances\GrievanceResource;
+use App\Http\Middleware\SetLocale;
 use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Grievance;
 use App\Support\Pin;
 use App\Support\ReferenceNumber;
 use BackedEnum;
+use Carbon\CarbonImmutable;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -41,7 +43,6 @@ class CreateGrievance extends CreateRecord
                 'reference' => ReferenceNumber::next(),
                 'pin_hash' => Hash::make($pin),
                 'status' => Status::Received,
-                'locale' => 'ne',
                 'created_by' => auth()->id(),
             ])->save();
             $case->acknowledge($pin);
@@ -76,10 +77,12 @@ class CreateGrievance extends CreateRecord
         $rules = StoreGrievanceRequest::caseRules() + [
             'channel' => ['required', Rule::enum(Channel::class)->except([Channel::Web])],
             'received_at' => ['required', 'date', 'before_or_equal:now'],
+            'locale' => ['required', Rule::in(SetLocale::LOCALES)],
         ];
 
         // Filament's selects hold enum objects; the shared rules compare codes, as the public form sends them.
         $data = array_map(fn ($value) => $value instanceof BackedEnum ? $value->value : $value, $data);
+        $data['incident_date_exact'] = ! ($data['day_unknown'] ?? false);
         $validator = Validator::make($data, $rules);
 
         if ($validator->fails()) {
@@ -87,6 +90,12 @@ class CreateGrievance extends CreateRecord
             throw ValidationException::withMessages(collect($validator->errors()->messages())->mapWithKeys(fn ($messages, $field) => ["data.$field" => $messages])->all());
         }
 
-        return $validator->validated();
+        $valid = $validator->validated();
+        // The day picked stands for its month, as the public form's "I don't remember the day" (P5).
+        if (! $valid['incident_date_exact']) {
+            $valid['incident_date'] = CarbonImmutable::parse($valid['incident_date'])->startOfMonth()->toDateString();
+        }
+
+        return $valid;
     }
 }

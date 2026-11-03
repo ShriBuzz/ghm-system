@@ -11,6 +11,8 @@ They were planned for the RFQ clarification email, due 2 Nov 2026 (RFQ section 1
 
 The email text below was written to go before the quotation; adjust its opening and question 1 (which mentions quoting new hosting) when it is sent.
 
+Questions 1, 3, 4, 5, 7, 8, 10 to 14 and 16 are written up for the first client meeting, with the options in use today, in `docs/client-discussion.md`.
+
 When the answers arrive: record each one in the "Answer" column below, apply the change listed for it, tick it off, and move any decision into `docs/progress.md`.
 
 ## Email text
@@ -45,6 +47,7 @@ Subject: Clarification questions: RFQ NBI/GHM/RFQ/01 – [your company name]
 > 13. Should the Administrator also receive new-case alerts (N1)? In particular, if the company has no restricted-case officer, should alerts for restricted cases go to the Administrator? Otherwise nobody is told about them. And should complainants who gave an email be told when staff reply? (The RFQ does not require it.)
 > 14. Should the staff screens be in Nepali, English, or both with a switch? The RFQ asks for both languages on the public side (P2) only.
 > 15. How long should closed cases and their attachments be kept? The RFQ does not set a retention period.
+> 16. For grievances received offline (A6): how should someone who used the drop box get a reference number and PIN, for example a numbered form with a tear-off part? Should people who complained by phone or in person use the status page, or be kept updated by staff? In which language, and with what wording, should the printed slip be? Should staff ask the optional questions in P6?
 >
 > Kind regards,
 > [name, company]
@@ -79,3 +82,4 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 13 | | No Administrator alerts, so a restricted case alerts nobody while the company has no active restricted-case officer (the deploy checks require one); no reply notification to complainants | `Grievance::alertStaff()` (drop the Administrator exclusion); a reply notification only if NBI asks for it | [ ] |
 | 14 | | The staff panel is in English (`App\Http\Middleware\SetPanelLocale`); `APP_LOCALE=ne` stays the public default | Nepali: change the locale in `SetPanelLocale`. A switch: a user setting read there instead | [ ] |
 | 15 | | No cleanup job; nothing is deleted | A scheduled cleanup and its note in `docs/technical-note.md` (WP3) | [ ] |
+| 16 | | The slip is in English, with the reference, PIN, received date and a line for staff; staff hand it over, read it out or rely on the acknowledgement email; no P6 answers for offline cases; an anonymous drop-box case cannot be followed up. Staff choose the complainant's language for the email | Slip text in `RecordedCase` and its print view `resources/views/filament/slip-print.blade.php` (Impeccable); the P6 fields on `GrievanceForm` if staff should ask them; a drop-box form is printed outside the app | [ ] |

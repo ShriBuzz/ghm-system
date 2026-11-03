@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Grievances\Schemas;
 use App\Enums\Channel;
 use App\Enums\ContactMethod;
 use App\Enums\Recurrence;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -48,12 +49,16 @@ class GrievanceForm
                             ->relationship('location', 'name_en', fn (Builder $query) => $query->where('is_active', true)->orderBy('sort'))
                             ->markAsRequired(),
                         DatePicker::make('incident_date')->label('When it happened')->maxDate(now())->markAsRequired(),
+                        // As on the public form: a remembered month is kept as the month only (P5).
+                        Checkbox::make('day_unknown')->label('The complainant does not remember the day: keep the month and year only'),
                         Select::make('recurrence')->label('How often')->options(Recurrence::class)->markAsRequired(),
                         Textarea::make('description')->rows(6)->columnSpanFull()->markAsRequired(),
                     ]),
                 Section::make('Complainant')
                     ->columns(['default' => 1, 'lg' => 2])
                     ->schema([
+                        Select::make('locale')->label('Complainant\'s language')->options(['ne' => 'Nepali', 'en' => 'English'])
+                            ->default('ne')->selectablePlaceholder(false)->helperText('The acknowledgement email is sent in this language.')->markAsRequired(),
                         Toggle::make('is_anonymous')->label('Anonymous: no name or contact details')->live()->columnSpanFull(),
                         TextInput::make('name')->visible($named)->markAsRequired(),
                         TextInput::make('phone')->tel()->visible($named)->helperText('A phone number or an email is needed.'),

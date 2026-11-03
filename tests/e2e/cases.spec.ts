@@ -7,7 +7,7 @@ import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOn
  */
 async function enterOfflineCase(
     page: Page,
-    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false } = {},
+    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false, dayUnknown = false, language = '' } = {},
 ) {
     await page.goto('/admin/grievances/create');
     await page.getByLabel('Channel').selectOption('Phone');
@@ -19,8 +19,15 @@ async function enterOfflineCase(
     await page.getByLabel('Category').selectOption(category);
     await page.getByLabel('Location').selectOption(location);
     await page.getByLabel('When it happened').fill('2026-10-28');
+    if (dayUnknown) {
+        await page.getByLabel(/does not remember the day/).check();
+    }
     await page.getByLabel('How often').selectOption('Once');
     await page.getByLabel('Description').fill('Fake grievance for a browser spec.');
+
+    if (language) {
+        await page.getByLabel('Complainant\'s language').selectOption(language);
+    }
 
     if (anonymous) {
         await page.getByRole('switch', { name: /Anonymous/ }).click();
@@ -88,6 +95,13 @@ test.describe('focal person', () => {
         await page.goBack();
         await expect(page).toHaveURL(/\/admin\/grievances$/);
         await expect(page.getByRole('main')).not.toContainText(pin);
+    });
+
+    test('enters a case for an English speaker who remembers only the month', { tag: ['@A6', '@P5'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page, { dayUnknown: true, language: 'English' });
+
+        await (await findCase(page, reference)).click();
+        await expect(page.getByRole('main')).toContainText('October 2026, exact day not remembered');
     });
 
     test('prints the slip without the panel around it', { tag: ['@A6'] }, async ({ page }) => {
