@@ -196,6 +196,35 @@ test('sends the grievance once, however often Send is tapped on a slow connectio
     expect(label).toBe('Sending…');
 });
 
+test('can still be sent after the browser\'s Stop button cancelled a send', { tag: ['@P1'] }, async ({ page }) => {
+    await page.route('**/en', async (route) => {
+        if (route.request().method() === 'POST') {
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+        await route.continue().catch(() => {});
+    });
+
+    await page.goto('/en');
+    await fillRequired(page);
+    // Stop fires no event a page can hear, so the guard against a second tap only lasts 10 seconds.
+    // In one call: Playwright cannot start another while the send is on its way.
+    await page.evaluate(async () => {
+        document.querySelector<HTMLButtonElement>('#send')!.click();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        window.stop();
+    });
+    await expect(page).toHaveURL(/\/en$/);
+    await expect(page.locator('#send')).toHaveText('Sending…');
+    // Eleven seconds later, without the wait: the page's clock moves on.
+    await page.evaluate(() => {
+        const now = Date.now();
+        Date.now = () => now + 11_000;
+    });
+    await page.locator('#send').click();
+
+    await expect(page).toHaveURL(/\/en\/received$/);
+});
+
 test('the form weighs under 50 KB with everything it loads', { tag: ['@X1', '@P1'] }, async ({ page }) => {
     let bytes = 0;
     page.on('response', async (response) => {

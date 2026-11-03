@@ -369,11 +369,6 @@ form:has(#is_anonymous-1:checked) .contact {
     color: var(--paper);
 }
 
-/* Sent and on its way (form.js): a second tap does nothing. */
-.button[aria-disabled="true"] {
-    cursor: progress;
-}
-
 @media (max-width: 40rem) {
     .button-primary {
         width: 100%;

@@ -24,20 +24,20 @@
         });
     }
 
-    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7).
+    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7). Only for
+    // 10 seconds: the browser's Stop button cancels a send without an event, and must not leave Send dead.
     for (const each of document.querySelectorAll('form[method="post"]')) {
         each.addEventListener('submit', (event) => {
-            if (each.dataset.sent) {
+            if (Date.now() - Number(each.dataset.sent ?? 0) < 10_000) {
                 event.preventDefault();
                 return;
             }
-            each.dataset.sent = 'true';
+            each.dataset.sent = String(Date.now());
             const button = event.submitter;
             if (button?.dataset.sending) {
-                button.dataset.label = button.textContent;
+                button.dataset.label ??= button.textContent;
                 button.textContent = button.dataset.sending;
             }
-            button?.setAttribute('aria-disabled', 'true');
         });
     }
     // Back on this page from the browser's memory (the Back button): it can be sent again.
@@ -48,9 +48,8 @@
         for (const each of document.querySelectorAll('form[data-sent]')) {
             delete each.dataset.sent;
         }
-        for (const button of document.querySelectorAll('[aria-disabled="true"]')) {
-            button.removeAttribute('aria-disabled');
-            button.textContent = button.dataset.label ?? button.textContent;
+        for (const button of document.querySelectorAll('[data-label]')) {
+            button.textContent = button.dataset.label;
         }
     });
 
