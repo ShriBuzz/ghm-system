@@ -93,7 +93,7 @@ it('stops one visitor guessing across many references, not another visitor', fun
         $this->post('/en/status', ['reference' => sprintf('GHM-2026-%04d', 5000 + $guess), 'pin' => '000000']);
     }
     lookUp($case)->assertRedirect(route('status.lookup', ['locale' => 'en']));
-    $this->get('/en/status')->assertSee('Too many attempts');
+    $this->get('/en/status')->assertSee('Too many wrong tries')->assertSee('Try again in 60 minutes')->assertSee('We could not open your grievance');
 
     $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.20']);
     lookUp($case)->assertRedirect(route('status.show', ['locale' => 'en']));
@@ -182,3 +182,24 @@ it('takes 10 messages an hour for a grievance, then asks the complainant to wait
     $this->post('/en/status/case', ['body' => 'An hour later']);
     expect(GrievanceMessage::count())->toBe(11);
 })->group('P8', 'N1');
+
+it('accepts the reference and PIN as people type them: Nepali digits, spaces, small letters, no hyphens', function () {
+    $case = Grievance::factory()->create();
+    [, $year, $number] = explode('-', $case->reference);
+
+    foreach ([[strtolower($case->reference), '१२३४५६'], ["ghm {$year} {$number}", '123 456'], ["GHM{$year}{$number}", ' 123456 ']] as [$reference, $pin]) {
+        $this->post('/en/status', ['reference' => $reference, 'pin' => $pin])->assertRedirect(route('status.show', ['locale' => 'en']));
+        $this->post('/en/status/close');
+    }
+})->group('P8');
+
+it('counts wrong PINs against the one reference, however it was typed', function () {
+    $case = Grievance::factory()->create();
+
+    foreach ([$case->reference, strtolower($case->reference), str_replace('-', '', $case->reference), str_replace('-', ' ', $case->reference), $case->reference] as $typed) {
+        $this->post('/en/status', ['reference' => $typed, 'pin' => '000000']);
+    }
+
+    lookUp($case)->assertRedirect(route('status.lookup', ['locale' => 'en']));
+    $this->get('/en/status')->assertSee('locked for 15 minutes');
+})->group('P8');

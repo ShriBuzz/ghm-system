@@ -28,7 +28,6 @@
         </div>
 
         <x-form.errors :anchors="[
-            'form' => 'send',
             'is_anonymous' => 'is_anonymous-1',
             'preferred_contact' => 'preferred_contact-phone',
             'incident_date' => 'incident_day',
@@ -36,7 +35,7 @@
         ]" />
 
         <div class="section">
-            <x-form.choices name="is_anonymous" :legend="__('form.identity.legend')" checked="1"
+            <x-form.choices name="is_anonymous" :legend="__('form.identity.legend')" checked="1" heading
                 :options="['1' => __('form.identity.anonymous'), '0' => __('form.identity.named')]"
                 :hints="['1' => __('form.identity.anonymous_hint'), '0' => __('form.identity.named_hint')]" />
 
@@ -72,6 +71,6 @@
             @endforeach
         </div>
 
-        <button type="submit" id="send" class="button button-primary">{{ __('form.submit') }}</button>
+        <button type="submit" id="send" class="button button-primary" data-sending="{{ __('form.sending') }}">{{ __('form.submit') }}</button>
     </form>
 @endsection

@@ -51,7 +51,7 @@
 
     <form method="post" action="{{ route('status.reply') }}" class="stack reply" novalidate>
         @csrf
-        <x-form.errors />
+        <x-form.errors :heading="__('track.errors.reply_heading')" />
         <div @class(['field', 'field-error' => $errors->has('body')])>
             <label for="body">{{ __('track.add') }}</label>
             <p class="hint" id="body-hint">{{ __('track.add_hint') }}</p>

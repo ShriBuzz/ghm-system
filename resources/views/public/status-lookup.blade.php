@@ -18,7 +18,7 @@
 
     <form method="post" action="{{ route('status.check') }}" class="stack" novalidate>
         @csrf
-        <x-form.errors :anchors="['lookup' => 'reference']" />
+        <x-form.errors :anchors="['lookup' => 'reference']" :heading="__('track.errors.heading')" />
         <x-form.field name="reference" :label="__('track.reference')" :hint="__('track.reference_hint')" required
             autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" />
         <x-form.field name="pin" :label="__('track.pin')" :hint="__('track.pin_hint')" required

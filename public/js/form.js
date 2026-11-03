@@ -23,6 +23,36 @@
         });
     }
 
+    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7).
+    for (const each of document.querySelectorAll('form[method="post"]')) {
+        each.addEventListener('submit', (event) => {
+            if (each.dataset.sent) {
+                event.preventDefault();
+                return;
+            }
+            each.dataset.sent = 'true';
+            const button = event.submitter;
+            if (button?.dataset.sending) {
+                button.dataset.label = button.textContent;
+                button.textContent = button.dataset.sending;
+            }
+            button?.setAttribute('aria-disabled', 'true');
+        });
+    }
+    // Back on this page from the browser's memory (the Back button): it can be sent again.
+    window.addEventListener('pageshow', (event) => {
+        if (!event.persisted) {
+            return;
+        }
+        for (const each of document.querySelectorAll('form[data-sent]')) {
+            delete each.dataset.sent;
+        }
+        for (const button of document.querySelectorAll('[aria-disabled="true"]')) {
+            button.removeAttribute('aria-disabled');
+            button.textContent = button.dataset.label ?? button.textContent;
+        }
+    });
+
     // Switching language loads the same form in the other language (P2). Carry what was typed across,
     // in this tab only, and forget it the moment it is put back. A chosen file cannot be carried.
     const form = document.querySelector('form[data-grievance]');

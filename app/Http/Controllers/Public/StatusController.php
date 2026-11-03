@@ -39,7 +39,7 @@ class StatusController
 
     public function check(StatusLookupRequest $request): RedirectResponse
     {
-        $reference = Str::upper(trim($request->string('reference')->toString()));
+        $reference = $request->string('reference')->toString();
         $visitor = 'status-failures:'.VisitorKey::for($request);
         $wrongPins = 'status-wrong-pins:'.hash('sha256', $reference);
         $lock = 'status-lock:'.hash('sha256', $reference);
@@ -47,7 +47,9 @@ class StatusController
         // Per visitor, so a bot cannot spread guesses over every reference; per reference, 5 wrong PINs
         // lock it for 15 minutes from the fifth. An unknown reference counts and answers the same.
         if (RateLimiter::tooManyAttempts($visitor, Config::integer('ghm.public.failed_lookups_per_hour'))) {
-            return $this->refuse($reference, __('track.errors.too_many'));
+            $minutes = max(1, (int) ceil(RateLimiter::availableIn($visitor) / 60));
+
+            return $this->refuse($reference, trans_choice('track.errors.too_many', $minutes, ['minutes' => $minutes]));
         }
         if (RateLimiter::tooManyAttempts($lock, 1)) {
             return $this->refuse($reference, __('track.errors.locked'));

@@ -155,6 +155,47 @@ test('the received page passes an axe WCAG 2.2 AA scan in both languages', { tag
     }
 });
 
+test('fits a 320 px screen with its gutters, in both languages', { tag: ['@S9', '@P1'] }, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+
+    for (const path of ['/ne', '/en', '/ne/status', '/en/status']) {
+        await page.goto(path);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth), path).toBeLessThanOrEqual(320);
+        // The 16 px gutter on the right as on the left: no field runs into it.
+        const right = await page.locator('main form').evaluate((form) => form.getBoundingClientRect().right);
+        expect(right, path).toBeLessThanOrEqual(320 - 16);
+    }
+});
+
+test('sends the grievance once, however often Send is tapped on a slow connection', { tag: ['@P1', '@P7'] }, async ({ page }) => {
+    let posts = 0;
+    await page.route('**/en', async (route) => {
+        if (route.request().method() === 'POST') {
+            posts++;
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+        // A second send would cancel the first in the browser, after the server already has it.
+        await route.continue().catch(() => {});
+    });
+
+    await page.goto('/en');
+    await fillRequired(page);
+    // Two taps from the page itself, the second while the first is on its way: Playwright's own click
+    // and locators wait for the navigation to finish.
+    const label = await page.evaluate(async () => {
+        const send = document.querySelector<HTMLButtonElement>('#send')!;
+        send.click();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const shown = send.textContent;
+        send.click();
+        return shown;
+    });
+
+    await expect(page).toHaveURL(/\/en\/received$/);
+    expect(posts).toBe(1);
+    expect(label).toBe('Sending…');
+});
+
 test('the form weighs under 50 KB with everything it loads', { tag: ['@X1', '@P1'] }, async ({ page }) => {
     let bytes = 0;
     page.on('response', async (response) => {

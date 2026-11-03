@@ -155,7 +155,7 @@ it('sends a form posted after the session ended back to it, with what was typed'
         ->and(session()->getOldInput('description'))->toBe('Typed before the session ended')
         ->and(session()->getOldInput('form_started'))->not->toBeNull()
         ->and(session()->getOldInput('website'))->toBeNull()
-        ->and(session('errors')->getBag('default')->first('form'))->toStartWith('Your session ended before the grievance was sent');
+        ->and(session('errors')->getBag('default')->first('form'))->toStartWith('This page was open too long to send');
 })->group('S2', 'P1');
 
 it('refuses crafted list values in place of text, without an error page', function () {

@@ -56,8 +56,9 @@ test('a complainant reads a staff reply and adds information, with the reference
     await expect(page.getByRole('status')).toHaveText('Your message was sent.');
     await expect(thread).toContainText('It started in July.');
 
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Finish and hide' }).click();
     await expect(page).toHaveURL(/\/en\/status$/);
+    await expect(page.getByRole('status')).toContainText('still open');
     await page.goto('/en/status/case');
     await expect(page).toHaveURL(/\/en\/status$/);
 
