@@ -2,7 +2,7 @@
 
 For whoever picks up the work next, on any machine, including a fresh Claude Code session that has no memory of earlier ones.
 
-Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, security) are built, and the whole repo has been through `/ponytail-audit` with every finding fixed. WP1 (public side) is in progress: steps 1 to 7, the form and the status page, are built.
+Last updated 2026-11-03. WP0, WP2 (admin side) and WP3 (alerts, reports, security) are built, and the whole repo has been through `/ponytail-audit` with every finding fixed. WP1 (public side) is built: all nine steps, in three stacked pull requests waiting for review.
 
 ## Where things stand
 
@@ -12,14 +12,14 @@ Last updated 2026-11-02. WP0, WP2 (admin side) and WP3 (alerts, reports, securit
 | WP2 step 1: reference number, PIN, attachment store | Merged (pull request #4) |
 | WP2 steps 2 to 6, 8, 10: settings, case list, case page, offline entry, Playwright sign-in per role | Merged (pull request #5) |
 | WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Merged (pull request #6) |
-| WP1 Public side | In progress: steps 1 to 5 (form, reference and PIN page, spam protection) in pull request #11 from `wp1/public-side`; steps 6 and 7 (status page) in the next one from `wp1/status-page`, stacked on it; steps 8 and 9 (QR poster, close-out) next. It uses `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
+| WP1 Public side | Built, in review: steps 1 to 5 (form, reference and PIN page, spam protection) in pull request #11 from `wp1/public-side`; steps 6 and 7 (status page) in #12 from `wp1/status-page`, stacked on it; steps 8 and 9 (QR poster, Impeccable critique and audit fixes, walks, `DESIGN.md`) in the third from `wp1/qr-poster`, stacked on #12. It uses `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
 | WP3 Alerts, reports, security | Merged (pull requests #7 to #9), then the `/ponytail-audit` fixes (WP3 step 12, branch `wp3/audit-fixes`). Still open: the timed restore drill on staging, the off-server backup copy, the S8 recipients |
 
 Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
 
 ## Next steps
 
-1. WP1 step 8, the QR poster (P10): a Filament page for every role with the QR code of the form's address and a printable A4 poster, using `chillerlan/php-qrcode`, already installed with Filament's MFA. Then step 9: Impeccable `critique` and `audit` of the public pages, walks per role at 360 px and desktop, `/ponytail-review`, traceability. When pull request #11 merges, retarget the status-page pull request to `main`. The plan's steps and decisions are in the WP1 table in `docs/progress.md` and the surface brief in `.impeccable/surfaces/`.
+1. Review and merge the WP1 pull requests in order: #11, then #12, then the QR-poster one. After each merge, retarget the next to `main` (`gh pr edit <number> --base main`). The WP1 table in `docs/progress.md` has each step's decisions; `DESIGN.md` has the public pages' visual rules, and `.impeccable/critique/` the P3 polish items left. Playwright runs share this machine's file cache with `php artisan serve`, so after a full run the local hourly limits for 127.0.0.1 are used up: start a walk server with `GHM_SUBMISSIONS_PER_HOUR=100 GHM_FAILED_LOOKUPS_PER_HOUR=100`.
 2. Keep building without NBI's answers: the clarification questions are asked after contract signing (decided 2026-11-02). The code follows the assumptions in `docs/clarification-questions.md`; its "Apply when answered" table lists the change for each answer.
 3. The staging deploy (plan: 16 to 18 Nov) follows `docs/deploy.md`, rehearsed locally (WP3 step 11), once the host is known; its section 1 checks the host first, PHP 8.4.1 included. `docs/restore.md` was run end to end locally (WP3 step 10). The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.
 4. Open questions for the project lead are in `docs/progress.md` (repo visibility and the disabled branch ruleset; the slip's wording and language; Nepali copy, including the acknowledgement email).
@@ -33,7 +33,7 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 5. `docs/progress.md`: what is done, what is next, open questions and decisions.
 6. `docs/local-setup.md`: how to set up a machine.
 7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/deploy.md`: putting it on a server. `docs/restore.md`: restoring a backup.
-8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views.
+8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views. `DESIGN.md`: the visual rules those pages follow.
 
 ## What git does not carry
 
