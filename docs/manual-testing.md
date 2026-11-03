@@ -114,6 +114,9 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
 | Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
 | Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
+| Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |
+| Print poster, or the browser's print preview | One A4 page: the heading in Nepali and English, the code and the address, no panel menu or buttons |
+| Download QR code (PNG) | A file `grievance-form-qr.png` that a phone camera also reads |
 
 **Restricted-case officer and Administrator: who sees what (A1, A3, A5)**
 
