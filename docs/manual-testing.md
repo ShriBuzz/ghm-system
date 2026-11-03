@@ -110,7 +110,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 
 | Try | Expect |
 |---|---|
-| Sign in as the focal person | Menu shows Dashboard and Cases only, no Settings. Opening `/admin/categories` shows "Forbidden" |
+| Sign in as the focal person | Menu shows Dashboard, Cases, Summary and QR poster, no Settings. Opening `/admin/categories` shows "Forbidden" |
 | Cases → Enter offline case: channel Phone, category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
 | Print slip, or the browser's print preview | Only the heading and the slip: no menu, no buttons, no staff name |
 | Reload the slip page | Back on the case list: the PIN is shown only once |
@@ -120,6 +120,22 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |
 | Print poster, or the browser's print preview | One A4 page: the heading in Nepali and English, the code and the address, no panel menu or buttons |
 | Download QR code (PNG) | A file `grievance-form-qr.png` that a phone camera also reads |
+
+**Offline cases from start to finish (A6)**
+
+A grievance that came by phone, email, drop box or in person, entered by staff and then followed by the complainant online. Keep the focal person signed in, and use a private window as the complainant. Fake details only; for an email address use one at `example.com`.
+
+| Try | Expect |
+|---|---|
+| Cases → Enter offline case. Channel In person, Received yesterday, a category and location, When it happened any day last month, tick "The complainant does not remember the day", How often Once, a short description. Complainant's language English, a name, a fake email, Preferred contact Email. Create | The slip: the reference, a 6-digit PIN and the received date. Write both down |
+| Find the case in the list and open it | "When it happened" shows the month and year with "exact day not remembered"; Channel In person |
+| Run the queue, then render the acknowledgement (section 7 commands) | The acknowledgement is in English, the language chosen. Enter another case with Nepali (the default) and it is in Nepali |
+| In the private window, http://127.0.0.1:8000/en/status with the slip's reference and PIN | The status page: Received, the received date, no messages yet |
+| Back on the case page, Messages → Send reply; then reload the status page | The reply shows as "Grievance team". "Add information or reply" there puts the message on the case page, and queues an alert |
+| On the case page, Documents → add a PDF, as for a scanned letter | It is listed and downloads; the complainant does not see it |
+| Enter a case with channel Drop box, Anonymous on | The slip still shows, but there is nobody to give it to: NBI question 16 asks how drop-box complainants should follow up |
+| Enter a case with channel Phone | The slip shows; staff read the reference and PIN out on the call, since the system sends no text messages (question 16) |
+| Enter a case with Received tomorrow | Refused with a message under Received; nothing is saved. When it happened cannot be set after today |
 
 **Restricted-case officer and Administrator: who sees what (A1, A3, A5)**
 
@@ -170,7 +186,7 @@ open storage/app/email-acknowledgement.html storage/app/email-alert.html
 
 | Look at | Expect |
 |---|---|
-| The acknowledgement | In the case's language (Nepali for offline cases): the reference, the PIN (here a made-up `123456`) and the public site's address. Nothing the complainant wrote |
+| The acknowledgement | In the case's language (the form's language for an online case, the one staff chose for an offline case): the reference, the PIN (here a made-up `123456`) and the public site's address. Nothing the complainant wrote |
 | The alert | In English: "A new grievance has been received" and a "Log in to view" button. No reference, category, name or description |
 | Both | The app's name as plain text at the top; no image or anything else from another site |
 
