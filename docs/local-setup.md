@@ -148,6 +148,8 @@ To run the app and try everything by hand, follow `docs/manual-testing.md`.
 | Browser tests | `npx playwright test` (runs its own server on port 8001), or `npx playwright test --grep @smoke` | now |
 | Browser session per role | `npx playwright cli -s=focal open http://127.0.0.1:8000/admin` | now |
 
+Run Pest and Playwright one after the other, never together: both use the `ghm_testing` database. A full Playwright run also uses up the public form's hourly limits for this machine's address, because every local server shares the file cache. For a walk by hand afterwards, start the app with `GHM_SUBMISSIONS_PER_HOUR=100 GHM_FAILED_LOOKUPS_PER_HOUR=100 php artisan serve`, or run `php artisan cache:clear`.
+
 ## Windows (first machine)
 
 How the Windows laptop was set up, for reference:

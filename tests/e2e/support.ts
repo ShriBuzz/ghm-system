@@ -165,3 +165,45 @@ export async function fillInDialog(field: Locator, statePath: string, value: str
         expect(state).toBe(value);
     }).toPass({ timeout: 10_000 });
 }
+
+/**
+ * Opens the case list, searches it for a reference and returns the link to that case.
+ */
+export async function findCase(page: Page, reference: string) {
+    await page.goto('/admin/grievances');
+
+    return search(page, reference);
+}
+
+/**
+ * Searches the list on screen, keeping any filters, and returns the link to that case.
+ */
+export async function search(page: Page, reference: string) {
+    await Promise.all([
+        page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+        page.getByRole('searchbox', { name: 'Search', exact: true }).fill(reference),
+    ]);
+
+    return page.getByRole('link', { name: reference, exact: true });
+}
+
+/**
+ * Opens one of the case page's tabs (messages, notes, documents). Filament loads each
+ * tab's table only once it is on screen.
+ */
+export async function openTab(page: Page, name: string) {
+    await open(page.getByRole('tab', { name }), page.getByRole('tabpanel', { name }));
+    // Clicking the tab can leave its panel just below the screen, where its table never loads.
+    await page.getByRole('tabpanel', { name }).scrollIntoViewIfNeeded();
+}
+
+/**
+ * Opens a case page action that writes text, fills it and creates the record.
+ */
+export async function writeOnCase(page: Page, button: string, heading: string, field: string, text: string) {
+    const dialog = page.getByRole('dialog', { name: heading });
+    await open(page.getByRole('button', { name: button }), headingOf(dialog));
+    await dialog.getByLabel(field).fill(text);
+    await dialog.getByRole('button', { name: 'Create', exact: true }).click();
+    await expect(headingOf(dialog)).toBeHidden();
+}

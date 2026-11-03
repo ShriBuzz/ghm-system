@@ -20,6 +20,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `laravel/framework` | runtime | The application framework. |
 | `openspout/openspout` | runtime | The CSV and Excel export (N4). Writes the rows as it reads the cases; Livewire then holds the whole file in memory to send it, fine for this project's few thousand cases a year. Writes the CSV with a byte-order mark so Excel reads Nepali text as UTF-8. |
 | `spatie/laravel-backup` | runtime | The nightly backup (S7): database dump and attachments in an AES-256 password-protected zip, the 15-day cleanup and a daily check that a fresh backup exists. |
+| `chillerlan/php-qrcode` | runtime | The QR poster (P10). Already installed with Filament's two-factor sign-in; declared because the app now uses it directly. Makes the code as SVG for print and PNG for download, and its decoder lets the test read the code back. |
 | `spatie/laravel-activitylog` | runtime | The append-only activity log (S6). Its `activity_log` table has no IP or device columns. |
 | `laravel/tinker` | runtime | Skeleton default; console REPL for local debugging. |
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
@@ -82,6 +83,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 - Spam (P9) needs no package: a hidden trap field, a minimum fill time read from an encrypted "form shown at" stamp, and an hourly limit per visitor. The plan's `spatie/laravel-honeypot` would have been a dependency for the same 30 lines. The limits are in `config/ghm.php` (`public`), from `GHM_SUBMISSIONS_PER_HOUR` (10), `GHM_FAILED_LOOKUPS_PER_HOUR` (10) and `GHM_MIN_FILL_SECONDS` (3); Playwright's local server raises them.
 - Rate limits key on `App\Support\VisitorKey`, an HMAC of the IP with a random salt kept in the cache until midnight. The IP is never stored, and once the salt is gone no key can be turned back into an address (S5).
 - A form sent after the 30-minute session ended: Laravel 13's `PreventRequestForgery` accepts a same-origin POST by the browser's `Sec-Fetch-Site` header, so current browsers send it normally. An older browser without that header fails the token check; `bootstrap/app.php` sends it back to the form with what was typed instead of "Page expired".
+- The status page (P8) takes the reference and PIN by POST. 5 wrong PINs lock that reference for 15 minutes; failed lookups are capped per visitor; an unknown reference is checked against a dummy hash made once with the server's bcrypt cost (cached), so its timing gives nothing away. A correct PIN regenerates the session and keeps only the case ID, for 10 idle minutes. Complainant messages are capped at 10 an hour per grievance, since each emails staff. `pin` is in the exception handler's `dontFlash`, so a refused form never sends it back.
 - `post_max_size` must be well above `upload_max_filesize` (`docs/deploy.md`): above it PHP drops the whole form, typed text included.
 
 ## Email and queue (N1, N2)

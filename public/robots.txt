@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /ne/received
+Disallow: /en/received
+Disallow: /ne/status
+Disallow: /en/status

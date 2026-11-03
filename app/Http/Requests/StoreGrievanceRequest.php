@@ -49,7 +49,8 @@ class StoreGrievanceRequest extends FormRequest
             if (filled($this->input('website')) || $this->sentTooSoon()) {
                 $validator->errors()->add('form', __('form.errors.not_sent'));
             } elseif (RateLimiter::tooManyAttempts(self::limiterKey($this), Config::integer('ghm.public.submissions_per_hour'))) {
-                $validator->errors()->add('form', __('form.errors.too_many'));
+                $minutes = max(1, (int) ceil(RateLimiter::availableIn(self::limiterKey($this)) / 60));
+                $validator->errors()->add('form', trans_choice('form.errors.too_many', $minutes, ['minutes' => $minutes]));
             }
         }];
     }

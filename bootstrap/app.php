@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // turns into a 419 before this runs. Send the visitor back to the form by name, with what they typed,
         // instead of "Page expired": no referrer is sent and the old session is gone, so "back" knows nothing.
         $exceptions->render(function (HttpException $e, Request $request) {
-            $form = ['grievance.store' => 'home'][$request->route()?->getName()] ?? null;
+            $form = ['grievance.store' => 'home', 'status.check' => 'status.lookup', 'status.reply' => 'status.lookup'][$request->route()?->getName()] ?? null;
 
             if ($e->getStatusCode() !== 419 || $form === null) {
                 return null;
@@ -36,9 +36,12 @@ return Application::configure(basePath: dirname(__DIR__))
             app()->setLocale((string) $request->route('locale'));
 
             return redirect()->route($form, ['locale' => $request->route('locale')])
-                ->withInput($request->except(['_token', 'attachment', 'website']))
-                ->withErrors(['form' => __('form.errors.expired')]);
+                ->withInput($request->except(['_token', 'attachment', 'website', 'pin', 'body']))
+                ->withErrors([$request->routeIs('grievance.store') ? 'form' : 'lookup' => __($request->routeIs('grievance.store') ? 'form.errors.expired' : 'track.expired')]);
         });
+
+        // A PIN typed on the status page never comes back in a refused form's old input (P8).
+        $exceptions->dontFlash(['pin']);
 
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

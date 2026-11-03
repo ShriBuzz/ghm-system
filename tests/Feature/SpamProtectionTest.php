@@ -49,6 +49,19 @@ it('refuses the 11th grievance in an hour from one visitor, not from another, an
     expect(Grievance::count())->toBe(12);
 })->group('P9');
 
+it('shows a refusal as not sent, apart from the answers, with the minutes to wait', function () {
+    foreach (range(1, 10) as $ignored) {
+        $this->post('/en', formInput());
+    }
+    $this->travel(20)->minutes();
+
+    $this->from('/en')->post('/en', formInput(['description' => 'The eleventh']));
+    $html = $this->get('/en')->assertSee('Your grievance was not sent')->assertSee('try again in 40 minutes')
+        ->assertDontSee('Some answers need fixing')->getContent();
+
+    expect($html)->not->toContain('href="#send"');
+})->group('P9');
+
 it('keys visitors without their IP address, by a salt that is thrown away at midnight', function () {
     $request = Request::create('/en', 'POST', server: ['REMOTE_ADDR' => '203.0.113.7']);
     $key = VisitorKey::for($request);

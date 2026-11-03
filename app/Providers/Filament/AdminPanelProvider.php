@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\QrPoster;
 use App\Filament\Resources\Grievances\Pages\RecordedCase;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Middleware\SetPanelLocale;
@@ -44,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->defaultAvatarProvider(InitialsAvatarProvider::class)
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.idle-reload'))
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.slip-print'), scopes: RecordedCase::class)
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.poster-print'), scopes: QrPoster::class)
             ->colors([
                 'primary' => Color::Amber,
             ])

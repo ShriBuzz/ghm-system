@@ -30,7 +30,8 @@ class Acknowledgement extends Notification implements ShouldBeEncrypted, ShouldQ
 
     public function toMail(Grievance $notifiable): MailMessage
     {
-        $site = route('home', ['locale' => $notifiable->locale]);
+        // The status page, where the reference and PIN show the case and its replies (P8).
+        $site = route('status.lookup', ['locale' => $notifiable->locale]);
 
         return (new MailMessage)
             ->subject(__('acknowledgement.subject'))

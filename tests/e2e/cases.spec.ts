@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { fillInDialog, headingOf, open, test } from './support';
+import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOnCase } from './support';
 
 /**
  * Enters a fake offline case and returns what the slip shows.
@@ -37,27 +37,6 @@ async function enterOfflineCase(
     const slip = await page.getByRole('main').innerText();
 
     return { reference: slip.match(/GHM-\d{4}-\d{4}/)![0], pin: slip.match(/PIN\s+(\d{6})\b/)![1] };
-}
-
-/**
- * Opens the case list, searches it for a reference and returns the link to that case.
- */
-async function findCase(page: Page, reference: string) {
-    await page.goto('/admin/grievances');
-
-    return search(page, reference);
-}
-
-/**
- * Searches the list on screen, keeping any filters, and returns the link to that case.
- */
-async function search(page: Page, reference: string) {
-    await Promise.all([
-        page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
-        page.getByRole('searchbox', { name: 'Search', exact: true }).fill(reference),
-    ]);
-
-    return page.getByRole('link', { name: reference, exact: true });
 }
 
 /**
@@ -303,25 +282,6 @@ test.describe('administrator', () => {
  * A 1 × 1 PNG, enough for the document upload to accept and redraw.
  */
 const tinyPng = { name: 'site-visit.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64') };
-
-/**
- * Opens one of the case page's tabs (messages, notes, documents). Filament loads each
- * tab's table only once it is on screen.
- */
-async function openTab(page: Page, name: string) {
-    await open(page.getByRole('tab', { name }), page.getByRole('tabpanel', { name }));
-}
-
-/**
- * Opens a case page action that writes text, fills it and creates the record.
- */
-async function writeOnCase(page: Page, button: string, heading: string, field: string, text: string) {
-    const dialog = page.getByRole('dialog', { name: heading });
-    await open(page.getByRole('button', { name: button }), headingOf(dialog));
-    await dialog.getByLabel(field).fill(text);
-    await dialog.getByRole('button', { name: 'Create', exact: true }).click();
-    await expect(headingOf(dialog)).toBeHidden();
-}
 
 /**
  * Uploads a document on the case page on screen and returns its download address.

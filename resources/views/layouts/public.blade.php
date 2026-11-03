@@ -13,7 +13,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@hasSection('title')@yield('title') · @endif{{ __('site.name') }}</title>
+    {{-- A page sent back with errors says so first, for screen readers (S9). --}}
+    <title>@if ($errors->any()){{ __('form.errors.prefix') }} @endif@hasSection('title')@yield('title') · @endif{{ __('site.name') }}</title>
     <link rel="stylesheet" href="{{ asset('css/public.css') }}">
     @stack('head')
     @foreach ($languages->except(app()->getLocale()) as $code => $language)
