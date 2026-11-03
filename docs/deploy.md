@@ -158,8 +158,9 @@ GHM_ADMIN_PASSWORD=
 | `BACKUP_DISKS` | Add the off-server copy here once the host is known (`docs/technical-note.md`, Backups) |
 | `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
+| `GHM_SUBMISSIONS_PER_HOUR`, `GHM_FAILED_LOOKUPS_PER_HOUR` | Optional; leave them out for 10 each. Grievances accepted, and failed status lookups, per network per hour (P8, P9). Raise the first before posters go up if many workers share one Wi-Fi (progress, open question 5) |
 
-If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups) count all visitors as one, so real complainants get refused.
+If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups, see the table above) count all visitors as one, so real complainants get refused.
 
 ## 6. Updating to a new version
 
@@ -192,6 +193,7 @@ To go back, deploy the previous version the same way. If the new version changed
 |---|---|
 | `php artisan about` | Environment `production` (or `staging`), Debug Mode `OFF`; Config, Events, Routes and Views `CACHED`; under Backups, Archive password `set` (a red `NOT SET` means the nightly archive is not encrypted) |
 | `php artisan schedule:list` | Eight tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount, failed-job pruning, the upload clean-up and the cache clean-up, both hourly |
+| QR poster, in the staff panel | The address under the code is the site's own `https://` address. Print posters only after this check: the code is made from the address the panel was opened with (P10) |
 | Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, nobody is told about a restricted case until NBI answers question 13 |
 | From a developer machine: `BASE_URL=https://<subdomain> npx playwright test` | The `@smoke` specs pass: pages load over HTTPS with the security headers, and the staff sign-in is reachable. Against a non-local address Playwright runs nothing else |
 | `http://<subdomain>` in a browser | It moves to `https://` |

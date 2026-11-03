@@ -1,6 +1,6 @@
 # Requirements traceability
 
-One row per RFQ requirement (wording in `docs/rfq-requirements.md`) plus the plan's implied rows X1 and X2: where it lives in the code, which tests prove it, and its status. Last updated 2026-11-02, during WP1 (steps 1 to 7: the public form and the status page).
+One row per RFQ requirement (wording in `docs/rfq-requirements.md`) plus the plan's implied rows X1 and X2: where it lives in the code, which tests prove it, and its status. Last updated 2026-11-03, after WP1 (all nine steps: the public form, the status page, the QR poster and the close-out).
 
 Every Pest test is grouped by its ID and every Playwright spec tagged with it, so one requirement can be checked on its own:
 
@@ -71,5 +71,5 @@ Status counts the whole requirement, not the part one work package built:
 
 | ID | Requirement | Status | Work package | Code | Tests | Notes |
 |---|---|---|---|---|---|---|
-| X1 | Light public pages with no third-party requests | Tested | WP0, WP1 | `public/css/public.css` (about 8 KB), `public/js/form.js` (about 3 KB), no inline script or style | Pest `PublicShellTest`; Playwright: the form under 50 KB with everything it loads, nothing loaded from other sites | Lighthouse on a phone is a UAT check. |
+| X1 | Light public pages with no third-party requests | Tested | WP0, WP1 | `public/css/public.css` (about 11 KB), `public/js/form.js` (about 5 KB), no inline script or style | Pest `PublicShellTest`; Playwright: the form under 50 KB with everything it loads, nothing loaded from other sites | Lighthouse on a phone is a UAT check. |
 | X2 | Encryption key recoverable | In progress | WP3 | `docs/restore.md` ("What you need", "If the server itself is lost") | Pest `BackupTest`: case details are only ciphertext in the backup's database dump, the app key decrypts them and another key cannot; local restore drill (progress, WP3 step 10) | Locally, a restored database decrypts with the key kept apart from the backup. Proven on another machine by the timed restore drill on staging, once hosting is known. |
