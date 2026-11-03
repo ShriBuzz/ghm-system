@@ -50,23 +50,26 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 
 | Try | Expect |
 |---|---|
-| Press "Send grievance" with nothing filled in | A box at the top lists what needs fixing, each line a link to its field |
+| Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling |
+| DevTools device toolbar, width 320, on `/ne` and `/en` | Nothing scrolls sideways; the photo field stays inside the page |
+| Tap "Send grievance" twice quickly (DevTools, Network, "Slow 4G", with a photo) | The button says "Sending…" and only one grievance arrives |
 | Choose "Yes, give my name and contact", then "No, stay anonymous" | The contact fields appear, then go away; with JavaScript off too |
 | Day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
 | Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
 | Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
 | Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |
-| Send six or more grievances in a row | Each goes through; the 11th within an hour is refused with what you typed kept (P9). `php artisan cache:clear` resets the count |
+| Send six or more grievances in a row | Each goes through; the 11th within an hour gets a box headed "Your grievance was not sent", saying how many minutes to wait, with what you typed kept (P9). `php artisan cache:clear` resets the count, which a full Playwright run also uses up |
 
 The status page (P8), at http://127.0.0.1:8000/en/status or from the link on the form:
 
 | Try | Expect |
 |---|---|
+| Enter the reference in small letters without hyphens (`ghm20260001`) and the PIN in Nepali digits (`१२३४५६`) | Accepted like the usual form; a wrong PIN typed either way counts toward the same lock |
 | Enter a reference and PIN you noted when sending | The status, the received date and the messages. A staff reply from the case page in the panel shows as "Grievance team", never a staff name; internal notes never show |
 | Write in "Add information or reply" and send | "Your message was sent." and the message in the thread as "You". The case page's Messages tab in the panel shows it, and the staff who can see the case get an alert (in the queue) |
 | A wrong PIN five times | The fifth says the reference is locked for 15 minutes; the right PIN is refused until then. An unknown reference gets the same message as a wrong PIN |
 | Leave the status page untouched for 10 minutes, then reload | Back on the lookup, asked for the reference and PIN again |
-| Close | Back on the lookup; the status page needs the PIN again |
+| Finish and hide | Back on the lookup with "Hidden on this phone. Your grievance is still open with the team."; the status page needs the PIN again |
 
 ## 4. Staff panel
 
@@ -114,6 +117,9 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
 | Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
 | Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
+| Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |
+| Print poster, or the browser's print preview | One A4 page: the heading in Nepali and English, the code and the address, no panel menu or buttons |
+| Download QR code (PNG) | A file `grievance-form-qr.png` that a phone camera also reads |
 
 **Restricted-case officer and Administrator: who sees what (A1, A3, A5)**
 

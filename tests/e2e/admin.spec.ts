@@ -73,9 +73,9 @@ test.describe('on a server whose sessions last one idle minute', () => {
 });
 
 const menus = {
-    administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'Public notice', 'Categories', 'Holidays', 'Locations', 'Users'],
-    focal_person: ['Dashboard', 'Cases', 'Summary'],
-    restricted_officer: ['Dashboard', 'Cases', 'Summary'],
+    administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'QR poster', 'Public notice', 'Categories', 'Holidays', 'Locations', 'Users'],
+    focal_person: ['Dashboard', 'Cases', 'Summary', 'QR poster'],
+    restricted_officer: ['Dashboard', 'Cases', 'Summary', 'QR poster'],
 };
 
 for (const role of roles) {
@@ -101,3 +101,22 @@ for (const role of ['focal_person', 'restricted_officer'] as const) {
         });
     });
 }
+
+test.describe('focal person, QR poster', () => {
+    test.use({ role: 'focal_person' });
+
+    test('shows the QR poster, prints it without the panel and downloads the code', { tag: ['@P10'] }, async ({ page }) => {
+        await page.goto('/admin/qr-poster');
+        await expect(page.getByRole('img', { name: /^QR code for http/ })).toBeVisible();
+        await expect(page.getByText('Send a grievance', { exact: true })).toBeVisible();
+
+        await page.emulateMedia({ media: 'print' });
+        await expect(page.locator('.fi-sidebar')).toBeHidden();
+        await expect(page.getByRole('button', { name: 'Print poster' })).toBeHidden();
+        await expect(page.getByRole('img', { name: /^QR code for http/ })).toBeVisible();
+        await page.emulateMedia({ media: 'screen' });
+
+        const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('link', { name: 'Download QR code (PNG)' }).click()]);
+        expect(download.suggestedFilename()).toBe('grievance-form-qr.png');
+    });
+});

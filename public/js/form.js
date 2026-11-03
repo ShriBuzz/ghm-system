@@ -1,7 +1,8 @@
 // Progressive enhancement for the public form (P1, P5, S9). Everything works without it.
 (() => {
-    // After a refused submission, take screen readers and keyboards straight to what needs fixing.
-    document.querySelector('[data-error-summary]')?.focus();
+    // After a refused submission, take screen readers and keyboards straight to what needs fixing; after an
+    // action, to what it did. A message already on the page when it opens is rarely read out otherwise.
+    (document.querySelector('[data-error-summary]') ?? document.querySelector('[data-notice]'))?.focus();
 
     // A file over the limit is refused before a slow upload on a phone connection, not after it.
     for (const input of document.querySelectorAll('input[type="file"][data-max-bytes]')) {
@@ -22,6 +23,35 @@
             }
         });
     }
+
+    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7). Only for
+    // 10 seconds: the browser's Stop button cancels a send without an event, and must not leave Send dead.
+    for (const each of document.querySelectorAll('form[method="post"]')) {
+        each.addEventListener('submit', (event) => {
+            if (Date.now() - Number(each.dataset.sent ?? 0) < 10_000) {
+                event.preventDefault();
+                return;
+            }
+            each.dataset.sent = String(Date.now());
+            const button = event.submitter;
+            if (button?.dataset.sending) {
+                button.dataset.label ??= button.textContent;
+                button.textContent = button.dataset.sending;
+            }
+        });
+    }
+    // Back on this page from the browser's memory (the Back button): it can be sent again.
+    window.addEventListener('pageshow', (event) => {
+        if (!event.persisted) {
+            return;
+        }
+        for (const each of document.querySelectorAll('form[data-sent]')) {
+            delete each.dataset.sent;
+        }
+        for (const button of document.querySelectorAll('[data-label]')) {
+            button.textContent = button.dataset.label;
+        }
+    });
 
     // Switching language loads the same form in the other language (P2). Carry what was typed across,
     // in this tab only, and forget it the moment it is put back. A chosen file cannot be carried.

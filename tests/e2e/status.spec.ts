@@ -53,11 +53,15 @@ test('a complainant reads a staff reply and adds information, with the reference
 
     await page.getByLabel('Add information or reply').fill('It started in July.');
     await page.getByRole('button', { name: 'Send', exact: true }).click();
+    // Focused, so a screen reader reads it: a live region already there when the page opens is rarely announced.
     await expect(page.getByRole('status')).toHaveText('Your message was sent.');
+    await expect(page.getByRole('status')).toBeFocused();
     await expect(thread).toContainText('It started in July.');
 
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Finish and hide' }).click();
     await expect(page).toHaveURL(/\/en\/status$/);
+    await expect(page.getByRole('status')).toContainText('still open');
+    await expect(page.getByRole('status')).toBeFocused();
     await page.goto('/en/status/case');
     await expect(page).toHaveURL(/\/en\/status$/);
 

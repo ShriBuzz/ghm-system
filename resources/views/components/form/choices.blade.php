@@ -1,10 +1,11 @@
-@props(['name', 'legend', 'options', 'hints' => [], 'hint' => null, 'checked' => null])
+@props(['name', 'legend', 'options', 'hints' => [], 'hint' => null, 'checked' => null, 'heading' => false])
 @php
     $error = $errors->first($name);
     $current = (string) old($name, $checked);
 @endphp
 <fieldset @class(['choices', 'field-error' => $error]) @if ($hint || $error) aria-describedby="{{ trim(($hint ? "{$name}-hint " : '').($error ? "{$name}-error" : '')) }}" @endif>
-    <legend>{{ $legend }}</legend>
+    {{-- A question that opens a section is also its heading, for heading navigation. --}}
+    <legend>@if ($heading)<h2>{{ $legend }}</h2>@else{{ $legend }}@endif</legend>
     @if ($hint)
         <p class="hint" id="{{ $name }}-hint">{{ $hint }}</p>
     @endif

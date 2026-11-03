@@ -8,6 +8,12 @@
 
 @section('content')
     <h1>{{ __('form.title') }}</h1>
+    <x-form.errors :anchors="[
+        'is_anonymous' => 'is_anonymous-1',
+        'preferred_contact' => 'preferred_contact-phone',
+        'incident_date' => 'incident_day',
+        'recurrence' => 'recurrence-once',
+    ]" />
     <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>
     <p><a href="{{ route('status.lookup') }}">{{ __('form.check_link') }}</a></p>
 
@@ -27,16 +33,8 @@
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
         </div>
 
-        <x-form.errors :anchors="[
-            'form' => 'send',
-            'is_anonymous' => 'is_anonymous-1',
-            'preferred_contact' => 'preferred_contact-phone',
-            'incident_date' => 'incident_day',
-            'recurrence' => 'recurrence-once',
-        ]" />
-
         <div class="section">
-            <x-form.choices name="is_anonymous" :legend="__('form.identity.legend')" checked="1"
+            <x-form.choices name="is_anonymous" :legend="__('form.identity.legend')" checked="1" heading
                 :options="['1' => __('form.identity.anonymous'), '0' => __('form.identity.named')]"
                 :hints="['1' => __('form.identity.anonymous_hint'), '0' => __('form.identity.named_hint')]" />
 
@@ -72,6 +70,6 @@
             @endforeach
         </div>
 
-        <button type="submit" id="send" class="button button-primary">{{ __('form.submit') }}</button>
+        <button type="submit" id="send" class="button button-primary" data-sending="{{ __('form.sending') }}">{{ __('form.submit') }}</button>
     </form>
 @endsection

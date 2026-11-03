@@ -129,9 +129,10 @@ main {
     padding-block: 2rem 3rem;
 }
 
+/* Type steps of at least 1.25 between body (18 px), h2 and h1, at phone width too. */
 h1 {
     margin: 0 0 1rem;
-    font-size: clamp(1.625rem, 1.3rem + 1.5vw, 2.125rem);
+    font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem);
     line-height: 1.35;
     text-wrap: balance;
 }
@@ -143,7 +144,7 @@ p {
 
 h2 {
     margin: 0 0 0.75rem;
-    font-size: 1.375rem;
+    font-size: 1.5rem;
     line-height: 1.35;
     text-wrap: balance;
 }
@@ -206,6 +207,11 @@ legend {
     padding: 0;
 }
 
+/* A question that is also its section's heading gets a heading's room below it. */
+.choices > legend h2 {
+    margin-bottom: 0.75rem;
+}
+
 .field,
 .choices,
 .contact,
@@ -259,8 +265,10 @@ textarea {
     resize: vertical;
 }
 
+/* Its own minimum width would widen the whole form past a 320 px screen. */
 input[type="file"] {
-    max-width: 100%;
+    width: 100%;
+    min-width: 0;
     font: inherit;
     font-size: 1rem;
 }
@@ -386,9 +394,18 @@ form:has(#is_anonymous-1:checked) .contact {
     border-radius: 0.5rem;
 }
 
+/* Under the page heading, so it is in view after a page sent back without JavaScript. */
+main > .error-summary {
+    margin-bottom: 1.5rem;
+}
+
 .error-summary h2 {
     color: var(--error);
     font-size: 1.25rem;
+}
+
+.error-summary p:last-child {
+    margin-bottom: 0;
 }
 
 .error-summary ul {
