@@ -113,7 +113,10 @@ it('keeps what was typed when something needs fixing, with a summary that links 
         ->assertRedirect('/en');
 
     $html = $this->get('/en')->getContent();
-    expect($html)->toContain('Wages unpaid since June')->toContain('href="#category_id"');
+    expect($html)->toContain('Wages unpaid since June')->toContain('href="#category_id"')
+        // In view without JavaScript too: under the heading, above the notice, and named in the title.
+        ->toContain('<title>Error: Send a grievance')
+        ->and(strpos($html, 'data-error-summary'))->toBeLessThan(strpos($html, 'notice-heading'));
 })->group('P1', 'S9');
 
 it('labels every field and puts every set of choices in a fieldset with a legend', function () {

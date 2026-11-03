@@ -9,6 +9,7 @@
 
 @section('content')
     <h1>{{ __('track.title') }}</h1>
+    <x-form.errors :heading="__('track.errors.reply_heading')" />
 
     @if (session('status_notice'))
         <p class="notice-line" role="status" tabindex="-1" data-notice>{{ session('status_notice') }}</p>
@@ -51,7 +52,6 @@
 
     <form method="post" action="{{ route('status.reply') }}" class="stack reply" novalidate>
         @csrf
-        <x-form.errors :heading="__('track.errors.reply_heading')" />
         <div @class(['field', 'field-error' => $errors->has('body')])>
             <label for="body">{{ __('track.add') }}</label>
             <p class="hint" id="body-hint">{{ __('track.add_hint') }}</p>

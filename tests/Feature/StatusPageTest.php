@@ -138,7 +138,9 @@ it('needs a reference and a PIN, and a reply with something in it', function () 
 
     lookUp($case);
     $this->from('/en/status/case')->post('/en/status/case', ['body' => '']);
-    $this->get('/en/status/case')->assertSee('Write your message');
+    $html = $this->get('/en/status/case')->assertSee('Write your message')->assertSee('<title>Error:', false)->getContent();
+    // Under the heading, above the case and its thread, not at the foot of the page, so it is in view without JavaScript.
+    expect(strpos($html, 'data-error-summary'))->toBeLessThan(strpos($html, 'class="facts"'));
     expect(GrievanceMessage::count())->toBe(0);
 })->group('P8', 'S9');
 

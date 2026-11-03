@@ -399,9 +399,18 @@ form:has(#is_anonymous-1:checked) .contact {
     border-radius: 0.5rem;
 }
 
+/* Under the page heading, so it is in view after a page sent back without JavaScript. */
+main > .error-summary {
+    margin-bottom: 1.5rem;
+}
+
 .error-summary h2 {
     color: var(--error);
     font-size: 1.25rem;
+}
+
+.error-summary p:last-child {
+    margin-bottom: 0;
 }
 
 .error-summary ul {
