@@ -21,7 +21,7 @@ Memorable moments: (1) the notice, then "stay anonymous" first, so reassurance c
 
 ## Structure
 
-Form order: notice; "Your name?" (stay anonymous / give my name, contact fields shown only for a name, by CSS); "What happened" (category, location, when as day/month/year with "I don't remember the day", how often, description, photo or PDF); "About you (optional)" as five selects, each blank by default with "prefer not to say"; full-width Send. A quiet "Already sent a grievance? Check it" link near the top. Received page ends with Done; status page has Close.
+Form order: notice; "Your name?" (stay anonymous / give my name, contact fields shown only for a name, by CSS); "What happened" (category, location, when as day/month/year with "I don't remember the day", how often, description, photo or PDF); "About you (optional)" as five selects, each blank by default with "prefer not to say"; full-width Send. A quiet "Already sent a grievance? Check it" link near the top. Received page ends with Done; status page has "Finish and hide", which says the grievance stays open.
 
 ## States and ranges
 

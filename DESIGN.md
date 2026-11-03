@@ -263,7 +263,7 @@ Gently rounded rectangles throughout, in three steps. Small (0.375rem) for input
 - **Shape:** medium radius (0.5rem), 2 px border, at least 3rem tall, 0.75rem by 1.5rem padding, label weight (600).
 - **Primary:** Placeholder Deep Teal fill with white text and a teal border. One per form, for its main action (Send, Check, Send a message). Full width below 40rem.
 - **Hover / Focus:** primary fill steps to Pressed Deep Teal. Focus is the global 3 px teal outline with a 2 px offset. While a submission is on its way its label changes to the sending text, and a second tap within 10 seconds does nothing (JavaScript only). It is never marked disabled, since it works again after that.
-- **Secondary:** white with a teal border and teal text; on hover the wash ground with Pressed Deep Teal border and text. Used for the ending actions (Done, Close), placed under a hint that says what they do.
+- **Secondary:** white with a teal border and teal text; on hover the wash ground with Pressed Deep Teal border and text. Used for the ending actions (Done, Finish and hide), placed under a hint that says what they do.
 
 ### Chips (choice cards)
 - **Style:** each radio option is a whole-row card: 2 px Quiet Line border, medium radius, 0.625rem by 0.875rem padding, at least 44 px tall, label weight, a 1.375rem native radio at the leading edge, and an optional hint below the label.
