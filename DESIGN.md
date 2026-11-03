@@ -262,7 +262,7 @@ Gently rounded rectangles throughout, in three steps. Small (0.375rem) for input
 ### Buttons
 - **Shape:** medium radius (0.5rem), 2 px border, at least 3rem tall, 0.75rem by 1.5rem padding, label weight (600).
 - **Primary:** Placeholder Deep Teal fill with white text and a teal border. One per form, for its main action (Send, Check, Send a message). Full width below 40rem.
-- **Hover / Focus:** primary fill steps to Pressed Deep Teal. Focus is the global 3 px teal outline with a 2 px offset. While a submission is on its way the button carries `aria-disabled` and a progress cursor, and its label changes to the sending text (JavaScript only).
+- **Hover / Focus:** primary fill steps to Pressed Deep Teal. Focus is the global 3 px teal outline with a 2 px offset. While a submission is on its way its label changes to the sending text, and a second tap within 10 seconds does nothing (JavaScript only). It is never marked disabled, since it works again after that.
 - **Secondary:** white with a teal border and teal text; on hover the wash ground with Pressed Deep Teal border and text. Used for the ending actions (Done, Close), placed under a hint that says what they do.
 
 ### Chips (choice cards)
