@@ -11,7 +11,7 @@
     <h1>{{ __('track.lookup_title') }}</h1>
 
     @if (session('status_notice'))
-        <p class="notice-line" role="status">{{ session('status_notice') }}</p>
+        <p class="notice-line" role="status" tabindex="-1" data-notice>{{ session('status_notice') }}</p>
     @endif
 
     <p>{{ __('track.intro') }}</p>

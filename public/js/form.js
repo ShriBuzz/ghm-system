@@ -1,7 +1,8 @@
 // Progressive enhancement for the public form (P1, P5, S9). Everything works without it.
 (() => {
-    // After a refused submission, take screen readers and keyboards straight to what needs fixing.
-    document.querySelector('[data-error-summary]')?.focus();
+    // After a refused submission, take screen readers and keyboards straight to what needs fixing; after an
+    // action, to what it did. A message already on the page when it opens is rarely read out otherwise.
+    (document.querySelector('[data-error-summary]') ?? document.querySelector('[data-notice]'))?.focus();
 
     // A file over the limit is refused before a slow upload on a phone connection, not after it.
     for (const input of document.querySelectorAll('input[type="file"][data-max-bytes]')) {
