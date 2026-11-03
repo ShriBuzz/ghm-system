@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -20,6 +21,24 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Mail servers quote the recipient's address when they refuse an email; it never reaches the log (S5).
         $exceptions->map(TransportExceptionInterface::class, fn (TransportExceptionInterface $e) => FailedJobStore::withoutAddress($e));
+
+        // A public form sent after the session ended (S2's 30 minutes) fails its CSRF check, which Laravel
+        // turns into a 419 before this runs. Send the visitor back to the form by name, with what they typed,
+        // instead of "Page expired": no referrer is sent and the old session is gone, so "back" knows nothing.
+        $exceptions->render(function (HttpException $e, Request $request) {
+            $form = ['grievance.store' => 'home'][$request->route()?->getName()] ?? null;
+
+            if ($e->getStatusCode() !== 419 || $form === null) {
+                return null;
+            }
+
+            // The CSRF check runs before SetLocale, so take the language from the address.
+            app()->setLocale((string) $request->route('locale'));
+
+            return redirect()->route($form, ['locale' => $request->route('locale')])
+                ->withInput($request->except(['_token', 'attachment', 'website']))
+                ->withErrors(['form' => __('form.errors.expired')]);
+        });
 
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

@@ -45,10 +45,12 @@ it('leaves the staff panel language alone', function () {
     expect($this->withCookie('locale', 'ne')->get('/admin/login')->getContent())->toMatch('/<html\s+lang="en"/');
 })->group('P2');
 
-it('styles public pages from one local stylesheet, with no inline style or script', function () {
+it('styles public pages from one local stylesheet and scripts them from one local file, nothing inline', function () {
     $html = $this->get('/ne')->getContent();
+    preg_match_all('/<script\b[^>]*>/i', $html, $scripts);
 
     expect($html)->toContain('<link rel="stylesheet" href="'.asset('css/public.css').'">')
-        ->not->toMatch('/<script|<style|\sstyle=/i')
+        ->not->toMatch('/<style|\sstyle=/i')
+        ->and($scripts[0])->toBe(['<script src="'.asset('js/form.js').'" defer>'])
         ->and(filesize(public_path('css/public.css')))->toBeLessThan(15 * 1024);
 })->group('P2', 'S9');

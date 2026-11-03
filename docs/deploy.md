@@ -19,7 +19,7 @@ which mysqldump
 |---|---|
 | PHP 8.4.1 or newer, for the website and on the command line | The locked packages (Symfony 8, `spatie/laravel-activitylog` 5) need it. With older PHP every page stops with "Your Composer dependencies require a PHP version >= 8.4.1" |
 | No "missing extension" or "gd lacks" lines | `gd` and `exif` redraw photos without their location and phone data (S5); `pdo_mysql` reaches the database; the rest are for Laravel, Filament, the export and the backups |
-| `upload_max_filesize` at least `6M`, `post_max_size` at least `8M` | Attachments up to 5 MB (P5, A3). PHP's default is `2M` |
+| `upload_max_filesize` `6M`, `post_max_size` `32M` | Attachments up to 5 MB (P5, A3); PHP's default is `2M`. Above `post_max_size` PHP drops the whole form, so a complainant who picks a large phone photo would lose everything typed; with `32M` it is an ordinary "file too large" message and the text stays |
 | `memory_limit` `512M`, or at least `256M` | Redrawing the largest photo the app accepts (25 megapixels) needs about 250 MB where GD is built into PHP |
 | `mysqldump` found | The nightly backup (S7). If it is not on the path, ask the host where it is and add `'dump' => ['dump_binary_path' => '<its folder>']` to the `mysql` connection in `config/database.php` |
 | MySQL 8 or MariaDB 10.6+, with one database and one user for it | |
@@ -159,7 +159,7 @@ GHM_ADMIN_PASSWORD=
 | `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
 
-If the host puts the site behind a proxy or load balancer that ends HTTPS (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy, or the HTTPS redirect loops (technical note, HTTPS).
+If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups) count all visitors as one, so real complainants get refused.
 
 ## 6. Updating to a new version
 

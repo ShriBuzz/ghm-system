@@ -34,7 +34,7 @@ beforeEach(function () {
         'name' => '=HYPERLINK("http://example.com","Click")',
         'phone' => '+9779800000000',
         'email' => 'complainant@example.com',
-        'complainant_type' => 'worker', 'sex' => 'female', 'age_group' => '25_34', 'ethnicity' => 'prefer_not', 'disability' => 'no',
+        'complainant_type' => 'worker', 'sex' => 'female', 'age_group' => '18_29', 'ethnicity' => 'prefer_not_to_say', 'disability' => 'no',
     ]);
     $this->case->forceFill(['status' => Status::Closed])->save();
     Grievance::factory()->create(['received_at' => '2026-10-31 23:59']);
@@ -81,7 +81,7 @@ it('exports the N4 columns for the cases received in the range, without names or
     expect($rows[0])->toBe(N4_COLUMNS)
         ->and($rows)->toHaveCount(3)
         ->and($rows[1])->toBe(['GHM-2026-0001', '2026-11-03 09:15', '2026-11-20 12:00', 'Phone', 'Wages', 'Head office', 'High', 'Closed',
-            'worker', 'female', '25_34', 'prefer_not', 'no'])
+            'Worker', 'Female', '18–29', 'Prefer not to say', 'No'])
         ->and(implode(' ', array_merge(...$rows)))->not->toContain('complainant@example.com')->not->toContain('9800000000');
 })->with(['csv', 'xlsx'])->group('N4');
 

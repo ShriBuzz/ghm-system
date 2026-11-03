@@ -76,6 +76,14 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 - The cache uses the `file` driver, which deletes an expired entry only when its key is read again. Sign-in counters are kept per email, so `ghm:prune-cache` deletes expired entries every hour, walking the folder without listing it first; otherwise a bot trying many emails would leave files behind until the host's file quota ran out (S2). A test run deleted 200,000 files with under 8 MB of memory.
 - Changing `APP_KEY` signs every user out, as well as making encrypted fields unreadable; keep the old key in `APP_PREVIOUS_KEYS` when rotating.
 
+## Public form (P1 to P9)
+
+- The form is the home page, `/ne` and `/en`, and works with JavaScript off. `public/js/form.js` only adds conveniences: focus on the error summary, a size check before a 5 MB upload, and carrying typed answers across a language switch in this tab's `sessionStorage`, deleted as soon as they are put back.
+- Spam (P9) needs no package: a hidden trap field, a minimum fill time read from an encrypted "form shown at" stamp, and an hourly limit per visitor. The plan's `spatie/laravel-honeypot` would have been a dependency for the same 30 lines. The limits are in `config/ghm.php` (`public`), from `GHM_SUBMISSIONS_PER_HOUR` (10), `GHM_FAILED_LOOKUPS_PER_HOUR` (10) and `GHM_MIN_FILL_SECONDS` (3); Playwright's local server raises them.
+- Rate limits key on `App\Support\VisitorKey`, an HMAC of the IP with a random salt kept in the cache until midnight. The IP is never stored, and once the salt is gone no key can be turned back into an address (S5).
+- A form sent after the 30-minute session ended: Laravel 13's `PreventRequestForgery` accepts a same-origin POST by the browser's `Sec-Fetch-Site` header, so current browsers send it normally. An older browser without that header fails the token check; `bootstrap/app.php` sends it back to the form with what was typed instead of "Page expired".
+- `post_max_size` must be well above `upload_max_filesize` (`docs/deploy.md`): above it PHP drops the whole form, typed text included.
+
 ## Email and queue (N1, N2)
 
 - Emails are queued in the `jobs` table, so a slow or failing mail server never blocks or breaks a submission. The server needs one cron line, `* * * * * php artisan schedule:run`; every minute it starts `queue:work --stop-when-empty --tries=4 --backoff=60,600,3600`, which exits once the queue is empty, never two at a time. A failed email is tried again 1 minute, 10 minutes and an hour later, so a mail-server outage or a host's hourly sending limit delays it rather than losing it. A job that fails four times stays in `failed_jobs` for 7 days, for `php artisan queue:retry`, then is pruned daily.

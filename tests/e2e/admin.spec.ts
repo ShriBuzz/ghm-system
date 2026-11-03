@@ -73,7 +73,7 @@ test.describe('on a server whose sessions last one idle minute', () => {
 });
 
 const menus = {
-    administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'Categories', 'Holidays', 'Locations', 'Users'],
+    administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'Public notice', 'Categories', 'Holidays', 'Locations', 'Users'],
     focal_person: ['Dashboard', 'Cases', 'Summary'],
     restricted_officer: ['Dashboard', 'Cases', 'Summary'],
 };
