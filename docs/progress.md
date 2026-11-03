@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-03. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built: steps 1 to 5 (the form, the reference and PIN page, spam protection) are in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in the third, stacked on #12. The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
+Last updated: 2026-11-03. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -64,7 +64,7 @@ No kickoff file; steps agreed in chat on 2026-11-01. Branch `wp3/alerts-reports-
 
 ## WP1 Public side
 
-Plan approved in chat on 2026-11-02: the form is the home page, one page in sections, the anonymous choice first, AD dates as three selects while question 8 is open, spam protection without a package. Branch `wp1/public-side`, three pull requests: steps 1 to 5, steps 6 and 7, steps 8 and 9.
+Plan approved in chat on 2026-11-02: the form is the home page, one page in sections, the anonymous choice first, AD dates as three selects while question 8 is open, spam protection without a package. Branch `wp1/public-side`, three pull requests: steps 1 to 5 (#11), steps 6 and 7 (#12), steps 8 and 9 (#13), with #14 carrying #12 and #13 onto `main`.
 
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
