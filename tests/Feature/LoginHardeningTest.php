@@ -50,6 +50,18 @@ it('locks the email, however it is typed, and no other account', function () {
     $this->assertAuthenticatedAs($other);
 })->group('S2');
 
+it('counts every spelling the database reads as the same email against the one account', function () {
+    User::factory()->create(['email' => 'officer@example.com']);
+
+    // Each has one full-width letter, which MySQL's collation treats as the plain letter.
+    foreach (['ｏfficer@example.com', 'oｆficer@example.com', 'ofｆicer@example.com', 'offｉcer@example.com', 'offiｃer@example.com'] as $spelling) {
+        failSignIn($spelling, 1);
+    }
+
+    signIn('officer@example.com', 'password')->assertNotified();
+    $this->assertGuest();
+})->group('S2');
+
 it('clears failed attempts after a successful sign-in', function () {
     $user = User::factory()->create();
 
