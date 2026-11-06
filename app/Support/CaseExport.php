@@ -26,6 +26,9 @@ class CaseExport
             'from' => $from->toDateString(), 'until' => $until->toDateString(), 'format' => $format,
             'personal_data' => $personal, 'cases' => $cases->count(),
         ])->log('Cases exported');
+        // Also on each case, so the log's reference filter answers who exported it (S6).
+        $cases->lazyById()->each(fn (Grievance $case) => activity()->performedOn($case)->causedBy($user)->event('exported')
+            ->withProperties(['personal_data' => $personal])->log('Case exported'));
 
         // shortcut: Livewire buffers the whole file to send it; for exports of tens of MB, download from a plain route instead.
         return response()->streamDownload(function () use ($cases, $format, $personal): void {
