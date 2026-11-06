@@ -57,6 +57,17 @@ it('lets the Administrator add and edit a category, restricted flag included', f
         ->and(Grievance::visibleTo($focal)->pluck('id')->all())->toBe([]);
 })->group('A7', 'A5');
 
+it('refuses a category name already in use, even by an inactive one, so the summary keeps them apart', function () {
+    signedInAs(Role::Administrator);
+    Category::factory()->create(['name_en' => 'Wages', 'name_ne' => 'तलब', 'is_active' => false]);
+
+    Livewire::test(ManageCategories::class)
+        ->callAction('create', data: ['name_en' => 'wages', 'name_ne' => 'तलब', 'is_restricted' => false, 'is_active' => true, 'sort' => 1])
+        ->assertHasFormErrors(['name_en' => 'unique', 'name_ne' => 'unique']);
+
+    expect(Category::where('name_en', 'Wages')->count())->toBe(1);
+})->group('A7', 'N3');
+
 it('lets the Administrator add locations and holidays, and remove a wrong holiday', function () {
     signedInAs(Role::Administrator);
 

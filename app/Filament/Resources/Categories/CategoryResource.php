@@ -33,8 +33,9 @@ class CategoryResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name_en')->label('Name in English')->required()->maxLength(255),
-                TextInput::make('name_ne')->label('Name in Nepali')->required()->maxLength(255),
+                // Unique, inactive ones included: the summary (N3) lists categories by name.
+                TextInput::make('name_en')->label('Name in English')->required()->maxLength(255)->unique(ignoreRecord: true),
+                TextInput::make('name_ne')->label('Name in Nepali')->required()->maxLength(255)->unique(ignoreRecord: true),
                 Toggle::make('is_restricted')
                     ->label('Restricted')
                     ->helperText('Cases in a restricted category, past ones included, are seen only by restricted-case officers and the Administrator.'),
