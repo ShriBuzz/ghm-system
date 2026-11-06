@@ -104,9 +104,24 @@ it('logs each export with its range, format and whether personal data was includ
     $admin = User::factory()->create(['role' => Role::Administrator]);
     exportRows($admin, 'xlsx', personal: true);
 
-    $entry = Activity::where('event', 'exported')->sole();
+    $entry = Activity::where('event', 'exported')->whereNull('subject_id')->sole();
     expect($entry->causer_id)->toBe($admin->id)
         ->and($entry->properties->all())->toEqual(['from' => '2026-11-01', 'until' => '2026-11-15', 'format' => 'xlsx', 'personal_data' => true, 'cases' => 2]);
+})->group('N4', 'S6');
+
+it('also logs the export on each exported case, so filtering the log by reference finds it', function () {
+    $admin = signedInAs(Role::Administrator);
+    exportRows($admin, personal: true);
+
+    $onCase = Activity::where('event', 'exported')->whereMorphedTo('subject', $this->case)->sole();
+    expect($onCase->causer_id)->toBe($admin->id)
+        ->and($onCase->properties->all())->toBe(['personal_data' => true])
+        ->and(Activity::where('event', 'exported')->whereNotNull('subject_id')->count())->toBe(2);
+
+    Livewire::test(ManageActivityLogs::class)
+        ->filterTable('reference', ['reference' => 'GHM-2026-0001'])
+        ->assertCanSeeTableRecords([$onCase])
+        ->assertSee('personal_data: yes');
 })->group('N4', 'S6');
 
 it('offers the personal-data choice to the Administrator only', function () {

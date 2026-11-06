@@ -6,7 +6,6 @@ use App\Models\Grievance;
 use App\Models\User;
 use App\Support\WorkingDays;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
@@ -15,10 +14,6 @@ use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
 
 Artisan::command('ghm:recount-working-days', function () {
     // Quietly: a system job, not a staff action, so no observer or activity entry.

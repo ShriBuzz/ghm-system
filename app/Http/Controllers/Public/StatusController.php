@@ -40,9 +40,13 @@ class StatusController
     public function check(StatusLookupRequest $request): RedirectResponse
     {
         $reference = $request->string('reference')->toString();
+        $case = Grievance::where('reference', $reference)->first();
+        // The stored reference when there is one, so every spelling the database reads as it (full-width
+        // characters) counts against the one lock.
+        $counted = hash('sha256', $case->reference ?? $reference);
         $visitor = 'status-failures:'.VisitorKey::for($request);
-        $wrongPins = 'status-wrong-pins:'.hash('sha256', $reference);
-        $lock = 'status-lock:'.hash('sha256', $reference);
+        $wrongPins = 'status-wrong-pins:'.$counted;
+        $lock = 'status-lock:'.$counted;
 
         // Per visitor, so a bot cannot spread guesses over every reference; per reference, 5 wrong PINs
         // lock it for 15 minutes from the fifth. An unknown reference counts and answers the same.
@@ -55,7 +59,6 @@ class StatusController
             return $this->refuse($reference, __('track.errors.locked'));
         }
 
-        $case = Grievance::where('reference', $reference)->first();
         // The same hash check for an unknown reference, so its timing does not tell which references exist.
         $valid = Hash::check($request->string('pin')->toString(), $case->pin_hash ?? self::dummyHash());
 

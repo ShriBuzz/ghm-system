@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
@@ -14,8 +15,8 @@ use SensitiveParameter;
 
 /**
  * Five failed sign-ins lock that email for 15 minutes. Every throttle is keyed
- * on a hash of the email, never the IP address. There is no "remember me", so
- * a session always ends after the idle lifetime.
+ * on the account the email signs in to, never the IP address. There is no
+ * "remember me", so a session always ends after the idle lifetime.
  */
 class Login extends BaseLogin
 {
@@ -25,7 +26,7 @@ class Login extends BaseLogin
 
     public function authenticate(): ?LoginResponse
     {
-        $lockoutKey = 'login-lockout:'.$this->emailHash();
+        $lockoutKey = 'login-lockout:'.$this->accountKey();
 
         if (RateLimiter::tooManyAttempts($lockoutKey, 1)) {
             $this->getRateLimitedNotification(
@@ -38,7 +39,7 @@ class Login extends BaseLogin
         $response = parent::authenticate();
 
         if ($response) {
-            RateLimiter::clear('login-failures:'.$this->emailHash());
+            RateLimiter::clear('login-failures:'.$this->accountKey());
         }
 
         return $response;
@@ -57,32 +58,38 @@ class Login extends BaseLogin
      */
     protected function fireFailedEvent(Guard $guard, ?Authenticatable $user, #[SensitiveParameter] array $credentials): void
     {
-        $failuresKey = 'login-failures:'.$this->emailHash();
+        $failuresKey = 'login-failures:'.$this->accountKey();
 
         RateLimiter::hit($failuresKey, self::LOCKOUT_SECONDS);
 
         // The lockout runs 15 minutes from the fifth failure, not from the first.
         if (RateLimiter::attempts($failuresKey) >= self::MAX_FAILED_ATTEMPTS) {
             RateLimiter::clear($failuresKey);
-            RateLimiter::hit('login-lockout:'.$this->emailHash(), self::LOCKOUT_SECONDS);
+            RateLimiter::hit('login-lockout:'.$this->accountKey(), self::LOCKOUT_SECONDS);
         }
 
         parent::fireFailedEvent($guard, $user, $credentials);
     }
 
     /**
-     * Filament's own five-per-minute throttle, keyed on the email instead of the IP address.
+     * Filament's own five-per-minute throttle, keyed on the account instead of the IP address.
      *
      * @param  string  $method
      * @param  class-string|null  $component
      */
     protected function getRateLimitKey($method, $component = null): string
     {
-        return 'login-throttle:'.$this->emailHash();
+        return 'login-throttle:'.$this->accountKey();
     }
 
-    private function emailHash(): string
+    /**
+     * The account's ID, so every spelling the database reads as the same email (other case, full-width
+     * letters) counts against the one account. An email with no account counts under its hash.
+     */
+    private function accountKey(): string
     {
-        return hash('sha256', Str::lower(trim((string) ($this->data['email'] ?? ''))));
+        $email = Str::lower(trim((string) ($this->data['email'] ?? '')));
+
+        return (string) (User::where('email', $email)->value('id') ?? hash('sha256', $email));
     }
 }
