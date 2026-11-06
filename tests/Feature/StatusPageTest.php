@@ -198,7 +198,8 @@ it('accepts the reference and PIN as people type them: Nepali digits, spaces, sm
 it('counts wrong PINs against the one reference, however it was typed', function () {
     $case = Grievance::factory()->create();
 
-    foreach ([$case->reference, strtolower($case->reference), str_replace('-', '', $case->reference), str_replace('-', ' ', $case->reference), $case->reference] as $typed) {
+    // The last is in full-width characters, which MySQL's collation treats as the plain ones.
+    foreach ([$case->reference, strtolower($case->reference), str_replace('-', '', $case->reference), str_replace('-', ' ', $case->reference), mb_convert_kana($case->reference, 'A')] as $typed) {
         $this->post('/en/status', ['reference' => $typed, 'pin' => '000000']);
     }
 
