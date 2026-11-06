@@ -42,8 +42,4 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // A PIN typed on the status page never comes back in a refused form's old input (P8).
         $exceptions->dontFlash(['pin']);
-
-        $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
-        );
     })->create();
