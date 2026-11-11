@@ -8,7 +8,7 @@ set -eu
 DEV_ONLY='.claude .impeccable CLAUDE.md PRODUCT.md DESIGN.md WP0-kickoff.md WP2-kickoff.md
 docs/implementation-plan.md docs/progress.md docs/handoff.md docs/clarification-questions.md
 docs/client-discussion.md docs/breach-report-template.md docs/production-access-log.md
-scripts/sync-main.sh'
+docs/credentials-handover.md scripts/sync-main.sh'
 
 # Mentions of dev tooling or internal docs that must not reach a file main keeps.
 LEAKS='CLAUDE\.md|\.claude|[Ii]mpeccable|[Pp]onytail|Claude Code|progress\.md|handoff\.md|implementation-plan|clarification[- ]question|\(question [0-9]+\)|client-discussion|kickoff\.md|breach-report-template|production-access-log|PRODUCT\.md|DESIGN\.md|main-backup|plan section'
