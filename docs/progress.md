@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-03. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
+Last updated: 2026-11-11 (the `main` and `main-backup` split, under Decisions). WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -83,7 +83,7 @@ Plan approved in chat on 2026-11-02: the form is the home page, one page in sect
 
 Questions for NBI, with what to change once they answer, are in `docs/clarification-questions.md` (email due 2 Nov). Until then the code follows the assumptions listed there. The ones below are internal.
 
-1. `laravel/pao` came with the Laravel skeleton and is agent tooling. Keep or remove? `CLAUDE.md` limits which agent tools the repo uses.
+1. Decided 2026-11-11: `laravel/pao` (agent tooling from the skeleton) was removed with the handover split, under Decisions.
 2. `main` is not protected on GitHub, although `CLAUDE.md` says it is. Checked 2026-11-01: no classic branch protection; a ruleset named "main protection" exists (blocks deletion and force pushes) but is disabled and targets no branch, so nothing is enforced. The repository is also still public. Should `main` require a reviewed pull request (enable the ruleset, target `main`, add "require a pull request"), and should the repository be private?
 3. The Nepali copy on public pages (site name, placeholder line) and in the acknowledgement email (`acknowledgement.*` in `lang/ne.json`) needs a Nepali speaker's read before UAT (P2 manual check). Since WP1 step 9 that includes "सकेर लुकाउनुहोस्" (Finish and hide) and the messages after it, and the refusal wording ("एउटै वाइफाइ वा मोबाइल नेटवर्कबाट…").
 4. The printed offline slip's language and wording (A6) is now part of NBI question 16, with how drop-box and phone complainants follow their case (`docs/client-discussion.md`).
@@ -96,6 +96,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 - PHP 8.4.1 is the minimum (decided 2026-11-02). The locked packages need it (Symfony 8.1, `spatie/laravel-activitylog` 5.1); `composer.json` requires it, with `ext-gd` and `ext-exif`, and `CLAUDE.md`, the technical note, the local setup, the deployment guide and NBI hosting question 1 say so. The shared plan doc (sections 4 and 11) still says 8.3 and is corrected there, then regenerated into `docs/implementation-plan.md`.
 - The clarification questions are not sent by the RFQ's 2 Nov deadline: NBI is asked after contract signing (decided 2026-11-02). Until then build what does not depend on the answers, on the assumptions in `docs/clarification-questions.md`, and apply its "Apply when answered" table once they arrive.
 - WP3, for the WP1 public form: after saving a case, call `$case->acknowledge($pin)` with the plain PIN; it emails the reference and PIN if an email was given (P7, N2).
+- Handover split, decided 2026-11-11. The client gets a zip of `main` (`git archive`), without git history. `main-backup` (made from `8d8c0a4`) holds everything and is where work continues. `main` is `main-backup` without the dev-only files (agent tooling and the internal docs) and changes only through `scripts/sync-main.sh` and a pull request merged with a merge commit; the first cleanup of `main` was a direct commit, by the project lead's choice. The tests, Playwright and CI ship with the code; `laravel/pao` was removed; the breach-report template and production-access log stay vendor-side. Rules in `CLAUDE.md` (Branching), steps in `docs/handoff.md` (Branches and sync).
 
 Made so far (the commit messages have the detail):
 
