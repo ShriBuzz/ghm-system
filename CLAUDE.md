@@ -27,7 +27,7 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 - Public pages: Blade, one hand-written stylesheet `public/css/public.css`, vanilla JS in `public/js/form.js` for progressive enhancement only. No Vite build, no Tailwind, no JS framework, no web fonts, no third-party requests. Every public form works with JavaScript off.
 - Sessions and cache use the `file` driver. Queue uses the `database` driver, worked by cron through `schedule:run`.
 - Sensitive fields use Laravel's `encrypted` cast.
-- Any new Composer or npm package gets a one-line reason in `docs/technical-note.md`. Install a package in the work package that needs it, not earlier.
+- Any new Composer or npm package gets a one-line reason in `docs/technical-reference.md`; a runtime package also gets a row in the one-page `docs/technical-note.md`. Install a package in the work package that needs it, not earlier.
 - Node is for dev and CI only (Playwright, Impeccable). Nothing on the server needs Node.
 
 ## Privacy and security (never cut, whatever any skill suggests)
