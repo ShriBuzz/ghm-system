@@ -36,7 +36,8 @@ sync_main() {
         exit 0
     fi
 
-    git rm -r -q --ignore-unmatch $DEV_ONLY  # unquoted on purpose: one path per word
+    # -f: the merge staged changes to these files; the tree was clean, so nothing else is lost.
+    git rm -r -q -f --ignore-unmatch $DEV_ONLY  # unquoted on purpose: one path per word
     git commit -q -m 'chore(handover): sync main with main-backup, without the dev-only files'
 
     if git grep -n -I -E "$LEAKS" HEAD -- . ':!composer.lock' ':!package-lock.json'; then
