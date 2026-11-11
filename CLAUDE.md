@@ -58,10 +58,13 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 ## Branching
 
-- `main`: protected and release-ready. Never commit or push to it directly. Tag `v1.0.0` at go-live.
-- One branch per work package off `main`, merged by pull or merge request after review:
-  `wp0/foundations`, `wp1/public-side`, `wp2/admin-side`, `wp3/alerts-reports-security`.
-- `fix/<ID>-<short-slug>` for UAT and support fixes.
+- `main-backup`: our development branch, with everything, the dev-only files included (this file, `.claude/`, `.impeccable/`, the internal docs). Work and fix branches start from it, and pull requests go into it with `gh pr create --base main-backup`: the GitHub default branch stays `main`.
+- `main`: what the client gets, release-ready. It is `main-backup` without the dev-only files. Change it only with `scripts/sync-main.sh` and a pull request from the sync branch it makes, merged with "Create a merge commit", never squash or rebase. Tag `v1.0.0` at go-live.
+- Never merge `main` into `main-backup`, and never open a pull request from `main-backup` itself. The dev-only files are deleted on `main`, so such a merge deletes them on `main-backup` too.
+- Files both branches share stay identical: edit them on `main-backup` only, and keep dev-only notes out of them. `scripts/sync-main.sh` stops when a shared file mentions dev tooling or the internal docs.
+- A new dev-only file goes into the `DEV_ONLY` list in `scripts/sync-main.sh` in the same commit.
+- Branch names: `wp<N>/<slug>` for work packages, `fix/<ID>-<short-slug>` for UAT and support fixes.
+- Handover zip for the client: `git archive --format=zip -o ghm-system.zip main`.
 
 ## Useful commands
 

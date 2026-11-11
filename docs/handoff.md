@@ -35,6 +35,18 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/deploy.md`: putting it on a server. `docs/restore.md`: restoring a backup.
 8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views. `DESIGN.md`: the visual rules those pages follow.
 
+## Branches and sync
+
+`main-backup` is the working branch and holds everything. `main` is what the client gets: the same code without the dev-only files. The rules are in `CLAUDE.md`, Branching. The full snapshot before the split is commit `8d8c0a4`.
+
+To bring work from `main-backup` into `main`:
+
+1. On a clean tree, run `scripts/sync-main.sh`. It makes a `sync/<date-time>` branch from `origin/main`, merges `origin/main-backup` into it, removes the dev-only files and checks that no shared file mentions them.
+2. `git push -u origin HEAD`, then `gh pr create --base main`.
+3. Merge on GitHub with "Create a merge commit". A squash or rebase cuts `main` off from `main-backup`'s history, and the next sync then conflicts on every shared file.
+
+The handover zip for the client: `git archive --format=zip -o ghm-system.zip main`.
+
 ## What git does not carry
 
 | Item | Why it is not in git | On the new machine |
@@ -47,13 +59,32 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 | Ponytail plugin files | Claude Code installs plugins per machine | Accept Claude Code's offer, or `/plugin install ponytail@ponytail` |
 | Claude Code chat history and memory | Kept in the old machine's home folder | This file and `docs/progress.md` carry the context |
 
+## Agent tooling (once per machine, not shipped)
+
+| Tool | Version | Used for |
+|---|---|---|
+| Claude Code | current | The coding agent, with the Ponytail plugin |
+
+- **Claude Code and Ponytail.** Start Claude Code in the project folder and trust the folder. `.claude/settings.json` names the Ponytail marketplace and enables the plugin, so Claude Code offers to install it. If it does not, run `/plugin marketplace add DietrichGebert/ponytail` and `/plugin install ponytail@ponytail` at project scope, then restart Claude Code.
+- **Impeccable design hook.** Impeccable 4.8.0; its skills and agents live in `.claude/`. The hook is kept out of git on purpose. Re-create it with the same version:
+
+  ```sh
+  npx impeccable@4.8.0 install --providers=claude --scope=project -y
+  git status   # expect no changes; the hook lands in the ignored .claude/settings.local.json
+  ```
+
+  The macOS engine binary (20 MB, not committed) downloads on first use and is checked against `engine-checksums.txt`. If `git status` shows changed skill files, look at the diff before committing anything. If the installer adds its `impeccable-ignore` block to the root `.gitignore` again, delete that block: its rules live in `.impeccable/.gitignore`, and the root `.gitignore` is shared with `main`.
+- **`/impeccable init`** is already done (`PRODUCT.md`). Do not run it again.
+- `.impeccable/config.json` sets `"telemetry": false` for everyone. Impeccable still calls impeccable.style when it starts a new design, because that call is the feature; this happens on developer machines only, never from the application.
+- **Playwright CLI skill**, installed with `npx playwright cli install --skills` into `.claude/skills/playwright-cli`.
+
 A fresh `APP_KEY` is fine now because no encrypted data exists yet. Once it does, a database copied between machines only decrypts with the same `APP_KEY`. Local data is fake, so recreate it rather than copying it.
 
 ## Starting a new session
 
 On a new machine, work through `docs/local-setup.md` first. Then start Claude Code in the project folder and give it this prompt:
 
-> Read CLAUDE.md, docs/handoff.md and docs/progress.md. Check `git status`, the current branch and how it compares with origin/main, then run php artisan test, vendor/bin/pint --test and vendor/bin/phpstan analyse --memory-limit=1G, and report the results. Then tell me the next step from docs/handoff.md and wait for my go-ahead. Work one step at a time: a failing Pest test first, then the code, then check it in a browser with Playwright CLI using fake users you delete afterwards. Commit each step with its requirement IDs; push or open a pull request only when I ask. Bring open questions to me instead of guessing.
+> Read CLAUDE.md, docs/handoff.md and docs/progress.md. Check `git status`, the current branch and how it compares with origin/main-backup, then run php artisan test, vendor/bin/pint --test and vendor/bin/phpstan analyse --memory-limit=1G, and report the results. Then tell me the next step from docs/handoff.md and wait for my go-ahead. Work one step at a time: a failing Pest test first, then the code, then check it in a browser with Playwright CLI using fake users you delete afterwards. Commit each step with its requirement IDs; push or open a pull request only when I ask. Bring open questions to me instead of guessing.
 
 ## Keep this current
 

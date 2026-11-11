@@ -1,0 +1,20 @@
+# Ephemeral output, runtime state, and per-dev overrides.
+# Shared artifacts stay tracked: config.json, live/config.json,
+# design.json, surfaces/*.md, critique/*.md.
+/config.local.json
+/hook.cache.json
+/hook.pending.json
+/*.png
+/review/
+/questions/
+/live/server.json
+/live/sessions/
+/live/previews/
+/live/annotations/
+/live/cache/
+/live/manual-edit-apply-transaction.json
+/live/manual-edit-events.jsonl
+/live/manual-edit-evidence/
+/live/pending-manual-edits.json
+/live/deferred-svelte-component-accepts.json
+/live/*.png

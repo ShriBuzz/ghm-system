@@ -10,7 +10,7 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | Laravel | 13.39 | From the `laravel/laravel` 13.x skeleton, with Vite and Tailwind removed |
 | Admin panel | Filament 5.11, Livewire 4.4 | Staff panel at `/admin`; its assets are published on `composer install` |
 | Database | MySQL 8 or MariaDB 10.6+ | |
-| Node | 20+ | Dev and CI only (Playwright, Impeccable); nothing on the server needs Node |
+| Node | 20+ | Dev and CI only (Playwright); nothing on the server needs Node |
 
 ## Composer packages
 
@@ -26,7 +26,6 @@ Started in WP0. Every Composer or npm package gets a one-line reason here when i
 | `fakerphp/faker` | dev | Fake data for factories and tests; real grievance data is never used outside production. |
 | `larastan/larastan` | dev | Static analysis (PHPStan for Laravel) at level 8 on `app/`, `bootstrap/app.php`, `database/` and `routes/`, run in CI. |
 | `laravel/pail` | dev | Skeleton default; tails the local log. |
-| `laravel/pao` | dev | Skeleton default; condenses test and Pint output when an AI agent runs them. Under review, see below. |
 | `laravel/pint` | dev | Code style check (`vendor/bin/pint --test`). |
 | `mockery/mockery` | dev | Test doubles. |
 | `nunomaduro/collision` | dev | Readable console errors in tests. |
@@ -96,7 +95,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 ## Backups (S7)
 
 - Every night at 01:00 `backup:run` dumps the database (`mysqldump`, which the host must provide) and copies `storage/app/private` without `livewire-tmp` into one zip, encrypted with AES-256 and `BACKUP_ARCHIVE_PASSWORD`. The code is in Git; `.env` is left out, so `APP_KEY` never sits next to the data it unlocks.
-- Archives go to every disk in `BACKUP_DISKS`: `backups` (`storage/app/backups`, outside the web root) by default. The second copy off the web server is a disk added to that list once the host is known (clarification question 1).
+- Archives go to every disk in `BACKUP_DISKS`: `backups` (`storage/app/backups`, outside the web root) by default. The second copy off the web server is a disk added to that list once the host is known.
 - `backup:clean` at 01:30 deletes archives older than 15 days, so the one from 14 days ago is always there (RFQ: at least 14). `backup:monitor` at 02:00 reports when the newest backup is older than a day.
 - Failure emails go to `BACKUP_MAIL_TO`; without it nothing is sent. Success sends nothing.
 - **Production must set `BACKUP_ARCHIVE_PASSWORD`.** Without it the archive is not encrypted and the attachments in it are readable. Keep it in the company's password manager with `APP_KEY`: a backup restores only with both.
@@ -120,14 +119,4 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 
 - Logged: case created, viewed, status, priority, assignment (including clean-ups when an assignee can no longer see a case), manual restriction, note added, reply sent, message received, document uploaded and viewed, a category's restriction, sign-in, and a failed sign-in to an existing account. Exports are logged when N4 is built.
 - Entries hold codes, IDs and flags only, never case text or contact details. A failed sign-in is logged only when the email belongs to an account, and records only that account: never the email typed, the IP or the browser. An unknown email is not logged, because there is no one to record and the per-email throttle would not stop a script trying endless random ones.
-- Entries are kept: the package's 365-day clean-up is not scheduled. How long to keep them is clarification question 15.
-
-## Agent tooling (not shipped)
-
-- Impeccable 4.8.0, installed with `npx impeccable install --providers=claude --scope=project`. Skills and agents live in `.claude/`. The design hook sits in `.claude/settings.local.json`, which is per machine and not committed. The 20 MB engine binary is not committed either; the launcher downloads it on demand and checks it against `engine-checksums.txt`.
-- `.impeccable/config.json` sets `"telemetry": false` for everyone. Impeccable still calls impeccable.style when it starts a new design, because that call is the feature; this happens on developer machines only, never from the application.
-- Playwright CLI skill installed with `npx playwright cli install --skills` into `.claude/skills/playwright-cli`.
-
-## Open points
-
-- `laravel/pao` is agent tooling that came with the skeleton. `CLAUDE.md` limits which agent tools the repo uses, so keep or remove it is a decision for the project lead.
+- Entries are kept: the package's 365-day clean-up is not scheduled. How long to keep them is still to be agreed with the company.

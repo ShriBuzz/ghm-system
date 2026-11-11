@@ -7,8 +7,8 @@ use App\Models\Location;
 use Illuminate\Database\Seeder;
 
 /**
- * Placeholder categories and locations until NBI sends the real lists
- * (clarification question 2). The Administrator edits them in Settings;
+ * Placeholder categories and locations until NBI sends the real lists.
+ * The Administrator edits them in Settings;
  * the Nepali names still need a native speaker's check.
  */
 class PlaceholderListsSeeder extends Seeder

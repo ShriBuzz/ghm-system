@@ -2,7 +2,7 @@
 
 Copied word for word from the client's RFQ (Request for Quotation: Development of an Online Grievance Handling System for a Private Company), sections 2 and 3. Contact details, pricing, evaluation and contract terms are deliberately left out of this repo.
 
-This file is the source for requirement wording. If anything here conflicts with `docs/implementation-plan.md`, this file wins.
+This file is the source for requirement wording.
 
 ## From section 2: what the system is
 

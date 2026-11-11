@@ -1,5 +1,5 @@
-{{-- The incident date in AD, as three selects (P5). A Bikram Sambat version, if NBI asks for one
-     (clarification question 8), replaces this partial and StoreGrievanceRequest::prepareForValidation(). --}}
+{{-- The incident date in AD, as three selects (P5). A Bikram Sambat version, if NBI asks for one,
+     replaces this partial and StoreGrievanceRequest::prepareForValidation(). --}}
 @php
     $error = $errors->first('incident_date');
     $thisYear = (int) now()->year;

@@ -20,7 +20,7 @@ const N4_COLUMNS = ['Reference', 'Received', 'Closed', 'Channel', 'Category', 'L
     'Complainant type', 'Sex', 'Age group', 'Ethnicity', 'Disability'];
 
 beforeEach(function () {
-    app()->setLocale('en'); // The staff panel's language (clarification question 14).
+    app()->setLocale('en'); // The staff panel's language.
     $this->travelTo('2026-11-20 12:00');
 
     $this->case = Grievance::factory()->create([

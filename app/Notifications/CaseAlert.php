@@ -19,7 +19,7 @@ class CaseAlert extends Notification implements ShouldQueue
 
     public function __construct(public int $grievanceId, public bool $message)
     {
-        // The staff panel is in English (clarification question 14); APP_LOCALE is Nepali.
+        // The staff panel is in English; APP_LOCALE is Nepali.
         $this->locale('en');
     }
 
