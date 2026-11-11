@@ -36,7 +36,7 @@ export default defineConfig({
     failOnFlakyTests: !!process.env.CI,
     reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
     // Away from this machine only the read-only @smoke specs run, because production
-    // holds real grievances (CLAUDE.md). Staging sets E2E_FULL=1 for the full suite.
+    // holds real grievances. Staging sets E2E_FULL=1 for the full suite.
     grep: local || process.env.E2E_FULL === '1' ? undefined : /@smoke/,
     globalSetup: './tests/e2e/global-setup.ts',
     use: {

@@ -2,7 +2,7 @@
 
 For whoever puts the grievance system on a server: staging first, with fake data only, then production.
 
-It is written for the plan's first choice of host: the company's shared hosting with cPanel, SSH and cron (plan section 3, H1). On a VPS (H2) only section 2, the folders, is different. The host is not known yet (question 1 in `docs/clarification-questions.md`).
+It is written for the company's shared hosting with cPanel, SSH and cron. On a VPS only section 2, the folders, is different.
 
 Every command below was rehearsed on 2026-11-02 on a developer machine, from a clean export without dev packages, in staging mode. Only a real host can check the parts that depend on it: the certificate, email delivery, cron, and the PHP settings for the website.
 
@@ -26,7 +26,7 @@ which mysqldump
 | Cron every minute | Emails, the nightly backup and the working-day count |
 | A subdomain with a free certificate (AutoSSL or Let's Encrypt) | S1 |
 | Outgoing SMTP, with SPF and DKIM for the sending domain | Alerts and acknowledgements (N1, N2), kept out of spam |
-| If possible, web access logs off or short for the subdomain | They record visitors' IP addresses outside the app (S5, question 4) |
+| If possible, web access logs off or short for the subdomain | They record visitors' IP addresses outside the app (S5) |
 
 On cPanel, the website's PHP version is set in MultiPHP Manager and its `upload_max_filesize`, `post_max_size` and `memory_limit` in MultiPHP INI Editor. The command line can run a different PHP from the website: `php -v` over SSH shows the command line's. If it is older, use the full path of PHP 8.4, for example `/opt/cpanel/ea-php84/root/usr/bin/php`, wherever this guide says `php`, the cron line included.
 
@@ -153,12 +153,12 @@ GHM_ADMIN_PASSWORD=
 | `APP_NAME` | Shows in emails, the staff panel and authenticator apps; the company's name replaces it at kick-off |
 | `LOG_*` | One log file a day, kept 14 days, warnings and errors only. The log holds no personal data (technical note) |
 | `SESSION_LIFETIME` | 30 minutes idle and staff are signed out (S2). Leave `SESSION_SECURE_COOKIE` out: cookies are then Secure over HTTPS |
-| `MAIL_*` | The company's mail server or sending service (question 3). Never `MAIL_MAILER=log`: it writes every email, PINs included, into the log |
+| `MAIL_*` | The company's mail server or sending service. Never `MAIL_MAILER=log`: it writes every email, PINs included, into the log |
 | `BACKUP_ARCHIVE_PASSWORD` | Required. Without it the nightly archive is not encrypted. Keep it in the password manager with `APP_KEY` |
 | `BACKUP_DISKS` | Add the off-server copy here once the host is known (`docs/technical-note.md`, Backups) |
 | `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
-| `GHM_SUBMISSIONS_PER_HOUR`, `GHM_FAILED_LOOKUPS_PER_HOUR` | Optional; leave them out for 10 each. Grievances accepted, and failed status lookups, per network per hour (P8, P9). Raise the first before posters go up if many workers share one Wi-Fi (progress, open question 5) |
+| `GHM_SUBMISSIONS_PER_HOUR`, `GHM_FAILED_LOOKUPS_PER_HOUR` | Optional; leave them out for 10 each. Grievances accepted, and failed status lookups, per network per hour (P8, P9). Raise the first before posters go up if many workers share one Wi-Fi |
 
 If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups, see the table above) count all visitors as one, so real complainants get refused.
 
@@ -194,7 +194,7 @@ To go back, deploy the previous version the same way. If the new version changed
 | `php artisan about` | Environment `production` (or `staging`), Debug Mode `OFF`; Config, Events, Routes and Views `CACHED`; under Backups, Archive password `set` (a red `NOT SET` means the nightly archive is not encrypted) |
 | `php artisan schedule:list` | Eight tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount, failed-job pruning, the upload clean-up and the cache clean-up, both hourly |
 | QR poster, in the staff panel | The address under the code is the site's own `https://` address. Print posters only after this check: the code is made from the address the panel was opened with (P10) |
-| Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, nobody is told about a restricted case until NBI answers question 13 |
+| Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, nobody is told about a restricted case |
 | From a developer machine: `BASE_URL=https://<subdomain> npx playwright test` | The `@smoke` specs pass: pages load over HTTPS with the security headers, and the staff sign-in is reachable. Against a non-local address Playwright runs nothing else |
 | `http://<subdomain>` in a browser | It moves to `https://` |
 | [SSL Labs](https://www.ssllabs.com/ssltest/) for the subdomain | Grade A (S1) |
@@ -214,8 +214,8 @@ On staging also:
 | | Staging | Production |
 |---|---|---|
 | `APP_ENV` | `staging` | `production` |
-| Data | Fake only | Real. The vendor signs in only with the company's written permission, each time (`docs/production-access-log.md`, S8) |
+| Data | Fake only | Real. The vendor signs in only with the company's written permission, each time (S8) |
 | Categories and locations | Placeholders from `db:seed` | The real lists, entered in Settings |
 | Playwright | The full suite | `@smoke` only |
 | First Administrator | A test account | The company's own, named at kick-off |
-| Before go-live | | Every UAT case cleared (plan section 10) |
+| Before go-live | | Every UAT case cleared |

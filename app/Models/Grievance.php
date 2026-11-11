@@ -105,7 +105,7 @@ class Grievance extends Model
 
     /**
      * Alert the staff who can see this case to it, or to a complainant's message (N1).
-     * No Administrator alerts until NBI answers clarification question 13; whoever
+     * No Administrator alerts until NBI decides otherwise; whoever
      * entered an offline case already knows about it.
      */
     public function alertStaff(bool $message = false): void

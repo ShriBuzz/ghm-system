@@ -2,7 +2,7 @@
 
 How to get a working copy of the GHM system on a developer machine. macOS comes first; the Windows notes at the end record how the first machine was set up.
 
-A local copy never points at production and never holds real grievance data (`CLAUDE.md`).
+A local copy never points at production and never holds real grievance data.
 
 ## What you need
 
@@ -11,9 +11,8 @@ A local copy never points at production and never holds real grievance data (`CL
 | PHP | 8.4.1 or newer (the locked packages need it; CI uses 8.4) | The app. Extensions: curl, exif, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium, zip |
 | Composer | 2.x | PHP packages |
 | MySQL | 8.x, or MariaDB 10.6+ | Local `ghm` and `ghm_testing` databases |
-| Node | 20+ | Playwright and Impeccable only |
+| Node | 20+ | Playwright only |
 | Git and GitHub CLI | recent | Clone, push, pull requests |
-| Claude Code | current | The coding agent, with the Ponytail plugin |
 
 ## macOS
 
@@ -90,7 +89,6 @@ git config --global user.email "you@example.com"
 ```sh
 gh repo clone <owner>/ghm-system   # the same repository as origin on the first machine
 cd ghm-system
-git checkout wp0/foundations       # the branch in progress, see docs/progress.md
 composer install
 npm ci
 npx playwright install chromium
@@ -121,19 +119,6 @@ php artisan serve        # http://127.0.0.1:8000
 
 The first sign-in at `/admin` asks you to set up an authenticator app; every account must have one. Each user can change their password and manage MFA at `/admin/profile`.
 
-### 5. Agent tooling (once per machine)
-
-- **Claude Code and Ponytail.** Start Claude Code in the project folder and trust the folder. `.claude/settings.json` names the Ponytail marketplace and enables the plugin, so Claude Code offers to install it. If it does not, run `/plugin marketplace add DietrichGebert/ponytail` and `/plugin install ponytail@ponytail` at project scope, then restart Claude Code.
-- **Impeccable design hook.** It is kept out of git on purpose. Re-create it with the same version:
-
-  ```sh
-  npx impeccable@4.8.0 install --providers=claude --scope=project -y
-  git status   # expect no changes; the hook lands in the ignored .claude/settings.local.json
-  ```
-
-  The macOS engine binary downloads on first use and is checked against `engine-checksums.txt`. If `git status` shows changed skill files, look at the diff before committing anything.
-- **`/impeccable init`** is already done (`PRODUCT.md`). Do not run it again.
-
 ## Everyday commands
 
 To run the app and try everything by hand, follow `docs/manual-testing.md`.
@@ -159,4 +144,4 @@ How the Windows laptop was set up, for reference:
 - GitHub CLI through `winget install --id GitHub.cli`.
 - MySQL 8.0 as the `MySQL80` service. It starts manually: run `Start-Service MySQL80` in an admin PowerShell after a reboot.
 - Open a new terminal after installing anything, so PATH changes apply.
-- Git on Windows does not record the executable bit. A shell script first committed from Windows lands as `100644` and fails on macOS and Linux with "Permission denied"; this broke the Impeccable hook until it was fixed with `git update-index --chmod=+x`. Check new scripts with `git ls-files -s`.
+- Git on Windows does not record the executable bit. A shell script first committed from Windows lands as `100644` and fails on macOS and Linux with "Permission denied"; this broke a hook script until it was fixed with `git update-index --chmod=+x`. Check new scripts with `git ls-files -s`.

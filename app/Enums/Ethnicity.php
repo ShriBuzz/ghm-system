@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * The complainant's ethnic group (P6). Placeholder options until NBI answers clarification question 5.
+ * The complainant's ethnic group (P6). Placeholder options until NBI confirms the list.
  * Codes are stored encrypted, so settle them before production; labels can change any time.
  */
 enum Ethnicity: string implements HasLabel

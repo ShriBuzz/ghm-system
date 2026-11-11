@@ -2,7 +2,7 @@
 
 How to run the GHM system on your machine and try what it does so far, by hand and with the automated checks. Set up the machine first with `docs/local-setup.md`.
 
-Use fake data only. Never point the app, a test or a browser session at production (`CLAUDE.md`).
+Use fake data only. Never point the app, a test or a browser session at production.
 
 Last updated 2026-11-02, after WP3 (alerts, summary, export, backups). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
@@ -133,8 +133,8 @@ A grievance that came by phone, email, drop box or in person, entered by staff a
 | In the private window, http://127.0.0.1:8000/en/status with the slip's reference and PIN | The status page: Received, the received date, no messages yet |
 | Back on the case page, Messages → Send reply; then reload the status page | The reply shows as "Grievance team". "Add information or reply" there puts the message on the case page, and queues an alert |
 | On the case page, Documents → add a PDF, as for a scanned letter | It is listed and downloads; the complainant does not see it |
-| Enter a case with channel Drop box, Anonymous on | The slip still shows, but there is nobody to give it to: NBI question 16 asks how drop-box complainants should follow up |
-| Enter a case with channel Phone | The slip shows; staff read the reference and PIN out on the call, since the system sends no text messages (question 16) |
+| Enter a case with channel Drop box, Anonymous on | The slip still shows, but there is nobody to give it to |
+| Enter a case with channel Phone | The slip shows; staff read the reference and PIN out on the call, since the system sends no text messages |
 | Enter a case with Received tomorrow | Refused with a message under Received; nothing is saved. When it happened cannot be set after today |
 
 **Restricted-case officer and Administrator: who sees what (A1, A3, A5)**
@@ -245,10 +245,10 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 ## Known so far
 
 - The staff panel's title and the emails show `APP_NAME` ("Grievance handling" in `.env.example`) until the company name arrives at kick-off.
-- The acknowledgement email's Nepali wording needs a native speaker's check (open question 3 in `docs/progress.md`).
+- The acknowledgement email's Nepali wording needs a native speaker's check.
 - Backups stay on the same machine until the off-server copy is set up, once the host is known.
-- The staff panel is in English until NBI answers question 14 in `docs/clarification-questions.md`; `APP_LOCALE=ne` stays the public pages' default.
+- The staff panel is in English; `APP_LOCALE=ne` stays the public pages' default.
 - Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
-- The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are an open question (`docs/progress.md`).
+- The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are still to be agreed.
 - Notes, replies and documents are on the case page as tabs below the submission. The Administrator's menu has "Activity log": every case change, view, note, reply, document and sign-in, with who and when.
 - The public home page is a placeholder until the WP1 grievance form.

@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * How a grievance reached the company (A6). Kick-off default: clarification question 7.
+ * How a grievance reached the company (A6). Kick-off default until NBI confirms the list.
  */
 enum Channel: string implements HasLabel
 {

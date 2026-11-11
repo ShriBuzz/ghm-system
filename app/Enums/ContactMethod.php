@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * How a named complainant prefers to be contacted (P4). Kick-off default: clarification question 6.
+ * How a named complainant prefers to be contacted (P4). Kick-off default until NBI confirms the list.
  */
 enum ContactMethod: string implements HasLabel
 {
