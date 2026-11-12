@@ -57,6 +57,11 @@ class GrievanceObserver
             }
         }
 
+        // A case marked restricted reaches the people who can now see it, as a new restricted case does (U6).
+        if ($grievance->wasChanged('is_restricted') && $grievance->is_restricted) {
+            $grievance->alertStaff(AlertKind::Restricted);
+        }
+
         // The Administrators are told each time a case becomes Critical: it needs action the same day (U6).
         if ($grievance->wasChanged('priority') && $grievance->priority === Priority::Critical) {
             $grievance->alertStaff(AlertKind::Critical);

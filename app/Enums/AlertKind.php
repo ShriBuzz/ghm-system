@@ -8,6 +8,7 @@ namespace App\Enums;
 enum AlertKind: string
 {
     case NewCase = 'new_case';
+    case Restricted = 'restricted';
     case Message = 'message';
     case Critical = 'critical';
     case PastTarget = 'past_target';
