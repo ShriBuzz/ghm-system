@@ -49,8 +49,10 @@ class GrievanceObserver
             if ($grievance->wasChanged($field)) {
                 $plain = fn (mixed $value): mixed => $value instanceof BackedEnum ? $value->value : $value;
 
+                $reason = $field === 'manually_restricted' && $grievance->reasonNoteId !== null ? ['note_id' => $grievance->reasonNoteId] : [];
+
                 activity()->performedOn($grievance)->event($event)
-                    ->withProperties(['old' => $plain($grievance->getOriginal($field)), 'new' => $plain($grievance->getAttribute($field))])
+                    ->withProperties(['old' => $plain($grievance->getOriginal($field)), 'new' => $plain($grievance->getAttribute($field)), ...$reason])
                     ->log(str($event)->headline()->toString());
             }
         }

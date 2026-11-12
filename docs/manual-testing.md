@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 4, 7, 10 and 12 (the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 and 12 (a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -164,7 +164,8 @@ A grievance that came by phone, email, drop box, in person, letter, a meeting or
 | Open it, Assign | Only the Administrator and the officer are offered, never a focal person |
 | As the Administrator, open Cases | Every case. Search a reference number; filter by status, category, location or date |
 | Assign a named case to the focal person, then Mark restricted | The assignment is cleared, and the case leaves the focal person's list |
-| Remove restricted mark (Administrator only) | The focal person sees the case again |
+| Remove restricted mark (Administrator only) and press Submit with the Reason box empty | The dialog stays open: the reason is required |
+| Remove restricted mark again, write a reason, Submit | The focal person sees the case again. The reason is in its Notes tab, by the Administrator, and the activity log's "Restriction Changed" entry reads "yes → no. Reason: …" |
 | Settings → Categories → make "Wages and benefits" restricted | Its cases leave the focal person's list at once, past ones included |
 
 ## 6. Encryption in the database

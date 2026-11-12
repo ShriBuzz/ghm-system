@@ -10,8 +10,10 @@ use App\Models\Grievance;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The case page and the actions staff take on it (A3, A4, A5).
@@ -75,15 +77,22 @@ class ViewGrievance extends ViewRecord
                     }
                 }),
 
+            // The reason is kept as an internal note, encrypted; the activity log holds the note's ID (U5).
             Action::make('unrestrict')
                 ->label('Remove restricted mark')
                 ->authorize('removeRestriction')
                 ->visible(fn (Grievance $record): bool => $record->manually_restricted)
-                ->requiresConfirmation()
                 ->modalDescription(fn (Grievance $record): string => $record->category?->is_restricted
                     ? 'The case stays restricted, because its category is restricted.'
                     : 'Focal persons will see this case again.')
-                ->action(fn (Grievance $record) => $record->update(['manually_restricted' => false])),
+                ->schema([
+                    Textarea::make('reason')->label('Reason')->required()->maxLength(5000)->rows(3)
+                        ->helperText('Kept as an internal note on the case, so everyone who can see the case can read it, and shown in the activity log.'),
+                ])
+                ->action(fn (Grievance $record, array $data) => DB::transaction(function () use ($record, $data): void {
+                    $record->reasonNoteId = $record->notes()->create(['user_id' => $this->user()->id, 'body' => $data['reason']])->id;
+                    $record->update(['manually_restricted' => false]);
+                })),
         ];
     }
 

@@ -4,6 +4,7 @@ use App\Enums\Priority;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Filament\Resources\Grievances\Pages\CreateGrievance;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
@@ -61,6 +62,24 @@ it('logs status, priority, assignment and restriction changes with old and new v
     $assignments = Activity::where('event', 'assigned')->orderBy('id')->get()->map->properties->map->toArray()->all();
     expect($assignments)->toEqual([['old' => null, 'new' => $colleague->id], ['old' => $colleague->id, 'new' => null, 'reason' => 'assignee can no longer see the case']]);
 })->group('S6');
+
+it('logs the removal of a restriction with the ID of its reason note, and shows the reason on the log page', function () {
+    $case = Grievance::factory()->create(['manually_restricted' => true]);
+    $admin = signedInAs(Role::Administrator);
+
+    Livewire::test(ViewGrievance::class, ['record' => $case->getRouteKey()])
+        ->callAction('unrestrict', data: ['reason' => 'Reviewed with <b>HR</b>: not sensitive.']);
+
+    $entry = logged('restriction_changed');
+    $note = $case->notes()->sole();
+    expect($entry->causer_id)->toBe($admin->id)
+        ->and($entry->properties->toArray())->toEqual(['old' => true, 'new' => false, 'note_id' => $note->id])
+        // The log is not encrypted, so the reason itself stays in the encrypted note (S3).
+        ->and(json_encode($entry->properties))->not->toContain('Reviewed');
+
+    Livewire::test(ManageActivityLogs::class)
+        ->assertSee('yes → no. Reason: Reviewed with &lt;b&gt;HR&lt;/b&gt;: not sensitive.', false);
+})->group('S6', 'U5');
 
 it('logs notes, replies, uploads and document views', function () {
     Storage::fake('local');

@@ -90,17 +90,24 @@ it('lets a focal person mark a case restricted, then sends them back to the list
     expect($case->fresh()->is_restricted)->toBeTrue();
 })->group('A5');
 
-it('lets only the Administrator remove a restriction', function () {
+it('lets only the Administrator remove a restriction, with a reason kept as an internal note', function () {
     $case = Grievance::factory()->create(['manually_restricted' => true]);
 
     signedInAs(Role::RestrictedOfficer);
     viewCase($case)->assertActionHidden('unrestrict')->assertActionHidden('restrict');
 
-    signedInAs(Role::Administrator);
-    viewCase($case)->callAction('unrestrict');
+    $admin = signedInAs(Role::Administrator);
+    viewCase($case)->callAction('unrestrict', data: ['reason' => ''])->assertHasActionErrors(['reason' => 'required']);
+    expect($case->fresh()->is_restricted)->toBeTrue()
+        ->and($case->notes()->count())->toBe(0);
 
-    expect($case->fresh()->is_restricted)->toBeFalse();
-})->group('A5');
+    viewCase($case)->callAction('unrestrict', data: ['reason' => 'Reviewed: about wages, not harassment.'])->assertHasNoActionErrors();
+
+    $note = $case->notes()->sole();
+    expect($case->fresh()->is_restricted)->toBeFalse()
+        ->and($note->body)->toBe('Reviewed: about wages, not harassment.')
+        ->and($note->user_id)->toBe($admin->id);
+})->group('A5', 'U5');
 
 it('keeps a new assignment when the old assignee was loaded and can no longer see the case', function () {
     $old = User::factory()->create(['role' => Role::FocalPerson]);

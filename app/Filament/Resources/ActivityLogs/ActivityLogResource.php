@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\GrievanceNote;
 use App\Models\Holiday;
 use App\Models\User;
 use App\Support\BsDate;
@@ -100,7 +101,9 @@ class ActivityLogResource extends Resource
         };
 
         if ($properties->has('old') || $properties->has('new')) {
-            return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '');
+            return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '')
+                // A removed restriction's reason is an encrypted note; the log holds only its ID (U5).
+                .($properties->has('note_id') ? '. Reason: '.GrievanceNote::whereKey($properties->get('note_id'))->first()?->body : '');
         }
 
         return $properties->map(fn (mixed $value, string $key): string => $key.': '.(is_bool($value) ? ($value ? 'yes' : 'no') : $value))->implode(', ');
