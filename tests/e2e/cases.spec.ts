@@ -424,6 +424,36 @@ test.describe('administrator, working a case', () => {
         await expect(entry).toContainText(reference);
         await expect(entry).toContainText('Received → Under Investigation');
     });
+
+    test('removes a restricted mark only with a reason, kept as a note and shown in the activity log', { tag: ['@U5', '@A5', '@S6'] }, async ({ page }) => {
+        const reason = `Reviewed ${Date.now()}: about wages, not harassment.`;
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+
+        const mark = page.getByRole('alertdialog', { name: 'Mark restricted' });
+        await open(page.getByRole('button', { name: 'Mark restricted' }), headingOf(mark));
+        await mark.getByRole('button', { name: 'Confirm' }).click();
+        await expect(headingOf(mark)).toBeHidden();
+
+        // No reason, no removal: the browser keeps the dialog open on the empty field (the server refuses it too, in Pest).
+        const remove = page.getByRole('dialog', { name: 'Remove restricted mark' });
+        await open(page.getByRole('button', { name: 'Remove restricted mark' }), headingOf(remove));
+        await remove.getByRole('button', { name: 'Submit' }).click();
+        await expect(headingOf(remove)).toBeVisible();
+        expect(await remove.getByLabel('Reason').evaluate((field: HTMLTextAreaElement) => field.validity.valueMissing)).toBe(true);
+
+        await remove.getByLabel('Reason').fill(reason);
+        await remove.getByRole('button', { name: 'Submit' }).click();
+        await expect(headingOf(remove)).toBeHidden();
+        await expect(page.getByRole('button', { name: 'Mark restricted' })).toBeVisible();
+
+        await openTab(page, 'Notes');
+        await expect(page.getByRole('tabpanel', { name: 'Notes' })).toContainText(reason);
+
+        await activityLogOf(page, reference);
+        const entry = page.getByRole('row').filter({ hasText: 'Restriction Changed' }).filter({ hasText: 'yes → no' });
+        await expect(entry).toContainText(`Reason: ${reason}`);
+    });
 });
 
 test.describe('focal person, documents', () => {

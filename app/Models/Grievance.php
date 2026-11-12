@@ -41,6 +41,12 @@ class Grievance extends Model
     use HasFactory, RoutesNotifications;
 
     /**
+     * The internal note giving the reason a restriction was removed (U5), for the activity log
+     * entry of that save. Never a column: the log holds this ID, the note holds the text.
+     */
+    public ?int $reasonNoteId = null;
+
+    /**
      * The optional questions about the complainant (P6) and their options. Each column holds
      * the chosen code, encrypted; the form, the rules, the case page and the export read this list.
      *

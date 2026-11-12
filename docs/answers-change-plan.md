@@ -1,6 +1,6 @@
 # Change plan: the company's answers and Policy updates
 
-Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 4, 7, 10 and 12 of section 6 are built; the step status is in `docs/progress.md`. The work is WP4 (section 6). Step status goes in `docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
+Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 5, 7, 10 and 12 of section 6 are built; the step status is in `docs/progress.md`. The work is WP4 (section 6). Step status goes in `docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
 
 **Decision, 2026-11-12: answers first.** The project lead chose to build now what answers our own clarification questions, together with what the company added while answering them. Everything that answers no question we asked is a new requirement, held until scope and price are agreed with NBI. Section 3 marks each ID's track. Section 6, "Answers first", has the items, the defaults for the conflicts and what to tell the company.
 

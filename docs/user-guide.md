@@ -119,7 +119,7 @@ A message from the complainant never changes the status. If a closed case needs 
 **Mark restricted.** Use it when a case should be seen only by restricted-case officers and the Administrator, for example when it turns out to involve harassment.
 
 - **You lose access at once.** As soon as you confirm, the case leaves your list.
-- **You cannot undo it.** Only the Administrator can remove the mark.
+- **You cannot undo it.** Only the Administrator can remove the mark, and must give a reason. The reason is kept as an internal note on the case, in the **Notes** tab, so you can read why once the case is back in your list.
 
 ## 6. Grievances received offline
 
