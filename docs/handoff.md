@@ -14,7 +14,7 @@ Last updated 2026-11-12: the company's answers and the brief of its Policy and S
 | WP2 steps 7, 9, 11: notes, replies, documents, activity log, review, walk, traceability | Merged (pull request #6) |
 | WP1 Public side | Steps 1 to 5 (form, reference and PIN page, spam protection) merged in pull request #11. Steps 6 and 7 (status page, #12) and 8 and 9 (QR poster, Impeccable critique and audit fixes, walks, `DESIGN.md`, #13) were merged into their stacked branches, not `main`; #14 from `wp1/land-steps-6-9` brings them to `main`. It uses `StoreGrievanceRequest::caseRules()`, `ReferenceNumber`, `Pin` and `AttachmentStore`, and after saving a case call `$case->acknowledge($pin)` (P7, N2) |
 | WP3 Alerts, reports, security | Merged (pull requests #7 to #9), then the `/ponytail-audit` fixes (WP3 step 12, branch `wp3/audit-fixes`). Still open: the timed restore drill on staging, the off-server backup copy, the S8 recipients |
-| WP4 The company's answers and Policy updates | Planned 2026-11-12, not started. Decided the same day: answers first. The answers to our clarification questions, and what the company added while answering them, are built now (about 5.5 working days); the new requirements are held until scope and price are agreed. New IDs U1 to U16, follow-up questions C1 to C27 |
+| WP4 The company's answers and Policy updates | Planned 2026-11-12, not started. Decided the same day: answers first. The answers to our clarification questions, and what the company added while answering them, are built now, with the brief's public page text (about 6 working days); the new requirements are held until scope and price are agreed. New IDs U1 to U16, follow-up questions C1 to C27 |
 
 Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which requirement is where, in `docs/requirements-traceability.md`.
 
@@ -24,7 +24,7 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 2. WP4. The company answered most clarification questions on 2026-11-12 and sent the updates from its Policy and SOP. `docs/answers-change-plan.md` sets out what each answer changes and how big the change is, with the new IDs U1 to U16, the follow-up questions C1 to C27 and the answers-first plan. Before building:
    - decided 2026-11-12: answers and the company's additions first, starting with step 1 on `wp4/answers-lists` (the WP4 table in `docs/progress.md`); the new requirements stay held until scope and price are agreed (open question 7);
    - the follow-up questions go to the company;
-   - the three PDFs and the brief's Word file in `docs/` stay untracked, because the repository is public and they name staff (open question 9).
+   - the three PDFs and the two Word files in `docs/` stay untracked: the repository is public, they are the company's internal documents, and the brief names staff (open question 9).
 
    Until a step is built, the code follows the assumptions in `docs/clarification-questions.md`. The requirement wording for U1 to U16 is at the end of `docs/rfq-requirements.md`.
 3. The staging deploy (plan: 16 to 18 Nov) follows `docs/deploy.md`, rehearsed locally (WP3 step 11), once the host is known; its section 1 checks the host first, PHP 8.4.1 included. `docs/restore.md` was run end to end locally (WP3 step 10). The timed restore drill on staging (S7, X2) and the off-server backup copy follow once hosting is known (question 1); the S8 recipients at kick-off.

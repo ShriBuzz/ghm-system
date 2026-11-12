@@ -105,7 +105,7 @@ The RFQ rows above stay word for word. Where an update below changes an RFQ row,
 - U1 to U11 are the brief's own table "Updates since the RFQ", word for word.
 - U12 to U16 quote the brief's later sections and the answers.
 - Questions about differences between the documents are with the company; until they answer, the "Open" notes below say what is unsettled.
-- Nepali strings were retyped from the documents' page images, because their text does not copy correctly. On 2026-11-12, every string the brief contains was checked against the company's Word file of the brief, and all match. Where the answers and the brief differ, both versions are shown below. The answers' version is not checked yet: their text has to come from the WhatsApp messages.
+- Nepali strings were first retyped from the documents' page images, because their text does not copy correctly. On 2026-11-12, every one was checked against the company's Word files of the brief and of the answers, and all match. Where the answers and the brief differ, both versions are shown below; both are the company's own wording.
 
 | ID | Change (brief, section 1, word for word) | Where it applies | Brief section |
 | --- | --- | --- | --- |
@@ -284,5 +284,14 @@ After submitting:
 > अब के हुन्छ: गुनासो दर्ता हुनासाथ तपाईंले सन्दर्भ नम्बर पाउनुहुनेछ। गुनासो अघि बढाउन सकिने वा नसकिने बारे ७ कार्यदिनभित्र जानकारी दिइनेछ। गुनासोको प्रकृतिअनुसार धेरैजसो गुनासो १५ देखि ४५ कार्यदिनभित्र समाधान गरिन्छ। तपाईं जुनसुकै बेला प्रगति हेर्न सक्नुहुन्छ, र समाधान चित्त बुझ्यो कि बुझेन भनेर हामी तपाईंसँग सोध्नेछौं।
 >
 > यो सेवा निःशुल्क हो। यसको प्रयोग गर्दा तपाईंलाई प्रहरी, श्रम कार्यालय, राष्ट्रिय आयोग वा अदालतमा जानबाट रोकिँदैन।
+
+The answers give the confidentiality notice as one block, in this order:
+
+1. the heading and the four points above;
+2. the "What happens next" paragraph;
+3. the "Free, and your rights stay with you" paragraph;
+4. "In immediate danger? Call the police on 100."
+
+The brief splits the same text between the notice, the top of the page and the page after submitting. The Nepali follows the same order, without a lead-in phrase before "यो सेवा निःशुल्क हो।"
 
 Open: P3 asks the notice above the form to cover what happens next, which the brief places only after submitting (the answers put it in the notice); and the Nepali "What happens next" has a first sentence the English lacks. Both asked.

@@ -25,8 +25,10 @@ Two facts that affect everything below:
   - The PDFs were written in Word with Mangal, a Unicode Nepali font, and turned into PDFs with macOS's "Save as PDF", which loses the mapping for joined letters. The original Word files therefore hold clean Nepali text.
   - Get the `.docx` files, or text copied straight from WhatsApp messages; a re-saved PDF does not help.
   - Keep the files untracked, like the PDFs. The agent compares them with the retyped strings and lists every correction before they go into the language files or the seeder.
-  - Checked 2026-11-12: the brief's Word file (`docs/Brief_NEEKs_Digital_Grievance_Handling_System.docx`, untracked) holds clean Unicode Nepali. All 118 Nepali strings in `docs/rfq-requirements.md` that the brief contains match it exactly, so none needed correcting.
-  - Six strings appear only in the WhatsApp answers and stay unchecked until their text arrives (section 6, "Answers first"). The Word file also names staff, so it stays out of git like the PDFs.
+  - Checked 2026-11-12 against both Word files, `docs/Brief_NEEKs_Digital_Grievance_Handling_System.docx` and `docs/responses_to_whatsapp_queries.docx`. Both are untracked and hold clean Unicode Nepali.
+  - All 124 of the company's Nepali strings in `docs/rfq-requirements.md` match one of the files exactly, so none needed correcting. The only other Nepali there is our three old draft status labels, kept for comparison.
+  - The WhatsApp Word file says the same as its PDF and adds no requirement this plan lacks. Its Nepali age groups use a hyphen (१८-२४) where the brief uses an en dash (१८–२४). The en dash stays, as in the code today.
+  - Both files are the company's internal documents, and the brief's names staff, so they stay out of git like the PDFs.
 - **The repository is public** (checked 2026-11-12), and the Brief names staff members and describes internal policy. Keep the three PDFs out of git (section 5). This file and the other docs name roles, never people.
 
 ## How impact is rated
@@ -268,9 +270,18 @@ What changes (U10):
 
 P3 check: P3 asks the notice above the form to cover "what happens next". The Brief puts "What happens next" only on the page after submitting, while the WhatsApp version has it inside the notice. To keep P3, the plan shows that paragraph in the notice too (C7).
 
-Impact: **Medium**, half a day to a day. These are public pages with design and accessibility checks, but the work is mostly text. Scope: Answer for the notice (P3), which goes in now as data. The page title, received page, status page title, emergency line at the top and "other ways" come from the brief's section 7, which answers no question we asked: New, and held.
+Impact: **Medium**, half a day to a day. These are public pages with design and accessibility checks, but the work is mostly text. Scope: Answer for the notice (P3), which goes in now as data. The page title, received page, status page title, emergency line at the top and "other ways" come from the brief's section 7, which answers no question we asked: New. The project lead moved them into the answers track on 2026-11-12 (next paragraph).
 
-Open: C7, C8 (the Nepali "What happens next" has a sentence the English lacks), C11 (source files for the Nepali), C12 (hotline number and email).
+Open: C7, C8 (the Nepali "What happens next" has a sentence the English lacks), C12 (hotline number and email). C11 is settled: both Word files arrived.
+
+The WhatsApp answers say "The confidentiality notice and other page text will follow separately", and the Brief then supplied that other text. So the company expects it to be used. It answers no question we asked, but the project lead moved it into the answers track on 2026-11-12 (item 18 in section 6).
+
+The estimate:
+
+- the wording (page title, received page, status page title) is 1 to 2 hours;
+- the two new page elements (the emergency line at the top and the "other ways" block) add 2 to 3 hours, with the public-page design and accessibility checks.
+
+That makes about half a day in all.
 
 ### 1.8 Internal notifications (N1, question 13)
 
@@ -495,7 +506,7 @@ The question numbers are those in `docs/clarification-questions.md`. The WhatsAp
 | U7 | Export limits: users export only cases they can see; every export logged | N4, S6 | Yes | Built. Who may export waits on C6 | None | 0 to 2 hours |
 | U8 | Option lists and Nepali labels | P4, P5, P6, A4, A6, A7 | Placeholders | Answer (questions 2, 5, 6, 7 and 11): now | Small to Medium | 0.5 day |
 | U9 | Dates: BS on the Nepali form, AD on the English one, stored in AD, both on staff screens and in exports | P5, A2, A3, N4 | AD storage and Nepali default yes, BS no | Answer (question 8 asked about the form, staff screens and exports): now | Large | 2 days |
-| U10 | Public text: confidentiality notice and messages | P3, P7, P8 | The notice setting only | Answer for the notice (P3), entered as data: now. New for the page title, received page, status page title, emergency line and "other ways" (brief section 7): held | Medium | Entry now; 0.5 to 1 day held |
+| U10 | Public text: confidentiality notice and messages | P3, P7, P8 | The notice setting only | Answer for the notice (P3), entered as data: now. New for the page title, received page, status page title, emergency line and "other ways" (brief section 7), moved into the answers track by the project lead on 2026-11-12: now | Medium | Entry, plus about half a day |
 | U11 | Groups under 5 hidden in summaries | N3 | No | Addition (question 5): now | Small | 1 to 2 hours |
 | U12 | Status rules: a reply for Referred, a reason for Reopened, appeals | A3, A4 | No | New: held | Small to Medium | 0.5 day |
 | U13 | Dashboard indicators by quarter | N3 | Status and category counts only | New: held | Large | 1 to 1.5 days |
@@ -505,8 +516,8 @@ The question numbers are those in `docs/clarification-questions.md`. The WhatsAp
 
 Totals:
 
-- Now (answers and additions): about 5.5 working days.
-- Held (new): about 6 to 7 days, plus 2 for the structured feedback form and 2 to 3 for a Nepali panel.
+- Now (answers, additions and the brief's public text): about 6 working days.
+- Held (new): about 5.5 to 6.5 days, plus 2 for the structured feedback form and 2 to 3 for a Nepali panel.
 
 Docs and the walks are included.
 
@@ -523,7 +534,7 @@ Before the plan was committed, each held item was checked against the RFQ's sect
 | U13, dashboard indicators | N3: "number of cases by status and by category, for a chosen date range" | New: location, channel, complainant type, sex and age group breakdowns, resolution time, share within target, extensions, reopened, feedback, quarters. N3's own counts and date range are built |
 | U14, export columns other than the dates | N4: reference, dates received and closed, channel, category, location, priority, status, the five About-you fields; names only if the Administrator chooses | New: date of each status change, resolved date, days taken, within target, extension, reopened, a restricted mark, feedback answers. N4's columns are built |
 | U15, retention and deletion | Nothing on keeping or deleting case records (S7 is about backups) | New |
-| U10, the brief's other public text | P3: the notice above the form on confidentiality, no retaliation and what happens next. P7: the reference and PIN "with advice to note them down" | New as content. The emergency line and "other ways" are new elements. The page title, received page and status page wording replace our own text on pages the RFQ already has (P1, P7, P8); the function is built |
+| U10, the brief's other public text | P3: the notice above the form on confidentiality, no retaliation and what happens next. P7: the reference and PIN "with advice to note them down" | New as content. The emergency line and "other ways" are new elements. The page title, received page and status page wording replace our own text on pages the RFQ already has (P1, P7, P8); the function is built. Moved into the answers track on 2026-11-12 |
 | A Nepali staff panel | P2's language switch sits under "3.1 Public side" only | New |
 | Note kinds | Not a requirement: they are what U2, U4 and U12 need | Held with them |
 
@@ -531,7 +542,7 @@ Result:
 
 - Every held item is new in its held part.
 - Where a held ID overlaps the RFQ, that part (A2's 15 days, N3's counts, N4's columns, P8's replies) is already built. So holding them leaves no RFQ requirement unmet.
-- The additions built now (U5's reason, U11, U6's Critical and past-target alerts, and the Nepali names in U16) are also beyond the RFQ. They are built because the company asked for them while answering our questions, and each is small.
+- The additions built now (U5's reason, U11, U6's Critical and past-target alerts, and the Nepali names in U16) are also beyond the RFQ. They are built because the company asked for them while answering our questions, and each is small. So is the brief's public text (U10), which the project lead moved in because the answers announced it.
 - The RFQ never mentions Bikram Sambat, so U9 is not an RFQ requirement either. It is built because our question 8 offered it and the company answered.
 
 ## 4. Conflicts and questions for the company
@@ -548,7 +559,7 @@ Before production (stored codes and public text):
 - **C7.** P3 asks the notice above the form to say what happens next. May the "What happens next" paragraph appear in the notice above the form as well as after submitting?
 - **C8.** The Nepali "What happens next" adds "as soon as the grievance is registered you will get a reference number", which the English lacks. Keep it, or match the English?
 - **C9.** The Brief refers to "section 9" for caste/ethnicity and disability, but has no section 9. What does it say?
-- **C11.** The Nepali text in the PDFs cannot be copied without garbling. The Brief's Word file has arrived (2026-11-12). Please send the WhatsApp answers' text too, copied from the messages or as a Word file, not a PDF.
+- **C11.** Settled 2026-11-12: the Word files of the Brief and of the WhatsApp answers arrived, and every Nepali string was checked against them. Nothing to send.
 - **C12.** The hotline number and the grievance email address for "Other ways to raise a grievance".
 
 Rules (decide the code):
@@ -575,8 +586,8 @@ Still open from the first questions: 1 (hosting; staging is planned for 16 to 18
 ## 5. Decisions for the project lead
 
 - **Scope and price.** The RFQ is fixed price, and items marked New in section 3 are new requirements from the Policy and SOP. Plan section 11 says: "anything new is logged as a change request outside the fixed price". Decide which new items go in at no charge, which become change requests, and which wait for support. Decided for now (2026-11-12): the answers and the company's additions to them go first, and the new items wait (section 6, "Answers first").
-- **Timeline.** About 3.5 working days remain before the 18 Nov test version (12, 13, 16 and 17 Nov: 14 Nov is a Saturday and 15 Nov is Chhath). About 5 more remain before go-live on 27 Nov, and those also hold UAT, fixes, training on 25 Nov and the production deploy. The full list takes 10 to 12 days, so not everything fits. The answers track is about 5.5 days, ordered in section 6. The RFQ asks the vendor to tell NBI at once if a date is at risk.
-- **The PDFs and the public repository.** The repository is public, and the Brief names staff and holds internal policy. Do not commit the three PDFs, or the Brief's Word file, while the repository is public. Keep them in the vendor's private workspace, or make the repository private first (open question 2 in `docs/progress.md`). Until then, keep them untracked.
+- **Timeline.** About 3.5 working days remain before the 18 Nov test version (12, 13, 16 and 17 Nov: 14 Nov is a Saturday and 15 Nov is Chhath). About 5 more remain before go-live on 27 Nov, and those also hold UAT, fixes, training on 25 Nov and the production deploy. The full list takes 10 to 12 days, so not everything fits. The answers track is about 6 days, ordered in section 6. The RFQ asks the vendor to tell NBI at once if a date is at risk.
+- **The PDFs and the public repository.** The repository is public, and the Brief names staff and holds internal policy. Do not commit the three PDFs, or the two Word files, while the repository is public. Keep them in the vendor's private workspace, or make the repository private first (open question 2 in `docs/progress.md`). Until then, keep them untracked.
 - **The shared plan doc.** `docs/implementation-plan.md` now has a section 12 that the shared plan doc lacks. Add it there before the file is next regenerated.
 - **Design choices made in this plan**, to confirm or veto before WP4 starts:
   - target days copied onto each case at creation;
@@ -602,7 +613,9 @@ The project lead's decision:
 
 Section 3's Track column marks each ID. The question wording that counts is `docs/client-discussion.md`'s, which the WhatsApp answers follow.
 
-The track takes the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 and 12 in the full list below, and keeps their step numbers. It is about 5.5 working days.
+On 2026-11-12 the project lead also moved the brief's public page text (U10) into the track, because the answers announced it (item 18).
+
+The track takes the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 and 12 in the full list below, and keeps their step numbers. It is about 6 working days.
 
 | # | Change | Why now | Step, branch | Estimate |
 |---|---|---|---|---|
@@ -614,7 +627,7 @@ The track takes the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 
 | 6 | The count restarts from the reopening date (`reopened_at`), in the observer and the nightly recount | Answer, question 10 | 2, `wp4/working-days` | 2 hours |
 | 7 | Holidays: focal persons may add and edit them, and holiday changes go into the activity log so the Administrator can check them | Answer, question 10 | 2 | 1 to 2 hours |
 | 8 | Bikram Sambat incident date on the Nepali form: `BsDate`, the BS selects, conversion before validation, and a month-only BS date shown as a BS month on the case page | Answer, question 8 | 3, `wp4/bs-incident-date` | 1 day |
-| 9 | The notice from the WhatsApp answers entered in Settings: its heading, four points, what happens next, the free service and the police line. Covers P3 with no code | Answer, P3 | 4, data entry at each deploy | Entry only |
+| 9 | The notice from the WhatsApp answers entered in Settings: its heading, four points, what happens next and the free service. Its police line moves to the top of the page (item 18), so it is not shown twice. Covers P3 with no code | Answer, P3 | 4, data entry at each deploy | Entry only |
 | 10 | A reason when the Administrator removes a restriction, kept as an internal note; the activity log holds the note's ID, never the text (note kinds stay held) | Addition, question 12 | 5, `wp4/unrestrict-reason` | 2 hours |
 | 11 | The Administrator is alerted when a restricted case arrives and no active restricted-case officer exists | Answer, question 13 | 7, `wp4/alerts` | 2 hours |
 | 12 | A complainant message on a case with an active assignee who can see it alerts the assignee only; otherwise the same people as a new case | Answer, question 13 | 7 | 2 to 3 hours |
@@ -623,30 +636,33 @@ The track takes the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 
 | 15 | BS with AD alongside on staff screens: case list, case page, notes, messages, activity log and holidays; date inputs stay AD | Answer, question 8 | 10 | half a day |
 | 16 | Export: the Received and Closed dates in both AD and BS | Answer, question 8 | 12, `wp4/export-dates` | 2 to 3 hours |
 | 17 | Summary: counts from 1 to 4 shown as "<5" | Addition, question 5 | 11, `wp4/summary-small-groups` | 1 to 2 hours |
+| 18 | The brief's public page text (section 7): the page title "Raise a grievance", the received page's wording, the status page title, the emergency line "In immediate danger? Call the police on 100." at the top of every public page, and the "other ways to raise a grievance" block on the form page. Our hints that protect the PIN on a shared phone stay | New, moved in by the project lead (the answers announced it) | 4, `wp4/public-text` | about half a day: wording 1 to 2 hours, the two new elements 2 to 3 |
 
 Order. Each step follows the definition of done in `CLAUDE.md`.
 
 1. Aim to finish before the 18 Nov test version: steps 1, 3, 2, 10 and 12 (items 1 to 8 and 14 to 16), about 3.5 days. Whatever does not fit moves to the UAT window.
-2. In the UAT window: steps 7, 5 and 11 (items 10 to 13 and 17), about 1.5 days.
+2. In the UAT window: steps 7, 5, 11 and 4 (items 10 to 13, 17 and 18), about 2 days. Step 4 moves before 18 Nov if there is room, since testers see the public pages first.
 3. Item 9 is entered on staging at its deploy, and in production at go-live.
 4. Then step 16 closes the track.
 
 Defaults where the documents disagree, or a rule is not settled. Each can change before go-live; only C1 touches stored codes, and only fake data exists until then.
 
 - C1: three separate options (Trade union; Worker representative; Civil society organisation), as in the answers.
-- C2 to C5: the WhatsApp answers' Nepali wording. Those strings are still retyped from the PDF; the brief's versions are confirmed by its Word file (C11).
+- C2 to C5: the WhatsApp answers' Nepali wording. The company's Word files confirm both versions, so these are real differences between its two documents, not typing slips.
 - C7: "what happens next" sits in the notice above the form, as the answers have it and as P3 requires.
 - C9: build the lists as given, and revisit them when the company sends its section 9.
 - C15: focal persons may add and edit holidays; deleting one stays with the Administrator.
 - C20: with "Do not contact me", the acknowledgement is still emailed if an email was given, as P7 requires.
 - C21: a message on a case assigned to the Administrator alerts the Administrator. A message on a restricted case while no restricted-case officer is active also alerts the Administrator, as a new case does.
 - C22: a 0 shows as 0; only counts from 1 to 4 become "<5".
+- Item 18's placement, which the brief does not fix beyond "top of the page":
+  - The emergency line goes in the public layout, so every public page shows it, with 100 as a `tel:` link.
+  - The "other ways" block goes on the form page, below the form. It shows the company's text now; the hotline number and grievance email address are added when they arrive (C12).
 
 Held as new requirements (they answer no question we asked):
 
 - U1 (target days per category) and U2 (extensions). They came with the answer to question 10, but the company presents them as Policy changes after UNDP's feedback, and they change RFQ A2.
 - U4 (the feedback step and closure rule) and U12 (status rules), with the note kinds they need.
-- U10's page title, received page and status page wording, the emergency line at the top of the page, and the "other ways" block (brief section 7; "other ways" also waits on C12).
 - U13 (dashboard indicators), and U14's columns other than the two dates.
 - U15: the 5-year rule and the delete action (question 15 was not in the WhatsApp set).
 - A Nepali staff panel (question 14: "English is fine").
@@ -655,15 +671,6 @@ Tell the company, while the new items are held: every open case is flagged after
 
 Waiting, without blocking the track:
 
-- The WhatsApp answers' own text (C11). The brief's Word file arrived on 2026-11-12, and every Nepali string taken from the brief matches it. Six strings appear only in the WhatsApp answers and are still retyped from the PDF image:
-  - भन्न चाहँदिन;
-  - करार कामदार, जस्तै सुरक्षाकर्मी, सरसफाई, चालक आदि;
-  - के तपाईं अपाङ्गता भएको व्यक्ति हुनुहुन्छ?;
-  - भूमि तथा प्राकृतिक स्रोत;
-  - अन्यत्;
-  - घटना कतिपटक भएको हो?
-
-  Check them against the WhatsApp text before go-live, or use the brief's confirmed wording instead.
 - The Bikram Sambat month-length table, checked against the published calendar before item 8 is merged.
 - Questions 1 and 3 (hosting, email), which staging needs; questions 4 and 16; C12 (the hotline number and email address).
 

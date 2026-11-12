@@ -110,19 +110,19 @@ The plan is `docs/answers-change-plan.md` (2026-11-12). It covers:
 
 Decided 2026-11-12: **answers first**, widened the same day.
 
-- **Built now:** what answers our own clarification questions, and what the company added while answering them, on the same topic. That is the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 and 12, then step 16: about 5.5 working days, on branches `wp4/<slug>` from `main-backup`.
-- **Order:** steps 1, 3, 2, 10 and 12 aim for the 18 Nov test version (about 3.5 days). Steps 7, 5 and 11 follow in the UAT window (about 1.5 days).
+- **Built now:** what answers our own clarification questions, and what the company added while answering them, on the same topic. That is the answer and addition parts of steps 1, 2, 3, 4, 5, 7, 10, 11 and 12, then step 16. Also the brief's public page text (U10), moved in by the project lead on 2026-11-12 because the answers announced it. About 6 working days, on branches `wp4/<slug>` from `main-backup`.
+- **Order:** steps 1, 3, 2, 10 and 12 aim for the 18 Nov test version (about 3.5 days). Steps 7, 5, 11 and 4 follow in the UAT window (about 2 days); step 4 moves earlier if there is room.
 - **Held as new requirements:** everything that answers no question we asked, until scope and price are agreed with NBI (open question 7).
 
-The change plan's section 6, "Answers first", has the 17 items, the defaults for the conflicts and what to tell the company. Its section 3 marks each ID's track.
+The change plan's section 6, "Answers first", has the 18 items, the defaults for the conflicts and what to tell the company. Its section 3 marks each ID's track.
 
 | Step | Work | IDs | Track | Status | Commit or note |
 |---|---|---|---|---|---|
-| 0 | Change plan; requirement, traceability, question and plan docs updated; held items checked against the RFQ | U1 to U16 | | Done | Branch `wp4/change-plan`. Every held item is new in its held part (change plan, section 3). The PDFs and the Word file stay untracked (open question 9) |
+| 0 | Change plan; requirement, traceability, question and plan docs updated; held items checked against the RFQ | U1 to U16 | | Done | Branch `wp4/change-plan`. Every held item is new in its held part (change plan, section 3). Nepali checked against both Word files. The PDFs and the Word files stay untracked (open question 9) |
 | 1 | The company's lists and labels: About-you options, channels, Nepali status labels, "Do not contact me", the wording of how often and of anonymous or named; the 19 categories (two restricted) and 3 locations in the seeder, which may then run in production | U8, U5, A4, A6, P4, P6 | Answers | Not started | Branch `wp4/answers-lists`. No target days (held with U1). Defaults: C1 three options, C2 to C5 the WhatsApp wording, C20 the acknowledgement still sent |
 | 2 | Working days: the count restarts from the reopening date; focal persons may add and edit holidays, and holiday changes are logged | U3, A2, A7 | Answers, in part | Not started | Branch `wp4/working-days`. Question 10. Held: the target time per category (U1). Default C15: deleting a holiday stays with the Administrator |
 | 3 | `BsDate` and the Nepali form's incident date in Bikram Sambat, with a month-only BS date shown as a BS month on the case page | U9, P5 | Answers | Not started | Branch `wp4/bs-incident-date`. Check the BS table against the published calendar before merging |
-| 4 | Public text: the notice from the WhatsApp answers entered in Settings | U10, P3 | Answers, in part | Not started | Data, entered at each deploy; no branch. Held: the page title, received page and status page wording, the emergency line at the top and the "other ways" block (brief section 7; C12) |
+| 4 | Public text: the notice from the WhatsApp answers entered in Settings, without its police line; the brief's page title, received page and status page wording; the emergency line at the top of every public page; the "other ways" block on the form page | U10, P3 | Answers, and the brief's text moved in | Not started | Branch `wp4/public-text`, about half a day. The notice is data, entered at each deploy. Our PIN safety hints stay. The hotline number and email address wait on C12 |
 | 5 | A reason when the Administrator removes a restriction, kept as an internal note; the activity log holds the note's ID | U5, S6 | Addition, in part | Not started | Branch `wp4/unrestrict-reason`. Question 12. Held: note kinds (needed by U2, U4, U12) |
 | 6 | Due-date extension by the Administrator | U2 | Held: new | Not started | C17 |
 | 7 | Alerts: messages to the assignee only; the Administrator alerted for a restricted case with no active restricted-case officer, a Critical case, and an open case past its target (15 working days until U1), once per crossing | U6, N1 | Answers and additions | Not started | Branch `wp4/alerts`. Question 13. Default C21: the Administrator gets messages on cases assigned to them, and on restricted cases while no restricted-case officer is active |
@@ -136,10 +136,10 @@ The change plan's section 6, "Answers first", has the 17 items, the defaults for
 | 15 | Retention: the 5-year rule and the delete action | U15 | Held: new | Not started | Question 15 was not in the WhatsApp set. C27 |
 | 16 | Close the answers track: docs, schema, walk per role, `/ponytail-review`, traceability, sync to `main` | all | Answers | Not started | |
 
-Nepali text:
+Nepali text, checked 2026-11-12 against the company's Word files of the brief and of the WhatsApp answers:
 
-- The brief's Word file arrived on 2026-11-12, and every Nepali string in `docs/rfq-requirements.md` that the brief contains matches it exactly.
-- Six strings come only from the WhatsApp answers and are still retyped from the PDF image (listed in the change plan, section 6). Check them against the WhatsApp text before go-live, or use the brief's confirmed wording (C11).
+- Every one of the company's Nepali strings in `docs/rfq-requirements.md` matches them, so steps 1 and 4 can use the strings as they are (C11 settled).
+- The WhatsApp Word file says the same as its PDF and adds no requirement the plan lacks.
 
 ## Open questions for the project lead
 
@@ -152,12 +152,12 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 5. Ten accepted grievances an hour per network (`GHM_SUBMISSIONS_PER_HOUR`) was chosen for shared factory Wi-Fi. The day a canteen poster goes up, more than ten workers may send from one Wi-Fi within the hour; the 11th is asked to wait. Raise it before posters go up, or ask NBI how many people share one connection?
 6. The reply and note dialogs submit with Filament's default "Create" (and offer "Create & create another"); the user guide says "press Create". "Send reply" and "Save note", without the second button, would read better for focal persons. Change it before UAT?
 7. Scope and price (2026-11-12): the company's updates marked "New" in section 3 of `docs/answers-change-plan.md` are requirements the RFQ did not have. The contract is fixed price, and the plan's risk table says new items are logged as change requests. Which go in at no charge, which become change requests, and which wait for support?
-8. Timeline: all of WP4 is about 10 to 12 working days. About 3.5 remain before the 18 Nov test version (14 Nov is a Saturday and 15 Nov is Chhath), and about 5 more before go-live, which also hold UAT, training and the production deploy. The answers track (about 5.5 days, decided 2026-11-12) aims to put steps 1, 2, 3, 10 and 12 in the 18 Nov test version, and steps 5, 7 and 11 in the UAT window. When the new items are built is still to agree with NBI; tell NBI now if a date is at risk, as the RFQ asks.
-9. The three PDFs added to `docs/`, and the brief's Word file (`docs/Brief_NEEKs_Digital_Grievance_Handling_System.docx`), name staff members and hold the company's internal policy, and the repository is public (question 2). Keep them untracked, or in the vendor's private workspace, at least until the repository is private. Add `docs/*.pdf` to `.gitignore`?
+8. Timeline: all of WP4 is about 10 to 12 working days. About 3.5 remain before the 18 Nov test version (14 Nov is a Saturday and 15 Nov is Chhath), and about 5 more before go-live, which also hold UAT, training and the production deploy. The answers track (about 6 days, decided 2026-11-12) aims to put steps 1, 2, 3, 10 and 12 in the 18 Nov test version, and steps 4, 5, 7 and 11 in the UAT window. When the new items are built is still to agree with NBI; tell NBI now if a date is at risk, as the RFQ asks.
+9. The three PDFs and the two Word files added to `docs/` (`Brief_NEEKs_Digital_Grievance_Handling_System.docx`, `responses_to_whatsapp_queries.docx`) are the company's internal documents, the brief names staff members, and the repository is public (question 2). Keep them untracked, or in the vendor's private workspace, at least until the repository is private. Add `docs/*.pdf` and `docs/*.docx` to `.gitignore`?
 10. `docs/implementation-plan.md` gained a section 12 that the shared plan doc does not have. Add it to the shared doc before the Markdown copy is regenerated.
 11. `CLAUDE.md` now puts the updates U1 to U16 next to the RFQ in the order of authority, and scopes the work to the updates the project lead accepts. Confirm.
 12. Send the follow-up questions C1 to C26 (change plan, section 4) to the company. C27 (build the retention delete now, or only document it) is ours to decide.
-    - The brief's Word file has arrived. Ask for the WhatsApp answers' text too, copied from the messages (C11), so the six strings found only there can be checked.
+    - C11 is settled: the Word files of the brief and of the WhatsApp answers arrived, and every Nepali string matches them. C11 no longer needs sending.
     - Tell the company that while U1 is held, every open case is flagged after 15 working days, including cases in the 30- and 45-day categories, and the Administrator's past-target alert uses the same 15 days.
 
 ## Decisions
@@ -170,7 +170,8 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 - Handover split, decided 2026-11-11. The client gets a zip of `main` (`git archive`), without git history. `main-backup` (made from `8d8c0a4`) holds everything and is where work continues. `main` is `main-backup` without the dev-only files (agent tooling and the internal docs) and changes only through `scripts/sync-main.sh` and a pull request merged with a merge commit; the first cleanup of `main` was a direct commit, by the project lead's choice. The tests, Playwright and CI ship with the code; `laravel/pao` was removed; the breach-report template and production-access log stay vendor-side. Rules in `CLAUDE.md` (Branching), steps in `docs/handoff.md` (Branches and sync).
 - WP4, decided 2026-11-12: answers first.
   - Build now what answers our own clarification questions, and what the company added while answering them on the same topic: steps 1, 2, 3, 4, 5, 7, 10, 11 and 12, some in part, then 16.
-  - Hold everything that answers no question we asked as a new requirement, until scope and price are agreed with NBI. That covers U1, U2, U4, U12, U13, U15, U10's brief-only text, U14's other columns and a Nepali staff panel.
+  - Hold everything that answers no question we asked as a new requirement, until scope and price are agreed with NBI. That covers U1, U2, U4, U12, U13, U15, U14's other columns and a Nepali staff panel.
+  - The brief's public page text (U10) answers no question we asked either. The project lead moved it into the track the same day, because the answers announced it and it is about half a day.
   - Where the company's two documents disagree, use the WhatsApp answers until the company says otherwise (C1 to C5).
   - The question wording that counts is `docs/client-discussion.md`'s, which the WhatsApp answers follow.
 - Handover docs, decided 2026-11-11: the source goes over as a zip only, so the RFQ's "repository credentials" are not applicable and the credentials sheet says so; the focal-person guide is English first, Markdown in `docs/` with screenshots, and the Nepali edition follows; the credentials sheet stays vendor-side like the breach-report template; `README.md` is the package index.

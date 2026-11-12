@@ -548,7 +548,7 @@ They add 16 requirements, U1 to U16. U1 to U11 are the brief's own "Updates sinc
 | 2 | UAT window, if NBI agrees, otherwise after go-live | Note kinds and reasons; extensions; alerts; status rules; feedback due and the closure rule; both languages and BS dates on the case page; "<5" in the summary |
 | 3 | After go-live, as change requests or support | Export contents; dashboard indicators; the optional structured feedback form; retention |
 
-Decided 2026-11-12, replacing these phases for now: the answers to our questions, and what the company added while answering them, are built first (about 5.5 working days). The new requirements wait until scope and price are agreed. The steps and their order are in the change plan, section 6, and the WP4 table in `docs/progress.md`.
+Decided 2026-11-12, replacing these phases for now: the answers to our questions, and what the company added while answering them, are built first, with the brief's public page text (about 6 working days). The new requirements wait until scope and price are agreed. The steps and their order are in the change plan, section 6, and the WP4 table in `docs/progress.md`.
 
 **New risks.**
 
