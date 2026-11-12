@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 and 12 (a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 to 12 ("<5" for small groups in the summary; a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -186,6 +186,7 @@ Carry on with the users and cases from section 5.
 | Try | Expect |
 |---|---|
 | Summary in the menu, as each role | Cases received this month, counted by status and by category. The focal person's counts leave out restricted cases, the officer's count only those, the Administrator's count all |
+| Look at the counts on Summary | A count from 1 to 4 shows as "<5"; 0 shows as 0, 5 or more as the number. The line above the tables ("N cases received in this period.") is exact |
 | On Summary, set the end date before the start date | An error, and no counts |
 | Cases → Export as the focal person: this month, CSV | A file of the cases they can see: reference, received and closed dates, channel, category, location, priority, status and the five demographic columns. Each date has an AD column with the time and a BS column with the date; the BS date matches the one on the case page, and an open case's closed columns are empty. No names or contacts, and no option to add them |
 | The same as the Administrator, with "Include names and contact details" on | Name, phone and email columns after the reference. Opened in Excel or Numbers, Nepali text shows correctly |
