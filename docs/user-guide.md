@@ -72,6 +72,8 @@ Click a reference to open the case (picture 3).
 
 *Picture 3: a case page. The actions are at the top right.*
 
+Complainants who use the Nepali form give the incident date in Bikram Sambat. The case page shows it in AD, or, when they did not remember the day, as the Bikram Sambat month, for example "Kartik 2083, exact day not remembered".
+
 **What the page shows.** Opening a case is recorded in the activity log. The page has four sections:
 
 - **Case:** reference, status, priority, who it is assigned to, dates and channel

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Grievances\Schemas;
 
 use App\Models\Grievance;
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -41,9 +43,12 @@ class GrievanceInfolist
                         TextEntry::make('category.name_en')->label('Category'),
                         TextEntry::make('location.name_en')->label('Location'),
                         TextEntry::make('incident_date')->label('When it happened')
-                            ->formatStateUsing(fn (Grievance $record): string => $record->incident_date_exact
-                                ? $record->incident_date->format('j M Y')
-                                : $record->incident_date->format('F Y').', exact day not remembered'),
+                            ->formatStateUsing(fn (Grievance $record): string => match (true) {
+                                $record->incident_date_exact => $record->incident_date->format('j M Y'),
+                                // A BS month straddles two AD months, so it is shown as the month the complainant chose (U9).
+                                $record->incident_date_calendar === 'bs' => self::bsMonth($record->incident_date).', exact day not remembered',
+                                default => $record->incident_date->format('F Y').', exact day not remembered',
+                            }),
                         TextEntry::make('recurrence')->label('How often'),
                         TextEntry::make('description')->columnSpanFull(),
                     ]),
@@ -73,5 +78,15 @@ class GrievanceInfolist
                         TextEntry::make('disability')->state(fn (Grievance $record) => $record->answerLabel('disability'))->placeholder('Not given'),
                     ]),
             ]);
+    }
+
+    /**
+     * A BS month and year, such as "Kartik 2083".
+     */
+    private static function bsMonth(CarbonInterface $date): string
+    {
+        [$year, $month] = BsDate::fromAd($date);
+
+        return __("bs_month.{$month}")." {$year}";
     }
 }

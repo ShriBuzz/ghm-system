@@ -72,6 +72,52 @@ it('words the identity, contact and frequency choices as the company does, in bo
         ->assertSee('तपाईं को हुनुहुन्छ?')->assertSee('जाति/जातीयता')->assertSee('भन्न चाहँदिन');
 })->group('P4', 'P5', 'P6', 'U8');
 
+/**
+ * The form as the Nepali page sends it: the incident date as a Bikram Sambat day, month and year.
+ *
+ * @return array<string, mixed>
+ */
+function nepaliFormInput(string $day, string $month, string $year): array
+{
+    return array_diff_key(formInput(), array_flip(['incident_day', 'incident_month', 'incident_year']))
+        + ['incident_bs_day' => $day, 'incident_bs_month' => $month, 'incident_bs_year' => $year];
+}
+
+it('asks for the incident date in Bikram Sambat on the Nepali form and in AD on the English one', function () {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->get('/ne')->assertOk()->assertSee('name="incident_bs_month"', false)->assertDontSee('name="incident_month"', false)
+        ->assertSeeInOrder(['बैशाख', 'कार्तिक', 'चैत'])->assertSee('<option value="2083" selected>', false);
+    $this->get('/en')->assertOk()->assertSee('name="incident_month"', false)->assertDontSee('name="incident_bs_month"', false);
+})->group('P5', 'U9');
+
+it('stores a Bikram Sambat incident date in AD, and a remembered month as its first day', function () {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->post('/ne', nepaliFormInput('22', '7', '2083'))->assertSessionHasNoErrors();
+    $this->post('/ne', nepaliFormInput('unknown', '7', '2083'))->assertSessionHasNoErrors();
+    $this->post('/en', formInput())->assertSessionHasNoErrors();
+
+    expect(Grievance::orderBy('id')->get()->map->only('incident_date_exact', 'incident_date_calendar')->all())->toBe([
+        ['incident_date_exact' => true, 'incident_date_calendar' => 'bs'],
+        ['incident_date_exact' => false, 'incident_date_calendar' => 'bs'],
+        ['incident_date_exact' => true, 'incident_date_calendar' => 'ad'],
+    ])->and(Grievance::orderBy('id')->get()->map(fn (Grievance $case) => $case->incident_date->toDateString())->all())
+        ->toBe(['2026-11-08', '2026-10-18', '2026-10-28']);
+})->group('P5', 'U9');
+
+it('refuses a Bikram Sambat date that does not exist, is still to come, or is outside the calendar', function (array $date, string $message) {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->post('/ne', nepaliFormInput(...$date))->assertSessionHasErrors(['incident_date' => $message]);
+
+    expect(Grievance::count())->toBe(0);
+})->with([
+    'Kartik 2083 has 30 days' => [['31', '7', '2083'], 'यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।'],
+    '15 Mangsir 2083 is 1 December 2026' => [['15', '8', '2083'], 'यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।'],
+    'a year the calendar does not have' => [['1', '1', '2091'], 'यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।'],
+])->group('P5', 'U9');
+
 it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both until Done', function () {
     $this->post('/ne', formInput())->assertRedirect(route('grievance.received', ['locale' => 'ne']));
     $case = Grievance::sole();
