@@ -68,10 +68,28 @@ main {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem 1rem;
+    /* 0.5rem across too, so the site name and the language switch still share a row at 360 px. */
+    gap: 0.5rem;
     padding-block: 0.5rem;
     background: var(--band);
     border-bottom: 1px solid var(--line);
+}
+
+/* The emergency line (U10): its own strip at the top of every public page, ruled off from the site name,
+   the whole sentence one phone link at least a target tall. */
+.emergency {
+    flex-basis: 100%;
+    max-width: none;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+}
+
+.emergency a {
+    display: flex;
+    align-items: center;
+    min-height: var(--target);
 }
 
 .site-name {
@@ -167,11 +185,31 @@ h2 {
 }
 
 .notice h2 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+}
+
+.notice ul {
+    margin: 0 0 1rem;
+    padding-inline-start: 1.25rem;
+}
+
+.notice li + li {
+    margin-top: 0.5rem;
+}
+
+/* The promise (heading and points) ruled off from what follows it. */
+.notice ul + p {
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
 }
 
 .notice p:last-child {
     margin-bottom: 0;
+}
+
+/* Other ways to raise a grievance (U10): one last section below the form, set apart like the form's own. */
+.other-ways {
+    margin-top: 2.5rem;
 }
 
 /* The form: one column of sections, each a short group, more room between groups than inside them. */
@@ -447,6 +485,11 @@ main > .error-summary {
     font-weight: 600;
     letter-spacing: 0.06em;
     overflow-wrap: anywhere;
+}
+
+/* Our own advice under the company's sentence: what to do now, at label weight. */
+.keep .advice {
+    font-weight: 600;
 }
 
 .keep p:last-child {

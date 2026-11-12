@@ -45,7 +45,7 @@ class PublicNotice extends Page
 
     public function form(Schema $schema): Schema
     {
-        $hint = 'Shown above the grievance form. Plain text; leave an empty line between paragraphs.';
+        $hint = 'Shown above the grievance form. Plain text: the first paragraph is the heading, leave an empty line between paragraphs, and start each point of a list with "- " on its own line.';
 
         return $schema->statePath('data')->components([
             Textarea::make('ne')->label('Nepali')->required()->maxLength(3000)->rows(8)->helperText($hint)

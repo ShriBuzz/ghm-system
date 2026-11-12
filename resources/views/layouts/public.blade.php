@@ -23,6 +23,8 @@
 </head>
 <body>
     <header class="site-header">
+        {{-- The company's emergency line (U10), the whole sentence a phone link so it is easy to tap. --}}
+        <p class="emergency"><a href="tel:100">{{ __('emergency.line') }}</a></p>
         <a class="site-name" href="{{ route('home') }}">{{ __('site.name') }}</a>
         <nav class="language-switch" aria-label="{{ __('language.label') }}">
             <ul>

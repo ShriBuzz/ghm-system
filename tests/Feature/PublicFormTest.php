@@ -19,7 +19,7 @@ beforeEach(function () {
 });
 
 it('opens the form to anyone, with the notice above the first question, escaped', function () {
-    $this->get('/en')->assertOk()->assertSee('[Draft:', false)->assertSee('name="is_anonymous"', false);
+    $this->get('/en')->assertOk()->assertSee('Your grievance is safe with us.')->assertSee('name="is_anonymous"', false);
 
     Setting::put('notice.en', "Kept <b>confidential</b>.\n\nNo retaliation.");
     $html = $this->get('/en')->assertOk()->getContent();
@@ -27,7 +27,7 @@ it('opens the form to anyone, with the notice above the first question, escaped'
     expect($html)->toContain('Kept &lt;b&gt;confidential&lt;/b&gt;.')->toContain('<p>No retaliation.</p>')
         ->and(strpos($html, 'No retaliation.'))->toBeLessThan(strpos($html, 'name="is_anonymous"'));
 
-    $this->get('/ne')->assertOk()->assertSee('[मस्यौदा:', false);
+    $this->get('/ne')->assertOk()->assertSee('तपाईंको गुनासो हामीसँग सुरक्षित छ');
 })->group('P1', 'P3');
 
 it('keeps an anonymous case free of contact details, even when some were typed', function () {
@@ -185,7 +185,7 @@ it('keeps what was typed when something needs fixing, with a summary that links 
     $html = $this->get('/en')->getContent();
     expect($html)->toContain('Wages unpaid since June')->toContain('href="#category_id"')
         // In view without JavaScript too: under the heading, above the notice, and named in the title.
-        ->toContain('<title>Error: Send a grievance')
+        ->toContain('<title>Error: Raise a grievance')
         ->and(strpos($html, 'data-error-summary'))->toBeLessThan(strpos($html, 'notice-heading'));
 })->group('P1', 'S9');
 

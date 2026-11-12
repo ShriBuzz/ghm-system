@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 3, 10 and 12 (both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 4, 10 and 12 (the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -45,11 +45,13 @@ Open http://127.0.0.1:8000. It sends you to `/ne`, the Nepali page.
 | Chrome DevTools (Cmd+Opt+I), device toolbar (Cmd+Shift+M), width 360 | Everything fits, nothing scrolls sideways |
 | DevTools, Cmd+Shift+P, "Disable JavaScript", reload | The page and the language switch still work |
 | DevTools, Network tab, the page request | `Content-Security-Policy`, `Referrer-Policy: no-referrer` and `X-Content-Type-Options: nosniff` headers |
+| The top of every public page, in both languages | First, "In immediate danger? Call the police on 100." (तत्काल खतरामा हुनुहुन्छ भने प्रहरीलाई १०० मा फोन गर्नुहोस्।). On a phone, tapping the line offers to call 100. It sits on its own row, ruled off from the site name |
 
 The page is the grievance form (P1 to P9). Fill it with fake details only.
 
 | Try | Expect |
 |---|---|
+| Read the form page in both languages | Titled "Raise a grievance" (गुनासो दर्ता गर्नुहोस्). The notice "Your grievance is safe with us." with four points, then what happens next and that the service is free; the police line is only at the top. Below the Send button, "Other ways to raise a grievance" (गुनासो दर्ता गर्ने अन्य तरिका) |
 | Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling |
 | DevTools device toolbar, width 320, on `/ne` and `/en` | Nothing scrolls sideways; the photo field stays inside the page |
 | Tap "Send grievance" twice quickly (DevTools, Network, "Slow 4G", with a photo) | The button says "Sending…" and only one grievance arrives |
@@ -62,6 +64,7 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | On `/ne`: गते याद छैन, कार्तिक 2083, send | On the case page: "Kartik 2083, exact day not remembered", not an AD month |
 | On `/ne`: 31 कार्तिक 2083 (Kartik 2083 has 30 days), or a date still to come | Refused: "यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।" or "यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।" |
 | On `/ne`, choose a date, then switch to English | The English form keeps what you typed but not the date: pick it again in AD |
+| Read the page with the reference and PIN | "Thank you. Your grievance has been received."; in the framed box, the advice to keep the reference and PIN safe, then, in bold, to write them down or photograph them; what happens next; that the service is free and leaves the police, the Labour Office, a national commission and the courts open |
 | Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
 | Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
 | Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |
@@ -71,6 +74,7 @@ The status page (P8), at http://127.0.0.1:8000/en/status or from the link on the
 
 | Try | Expect |
 |---|---|
+| Open the status lookup in both languages | Titled "Check your grievance" (आफ्नो गुनासोको अवस्था हेर्नुहोस्) |
 | Enter the reference in small letters without hyphens (`ghm20260001`) and the PIN in Nepali digits (`१२३४५६`) | Accepted like the usual form; a wrong PIN typed either way counts toward the same lock |
 | Enter a reference and PIN you noted when sending | The status, the received date and the messages. A staff reply from the case page in the panel shows as "Grievance team", never a staff name; internal notes never show |
 | Write in "Add information or reply" and send | "Your message was sent." and the message in the thread as "You". The case page's Messages tab in the panel shows it, and the staff who can see the case get an alert (in the queue) |
@@ -112,6 +116,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Settings → Users → New user: a focal person and a restricted-case officer, with fake names, `@example.com` emails and a password of at least 8 characters | Both appear in the list with their role |
 | Edit your own user | Role and Active cannot be changed: you cannot lock yourself out |
 | Settings → Holidays → add a date | It appears; holidays can be deleted, other settings cannot (deactivate them instead) |
+| Settings → Public notice: the boxes are empty with the company's notice greyed in. Save a short English notice: a first line, an empty line, two lines starting "- ", an empty line and a sentence | `/en` shows the first line as the notice's heading, the two lines as a list and the sentence as a paragraph. Until something is saved, the form shows the company's notice |
 | Activity log, after a holiday is added, changed or deleted | "Holiday Added", "Holiday Changed" or "Holiday Deleted", with who did it, the date and the name |
 
 **Focal person: offline entry (A6)**

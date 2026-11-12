@@ -126,6 +126,10 @@ components:
     backgroundColor: "{colors.band}"
     textColor: "{colors.ink}"
     padding: "0.5rem"
+  emergency-line:
+    backgroundColor: "{colors.band}"
+    textColor: "{colors.accent}"
+    height: "{spacing.target}"
   notice-band:
     backgroundColor: "{colors.band}"
     textColor: "{colors.ink}"
@@ -196,7 +200,7 @@ A near-monochrome cool-grey paper palette with a single deep teal accent and one
 - **Counter Band** (#f2f6f7): the pale cool ground that groups without a border: the site header, the company's notice, the status facts and the team's messages. Soft ink on it is 6.84:1.
 - **Slate Ink** (#1b2428): all body text, headings, labels and the site name. 15.79:1 on white.
 - **Soft Ink** (#4b575d): hints, definition terms (the labels above reference, PIN, status, date), message meta, and the 2 px input borders. 7.45:1 on white.
-- **Quiet Line** (#c9d3d7): 1 px dividers between sections and under the header, the contact group's frame, the team message frame, and the resting border of a choice card. 1.52:1 on white, so it is decorative only; it never carries the boundary of a control on its own.
+- **Quiet Line** (#c9d3d7): 1 px dividers between sections, under the emergency line, under the header and between the notice's points and its paragraphs, the contact group's frame, the team message frame, and the resting border of a choice card. 1.52:1 on white, so it is decorative only; it never carries the boundary of a control on its own.
 
 ### Error
 - **Signal Red** (#b42318): error text, the error-summary heading, links and 3 px frame, and the border of a field in error. 6.57:1 on white. Always paired with words and a visually hidden "Error:" prefix.
@@ -218,7 +222,7 @@ A near-monochrome cool-grey paper palette with a single deep teal accent and one
 
 ### Hierarchy
 - **Headline** (700, clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem), 1.35): the page's one h1, balanced wrap; 30 px at 360 px wide, 36 px on desktop.
-- **Title** (700, 1.5rem, 1.35): section headings (h2), balanced wrap. Inside the notice the h2 drops to body size (1.125rem), and the error summary's h2 is 1.25rem in Signal Red.
+- **Title** (700, 1.5rem, 1.35): section headings (h2), balanced wrap. Inside the notice the h2 is 1.25rem, so the company's heading reads as the panel's title, and the error summary's h2 is 1.25rem in Signal Red.
 - **Body** (400, 1.125rem, 1.65): all running text and input text; paragraphs capped at 65ch.
 - **Label** (600, 1.125rem, 1.65): field labels, legends, choice card text, buttons, the site name, status fact values. The status value itself steps up to 1.375rem.
 - **Hint** (400, 1rem, 1.65): hints under labels, definition terms, message meta, the date-part labels and the language switch (600 there).
@@ -236,7 +240,7 @@ A near-monochrome cool-grey paper palette with a single deep teal accent and one
 
 One column, centred, at a 40rem measure. The header and main share the same inline padding, `max(gutter, (100% - measure) / 2)`, so the site name and language switch line up with the content edge on wide screens; the gutter is clamp(1rem, 4vw, 2rem). Main has 2rem above and 3rem below.
 
-The rhythm is "more room between groups than inside them". The form's sections sit 2.5rem apart, each opened by a 1 px Quiet Line rule and 2rem of top padding; inside a section, questions sit 1.5rem apart; inside a question, label, hint, error and control sit 0.5rem apart. Panels (notice, contact group, error summary, "keep these" card, status facts) all take 1.25rem padding. The status pages use the same 1.5rem stack.
+The rhythm is "more room between groups than inside them". The form's sections sit 2.5rem apart, each opened by a 1 px Quiet Line rule and 2rem of top padding; inside a section, questions sit 1.5rem apart; inside a question, label, hint, error and control sit 0.5rem apart. Panels (notice, contact group, error summary, "keep these" card, status facts) all take 1.25rem padding. The status pages use the same 1.5rem stack. The form page ends with "Other ways to raise a grievance", one more section opened the same way, 2.5rem below the Send button.
 
 There is one breakpoint, 40rem. Below it the primary button is full width; at and above it the three status facts sit in one row spread across the measure. The day, month and year selects share one row at every width, the year keeping the width its four digits need. Nothing scrolls sideways at 320 px; the file input's minimum width is released for that reason.
 
@@ -282,11 +286,15 @@ Gently rounded rectangles throughout, in three steps. Small (0.375rem) for input
 - **Error:** the border turns Signal Red, and an error line in Signal Red at label weight sits between the hint and the control, starting with a visually hidden "Error:".
 
 ### Navigation
-- **Site header:** Counter Band strip with a 1 px Quiet Line under it; the site name in Slate Ink at label weight (underlined on hover) at one end and the language switch at the other, wrapping on narrow screens.
+- **Emergency line:** the header's first row on every public page: the company's sentence ("In immediate danger? Call the police on 100.") as one phone link (`tel:100`) in teal at label weight, at least 44 px tall, ruled off from the row below by a 1 px Quiet Line. Never Signal Red: an emergency is not an error.
+- **Site header:** Counter Band strip with a 1 px Quiet Line under it; under the emergency line, the site name in Slate Ink at label weight (underlined on hover) at one end and the language switch at the other, 0.5rem apart at least, so they share a row at 360 px and wrap below that.
 - **Language switch:** both languages side by side in a 1 px teal frame with medium radius, like a two-way toggle. The current language is a filled teal pill with white text; the other is a teal link that takes the wash on hover. Each pill is at least 44 by 44 px, hint size at weight 600, each labelled in its own language.
 
 ### The "keep these" card (signature)
-The received page's framed card: 3 px teal border, large radius, 1.25rem padding. Soft Ink terms ("Reference number", "PIN") over the values in code display monospace, large and letter-spaced for copying, then one line of advice.
+The received page's framed card: 3 px teal border, large radius, 1.25rem padding. Soft Ink terms ("Reference number", "PIN") over the values in code display monospace, large and letter-spaced for copying, then the company's sentence on keeping them safe, then our own advice (write them down or photograph them; the PIN cannot be shown again) at label weight.
+
+### The company's notice
+The Counter Band panel above the form, in the company's words from Settings: the first paragraph is its heading (h2, 1.25rem), lines starting "- " are a bulleted list, the rest are paragraphs. A 1 px Quiet Line rules the points (the promise) off from the paragraphs after them.
 
 ### Error summary (signature)
 At the top of a refused form: 3 px Signal Red frame, medium radius, a red heading, and a list of red links at label weight, each jumping to its field. A refusal about the sending (rather than an answer) gets its own heading and no links. With JavaScript on, it takes focus on load.

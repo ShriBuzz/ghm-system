@@ -111,7 +111,7 @@ test.describe('focal person, QR poster', () => {
     test('shows the QR poster, prints it without the panel and downloads the code', { tag: ['@P10'] }, async ({ page }) => {
         await page.goto('/admin/qr-poster');
         await expect(page.getByRole('img', { name: /^QR code for http/ })).toBeVisible();
-        await expect(page.getByText('Send a grievance', { exact: true })).toBeVisible();
+        await expect(page.getByText('Raise a grievance', { exact: true })).toBeVisible();
 
         await page.emulateMedia({ media: 'print' });
         await expect(page.locator('.fi-sidebar')).toBeHidden();
