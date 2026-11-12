@@ -133,18 +133,21 @@ test.describe('focal person', () => {
         expect([403, 404]).toContain((await page.goto(address))!.status());
     });
 
-    test('counts the cases received on a day by status and category, leaving out restricted ones', { tag: ['@N3', '@A5'] }, async ({ page }) => {
+    test('counts the cases received on a day, small groups as "<5", leaving out restricted ones', { tag: ['@N3', '@A5', '@U11'] }, async ({ page }) => {
         // A day of its own in the past, so cases from other specs and workers do not land in it.
-        const day = `2021-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const day = `${2015 + Math.floor(Math.random() * 6)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
         const before = await summaryOf(page, day);
 
         await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
         await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment, exploitation and abuse', anonymous: true });
 
+        // The total is exact; a group of 1 to 4 shows as "<5", and an empty one as 0.
         const after = await summaryOf(page, day);
-        expect(after.received).toBe(before.received + 1);
-        expect(after.wages).toBe(before.wages + 1);
-        expect(after.restricted).toBe(0);
+        expect(after.total).toBe(before.total + 1);
+        expect(after.received).toBe('<5');
+        expect(after.wages).toBe('<5');
+        expect(after.closed).toBe('0');
+        expect(after.restricted).toBeNull();
     });
 
     test('exports a CSV of the N4 columns, dates in AD and BS, without names or contacts, and is not offered them', { tag: ['@N4', '@A5', '@U9'] }, async ({ page }) => {
@@ -220,13 +223,20 @@ async function summaryOf(page: Page, day: string) {
         await updated;
     }
 
-    const count = async (name: string) => {
+    // A count as shown, "<5" included, or null when the category has no row.
+    const shown = async (name: string) => {
         const row = page.getByRole('row').filter({ has: page.getByRole('rowheader', { name, exact: true }) });
 
-        return (await row.count()) ? Number(await row.getByRole('cell').innerText()) : 0;
+        return (await row.count()) ? (await row.getByRole('cell').innerText()).trim() : null;
     };
-
-    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment, exploitation and abuse') };
+    return {
+        // Always shown, 0 included; innerText waits for it.
+        total: parseInt(await page.getByText(/cases? received in this period\./).innerText(), 10),
+        received: await shown('Received'),
+        closed: await shown('Closed'),
+        wages: await shown('Wages and benefits'),
+        restricted: await shown('Sexual harassment, exploitation and abuse'),
+    };
 }
 
 test.describe('administrator', () => {

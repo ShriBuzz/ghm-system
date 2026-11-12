@@ -150,6 +150,8 @@ The PIN cannot be shown again. With the reference and PIN, the complainant can f
 
 **Summary** counts the cases received in a date range, by status and by category (picture 6). It counts only the cases you can see.
 
+- **Small groups show as <5.** A count from 1 to 4 shows as **<5**, so that nobody can be picked out of a small group. A 0 shows as 0, and the line above the tables gives the exact total.
+
 <img src="images/user-guide/06-summary.png" width="460" alt="The Summary page with date fields and two tables: cases by status and cases by category">
 
 *Picture 6: the summary for a chosen date range.*
