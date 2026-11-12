@@ -66,7 +66,7 @@
     "form.about.disability": "Do you have a disability?",
     "form.about.ethnicity": "Caste/ethnicity",
     "form.about.heading": "About you (optional)",
-    "form.about.hint": "These answers help the company see who raises grievances. Skip any question.",
+    "form.about.hint": "These answers show which groups of people raise grievances. Only the staff who handle grievances see them. Skip any question.",
     "form.about.sex": "Sex",
     "form.attachment": "A photo or document (optional)",
     "form.attachment_hint": "One photo (JPG, PNG or WebP) or PDF, up to 5 MB. We remove the location and phone details hidden in photos.",
