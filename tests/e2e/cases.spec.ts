@@ -190,9 +190,16 @@ async function exportCsv(page: Page, day: string, { personal = false } = {}) {
  */
 async function summaryOf(page: Page, day: string) {
     await page.goto('/admin/summary');
-    // Each date goes to the server on change; read the counts only after both answers.
-    for (const field of ['Received from', 'Received until']) {
-        const updated = page.waitForResponse((response) => response.url().includes('/livewire'));
+    // Each date goes to the server on change, sometimes in more than one request. Wait for the answer to
+    // the request that carries this date, not any answer: a late one for "from" would leave "until" unread.
+    for (const [field, path] of [['Received from', 'data.from'], ['Received until', 'data.until']]) {
+        const updated = page.waitForResponse((response) => {
+            try {
+                return JSON.parse(response.request().postData() ?? '').components.some((c: { updates?: Record<string, string> }) => c.updates?.[path] === day);
+            } catch {
+                return false;
+            }
+        });
         await page.getByLabel(field).fill(day);
         await updated;
     }
