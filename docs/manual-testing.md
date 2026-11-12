@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 step 1 (the company's lists and wording). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 and 2 (the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
