@@ -91,6 +91,15 @@ it('shows the optional answers on the case page by their labels', function () {
         ->assertDontSee('prefer_not_to_say');
 })->group('P6');
 
+it('shows a remembered Bikram Sambat month as that month, not the AD month it starts in', function () {
+    app()->setLocale('en');
+    signedInAs(Role::Administrator);
+    $case = Grievance::factory()->create(['incident_date' => '2026-10-18', 'incident_date_exact' => false, 'incident_date_calendar' => 'bs']);
+
+    Livewire::test(ViewGrievance::class, ['record' => $case->id])
+        ->assertSee('Kartik 2083, exact day not remembered')->assertDontSee('October 2026');
+})->group('P5', 'U9');
+
 it('shows a remembered month as the month and year only', function () {
     app()->setLocale('en');
     signedInAs(Role::Administrator);

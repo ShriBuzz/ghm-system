@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 and 2 (the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 3 (the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -56,7 +56,12 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | Choose "With my name", then "Without my name (anonymous)" | The contact fields appear, then go away; with JavaScript off too |
 | Choose "With my name", write a name, choose "Do not contact me", leave phone and email empty, fill in the rest and send | "Give a phone number or an email." in the box under the heading and at the phone field; with a phone number added, the grievance goes through |
 | On `/ne`, open the "About you" questions | तपाईं को हुनुहुन्छ? lists 11 answers and भन्न चाहँदिन; the age groups start with १८ वर्षभन्दा कम; जाति/जातीयता includes थारु |
-| Day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
+| On `/en`: day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
+| On `/ne`, open the date boxes | गते 1 to 32 and गते याद छैन; महिना बैशाख to चैत (the Bikram Sambat months); साल this BS year first, then the ten before |
+| On `/ne`: a past BS date, for example 22 कार्तिक 2083, the rest filled in, send | Sent. On the case page, "When it happened" shows the same day in AD (22 Kartik 2083 is 8 Nov 2026) |
+| On `/ne`: गते याद छैन, कार्तिक 2083, send | On the case page: "Kartik 2083, exact day not remembered", not an AD month |
+| On `/ne`: 31 कार्तिक 2083 (Kartik 2083 has 30 days), or a date still to come | Refused: "यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।" or "यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।" |
+| On `/ne`, choose a date, then switch to English | The English form keeps what you typed but not the date: pick it again in AD |
 | Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
 | Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
 | Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |

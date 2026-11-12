@@ -12,6 +12,8 @@ async function sendGrievance(page: Page): Promise<{ reference: string; pin: stri
     await page.getByLabel('Where did it happen?').selectOption('Head office, Thapathali');
     await page.getByLabel('Day', { exact: true }).selectOption('3');
     await page.getByLabel('Month', { exact: true }).selectOption('10');
+    // Last year, so the date is in the past whenever the suite runs.
+    await page.getByLabel('Year', { exact: true }).selectOption({ index: 1 });
     await page.getByText('Once', { exact: true }).click();
     await page.getByLabel('Describe what happened').fill('Test grievance for the status page');
     await page.getByRole('button', { name: 'Send grievance' }).click();

@@ -11,7 +11,7 @@
     <x-form.errors :anchors="[
         'is_anonymous' => 'is_anonymous-1',
         'preferred_contact' => 'preferred_contact-phone',
-        'incident_date' => 'incident_day',
+        'incident_date' => app()->getLocale() === 'ne' ? 'incident_bs_day' : 'incident_day',
         'recurrence' => 'recurrence-once',
     ]" />
     <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>

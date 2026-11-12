@@ -12,6 +12,8 @@ async function fillRequired(page: Page, description = 'Test grievance: wages unp
     await page.getByLabel('Where did it happen?').selectOption('Head office, Thapathali');
     await page.getByLabel('Day', { exact: true }).selectOption('3');
     await page.getByLabel('Month', { exact: true }).selectOption('10');
+    // Last year, so the date is in the past whenever the suite runs.
+    await page.getByLabel('Year', { exact: true }).selectOption({ index: 1 });
     await page.getByText('Once', { exact: true }).click();
     await page.getByLabel('Describe what happened').fill(description);
 }
@@ -19,13 +21,16 @@ async function fillRequired(page: Page, description = 'Test grievance: wages unp
 test.describe('with JavaScript off', () => {
     test.use({ javaScriptEnabled: false });
 
-    test('sends an anonymous grievance with a photo and keeps the reference and PIN on screen until Done', { tag: ['@P1', '@P5', '@P7'] }, async ({ page }) => {
+    test('sends an anonymous grievance with a photo and keeps the reference and PIN on screen until Done', { tag: ['@P1', '@P5', '@P7', '@U9'] }, async ({ page }) => {
         await page.goto('/ne');
         // The Nepali page lists categories and locations by their Nepali names.
         await page.getByLabel('गुनासो केबारे हो?').selectOption({ index: 1 });
         await page.getByLabel('कहाँ भयो?').selectOption({ index: 1 });
+        // The Nepali form takes the date in Bikram Sambat (U9): 3 Kartik of last BS year, always in the past.
+        await expect(page.getByLabel('महिना', { exact: true }).locator('option')).toContainText(['बैशाख', 'कार्तिक', 'चैत']);
         await page.getByLabel('गते', { exact: true }).selectOption('3');
-        await page.getByLabel('महिना', { exact: true }).selectOption('10');
+        await page.getByLabel('महिना', { exact: true }).selectOption('7');
+        await page.getByLabel('साल', { exact: true }).selectOption({ index: 1 });
         await page.getByText('एक पटक', { exact: true }).click();
         await page.getByLabel('के भयो, लेख्नुहोस्').fill('परीक्षण गुनासो: तीन महिनादेखि तलब पाएको छैन।');
         await page.getByLabel('फोटो वा कागजात (चाहेमा)').setInputFiles(photo);

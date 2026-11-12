@@ -155,6 +155,7 @@ CREATE TABLE `grievances` (
   `location_id` bigint unsigned NOT NULL,
   `incident_date` date NOT NULL,
   `incident_date_exact` tinyint(1) NOT NULL DEFAULT '1',
+  `incident_date_calendar` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ad',
   `recurrence` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `complainant_type` text COLLATE utf8mb4_unicode_ci,

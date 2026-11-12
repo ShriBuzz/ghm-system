@@ -6,6 +6,7 @@ use App\Enums\ContactMethod;
 use App\Enums\Recurrence;
 use App\Models\Grievance;
 use App\Support\AttachmentStore;
+use App\Support\BsDate;
 use App\Support\VisitorKey;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 
 /**
  * A new grievance from the public form (WP1). Offline entry (A6) uses the
@@ -91,6 +93,7 @@ class StoreGrievanceRequest extends FormRequest
     /**
      * The form sends strings: "1" or "0" for the anonymous choice, which the shared rules compare
      * as a boolean, and the incident date as day, month and year, the day possibly "unknown" (P5).
+     * The Nepali form sends a Bikram Sambat date (U9), the English form an AD one; both are stored in AD.
      */
     protected function prepareForValidation(): void
     {
@@ -98,17 +101,33 @@ class StoreGrievanceRequest extends FormRequest
             $this->merge(['is_anonymous' => filter_var($this->input('is_anonymous'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE)]);
         }
 
-        $day = $this->text('incident_day');
-        $month = $this->integer('incident_month');
-        $year = $this->integer('incident_year');
+        $bs = $this->has('incident_bs_year');
+        $prefix = $bs ? 'incident_bs_' : 'incident_';
+        $day = $this->text($prefix.'day');
+        $month = $this->integer($prefix.'month');
+        $year = $this->integer($prefix.'year');
 
         if ($day !== '' && $month > 0 && $year > 0) {
             $exact = $day !== 'unknown';
-            // An impossible day such as 30 February stays impossible here, so the date rule refuses it.
+            $day = $exact ? (int) $day : 1;
+            // An impossible date stays impossible here (30 February, or 31 Kartik), so the date rule refuses it.
             $this->merge([
-                'incident_date' => sprintf('%04d-%02d-%02d', $year, $month, $exact ? (int) $day : 1),
+                'incident_date' => $bs ? self::fromBs($year, $month, $day) : sprintf('%04d-%02d-%02d', $year, $month, $day),
                 'incident_date_exact' => $exact,
+                'incident_date_calendar' => $bs ? 'bs' : 'ad',
             ]);
+        }
+    }
+
+    /**
+     * A BS date in AD, or a value the date rule refuses when the calendar has no such date.
+     */
+    private static function fromBs(int $year, int $month, int $day): string
+    {
+        try {
+            return BsDate::toAd($year, $month, $day)->toDateString();
+        } catch (InvalidArgumentException) {
+            return 'no such date';
         }
     }
 
@@ -132,6 +151,8 @@ class StoreGrievanceRequest extends FormRequest
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
             // False when only the month is remembered; the date then holds the first of that month.
             'incident_date_exact' => ['sometimes', 'boolean'],
+            // Set above from the fields the form sent; offline entry leaves it to the column's "ad".
+            'incident_date_calendar' => ['sometimes', Rule::in(['ad', 'bs'])],
             'recurrence' => ['required', Rule::enum(Recurrence::class)],
             'description' => ['required', 'string', 'max:5000'],
             // Optional (P6): blank or one of the question's codes, "prefer not to say" among them.
