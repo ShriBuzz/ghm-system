@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AlertKind;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Models\Grievance;
@@ -15,12 +16,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 Artisan::command('ghm:recount-working-days', function () {
-    // Quietly: a system job, not a staff action, so no observer or activity entry.
+    // Quietly: a system job, not a staff action, so no observer or staff activity entry.
     Grievance::whereIn('status', Status::open())->lazyById()->each(function (Grievance $grievance): void {
         $grievance->working_days_open = $grievance->workingDaysSoFar();
+
+        // Past its target for the first time since it was received or reopened: tell the Administrators once (U6).
+        // shortcut: every case's target is the RFQ's 15 working days until per-category targets (U1) are agreed.
+        $escalate = $grievance->escalated_at === null && $grievance->working_days_open > Config::integer('ghm.sla_days');
+        if ($escalate) {
+            $grievance->escalated_at = now();
+        }
+
         $grievance->saveQuietly();
+
+        if ($escalate) {
+            activity()->performedOn($grievance)->event('escalated')
+                ->withProperties(['working_days' => $grievance->working_days_open])->log('Past target');
+            $grievance->alertStaff(AlertKind::PastTarget);
+        }
     });
-})->purpose('Recount working days open for open cases (A2)');
+})->purpose('Recount working days open for open cases (A2), and tell the Administrators of a case past its target (U6)');
 
 Schedule::command('ghm:recount-working-days')->dailyAt('00:30');
 

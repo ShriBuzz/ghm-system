@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AgeGroup;
+use App\Enums\AlertKind;
 use App\Enums\Channel;
 use App\Enums\ComplainantType;
 use App\Enums\ContactMethod;
@@ -105,16 +106,35 @@ class Grievance extends Model
     }
 
     /**
-     * Alert the staff who can see this case to it, or to a complainant's message (N1).
-     * No Administrator alerts until NBI decides otherwise; whoever
-     * entered an offline case already knows about it.
+     * Alert staff to this case, as the company set out (N1, U6):
+     * - a new case, or a message on a case with no active assignee: the active staff who can
+     *   see it, but not the Administrators;
+     * - a message on a case whose assignee is active and can see it: the assignee alone, even
+     *   when that is an Administrator;
+     * - a restricted case while no restricted-case officer is active: the Administrators,
+     *   since nobody else can see it;
+     * - a case set to Critical, or past its target: the Administrators.
+     * Whoever entered a case, or set it to Critical, already knows and is not told.
      */
-    public function alertStaff(bool $message = false): void
+    public function alertStaff(AlertKind $kind = AlertKind::NewCase): void
     {
-        $recipients = $this->assignableUsers()->reject(fn (User $user): bool => $user->role === Role::Administrator
-            || (! $message && $user->id === $this->created_by));
+        $staff = $this->assignableUsers();
+        $administrators = $staff->where('role', Role::Administrator);
+        $assignee = $staff->firstWhere('id', $this->assigned_to);
 
-        Notification::send($recipients, new CaseAlert($this->id, $message));
+        $recipients = match (true) {
+            $kind === AlertKind::Critical, $kind === AlertKind::PastTarget => $administrators,
+            $kind === AlertKind::Message && $assignee !== null => collect([$assignee]),
+            $this->is_restricted && $staff->doesntContain('role', Role::RestrictedOfficer) => $administrators,
+            default => $staff->diff($administrators),
+        };
+        $informed = match ($kind) {
+            AlertKind::NewCase => $this->created_by,
+            AlertKind::Critical => auth()->id(),
+            default => null,
+        };
+
+        Notification::send($recipients->reject(fn (User $user): bool => $user->id === $informed), new CaseAlert($this->id, $kind));
     }
 
     /**
@@ -245,6 +265,7 @@ class Grievance extends Model
             'received_at' => 'datetime',
             'closed_at' => 'datetime',
             'reopened_at' => 'datetime',
+            'escalated_at' => 'datetime',
             'working_days_open' => 'integer',
         ];
     }

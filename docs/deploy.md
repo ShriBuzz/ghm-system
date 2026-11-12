@@ -192,9 +192,9 @@ To go back, deploy the previous version the same way. If the new version changed
 | Check | Expect |
 |---|---|
 | `php artisan about` | Environment `production` (or `staging`), Debug Mode `OFF`; Config, Events, Routes and Views `CACHED`; under Backups, Archive password `set` (a red `NOT SET` means the nightly archive is not encrypted) |
-| `php artisan schedule:list` | Eight tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount, failed-job pruning, the upload clean-up and the cache clean-up, both hourly |
+| `php artisan schedule:list` | Eight tasks: the queue worker every minute, the backup at 01:00, its clean-up and check, the working-day recount (which also alerts the Administrator to a case past its target), failed-job pruning, the upload clean-up and the cache clean-up, both hourly |
 | QR poster, in the staff panel | The address under the code is the site's own `https://` address. Print posters only after this check: the code is made from the address the panel was opened with (P10) |
-| Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, nobody is told about a restricted case |
+| Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, the Administrator is alerted instead, and is the only one who can work them |
 | From a developer machine: `BASE_URL=https://<subdomain> npx playwright test` | The `@smoke` specs pass: pages load over HTTPS with the security headers, and the staff sign-in is reachable. Against a non-local address Playwright runs nothing else |
 | `http://<subdomain>` in a browser | It moves to `https://` |
 | [SSL Labs](https://www.ssllabs.com/ssltest/) for the subdomain | Grade A (S1) |

@@ -44,11 +44,13 @@ Open the staff address the Administrator gives you. It is the grievance site's a
 You get an email for:
 
 - each new grievance (**New grievance received**)
-- each new message from a complainant (**New message on a grievance**)
+- each new message from a complainant (**New message on a grievance**). When the case is assigned to you, only you get it; when it is assigned to nobody, everyone who can see the case does.
 
 The email holds no details of the grievance on purpose. Use its **Log in to view** button and read the case in the panel.
 
 You get no email for a restricted case, or for a case you entered yourself.
+
+The Administrator gets its own alerts: when a case is set to **Critical** (it needs action the same day), when an open case passes its target of 15 working days, and when a restricted case arrives while no restricted-case officer is active. Set a case to Critical when someone is in danger: the Administrator is told at once.
 
 ## 4. The case list
 

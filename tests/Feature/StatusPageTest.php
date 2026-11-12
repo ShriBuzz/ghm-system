@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AlertKind;
 use App\Enums\MessageDirection;
 use App\Enums\Role;
 use App\Models\Category;
@@ -49,7 +50,7 @@ it('lets the complainant add information, which alerts the staff who can see the
     $message = GrievanceMessage::sole();
     expect($message->direction)->toBe(MessageDirection::Complainant)->and($message->body)->toBe('The supervisor has done it again.')
         ->and($message->author_id)->toBeNull();
-    Notification::assertSentTo($focal, CaseAlert::class, fn (CaseAlert $alert) => $alert->message);
+    Notification::assertSentTo($focal, CaseAlert::class, fn (CaseAlert $alert) => $alert->kind === AlertKind::Message);
     $this->get('/en/status/case')->assertSee('The supervisor has done it again.')->assertSee('Your message was sent.');
 })->group('P8', 'N1');
 
