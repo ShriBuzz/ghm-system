@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Enums\AlertKind;
+use App\Enums\Priority;
 use App\Enums\Status;
 use App\Models\Grievance;
 use BackedEnum;
@@ -52,6 +54,11 @@ class GrievanceObserver
                     ->log(str($event)->headline()->toString());
             }
         }
+
+        // The Administrators are told each time a case becomes Critical: it needs action the same day (U6).
+        if ($grievance->wasChanged('priority') && $grievance->priority === Priority::Critical) {
+            $grievance->alertStaff(AlertKind::Critical);
+        }
     }
 
     /**
@@ -76,8 +83,10 @@ class GrievanceObserver
         $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
 
         // Only a stopped case restarts: an open, overdue case set to Reopened keeps its count.
+        // Its new count can pass the target again, so the past-target alert is due again (U6).
         if ($grievance->status === Status::Reopened && $was instanceof Status && ! $was->isOpen()) {
             $grievance->reopened_at = now();
+            $grievance->escalated_at = null;
         }
 
         if (! $was instanceof Status || $was->isOpen() || $grievance->status->isOpen()) {

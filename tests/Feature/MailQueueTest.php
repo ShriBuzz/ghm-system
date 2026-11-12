@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AlertKind;
 use App\Models\Grievance;
 use App\Models\User;
 use App\Notifications\Acknowledgement;
@@ -73,7 +74,7 @@ it('loads nothing from another site in an email, whatever the app is called', fu
     config(['app.name' => 'Laravel']);
     $case = Grievance::factory()->create(['email' => 'complainant@example.com']);
 
-    $emails = (string) (new CaseAlert($case->id, message: false))->toMail(User::factory()->create())->render()
+    $emails = (string) (new CaseAlert($case->id, AlertKind::NewCase))->toMail(User::factory()->create())->render()
         .(string) (new Acknowledgement('048213'))->toMail($case)->render();
 
     expect($emails)->not->toContain('laravel.com')->not->toContain('<img');

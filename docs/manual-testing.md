@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 4, 10 and 12 (the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 4, 7, 10 and 12 (the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -190,7 +190,7 @@ Carry on with the users and cases from section 5.
 | The same as the Administrator, with "Include names and contact details" on | Name, phone and email columns after the reference. Opened in Excel or Numbers, Nepali text shows correctly |
 | Activity log, as the Administrator | "Cases exported", with the dates, the format and whether personal data was included |
 
-Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, never the Administrator) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
+Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, nor the Administrator, unless it is restricted and no restricted-case officer is active) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
 
 ```sh
 php artisan queue:work --stop-when-empty
@@ -199,7 +199,7 @@ php artisan queue:work --stop-when-empty
 Each email shows a `RUNNING` line, then one ending in `DONE`; the worker stops once the queue is empty. To see what the two emails look like, render them for the newest case and open them in a browser (`open` is macOS; elsewhere open the files by hand):
 
 ```sh
-php artisan tinker --execute '$case = App\Models\Grievance::latest("id")->firstOrFail(); app()->setLocale($case->locale); file_put_contents(storage_path("app/email-acknowledgement.html"), (new App\Notifications\Acknowledgement("123456"))->toMail($case)->render()); app()->setLocale("en"); file_put_contents(storage_path("app/email-alert.html"), (new App\Notifications\CaseAlert($case->id, message: false))->toMail(App\Models\User::firstOrFail())->render());'
+php artisan tinker --execute '$case = App\Models\Grievance::latest("id")->firstOrFail(); app()->setLocale($case->locale); file_put_contents(storage_path("app/email-acknowledgement.html"), (new App\Notifications\Acknowledgement("123456"))->toMail($case)->render()); app()->setLocale("en"); file_put_contents(storage_path("app/email-alert.html"), (new App\Notifications\CaseAlert($case->id, App\Enums\AlertKind::NewCase))->toMail(App\Models\User::firstOrFail())->render());'
 open storage/app/email-acknowledgement.html storage/app/email-alert.html
 ```
 
@@ -208,6 +208,15 @@ open storage/app/email-acknowledgement.html storage/app/email-alert.html
 | The acknowledgement | In the case's language (the form's language for an online case, the one staff chose for an offline case): the reference, the PIN (here a made-up `123456`) and the public site's address. Nothing the complainant wrote |
 | The alert | In English: "A new grievance has been received" and a "Log in to view" button. No reference, category, name or description |
 | Both | The app's name as plain text at the top; no image or anything else from another site |
+
+Who gets which alert (U6). Count the queued alerts with `php artisan tinker --execute 'echo DB::table("jobs")->count();'` before and after each step, then work the queue as above.
+
+| Try | Expect |
+|---|---|
+| Assign a case to the focal person, then send a message on it from the status page | One alert, to the focal person only. On an unassigned case, every focal person gets one |
+| As the focal person, Set priority → Critical | One alert to each active Administrator: "Grievance set to Critical". Setting another priority, or Critical again, sends none |
+| Deactivate every restricted-case officer, then send a grievance in a restricted category | The Administrator gets "New grievance received". Reactivate the officer afterwards |
+| Enter an offline case received 30 days ago, then run `php artisan ghm:recount-working-days` twice | One "Grievance past its target" alert per active Administrator, and one "Escalated" entry for the case in the activity log, by "System or complainant". Closing and reopening the case starts its count again |
 
 Delete the two files afterwards: `rm storage/app/email-*.html`.
 

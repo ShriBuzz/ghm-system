@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOnCase } from './support';
 
@@ -188,6 +189,19 @@ async function exportCsv(page: Page, day: string, { personal = false } = {}) {
 }
 
 /**
+ * Opens the activity log filtered to one case.
+ */
+async function activityLogOf(page: Page, reference: string) {
+    await page.goto('/admin/activity-log');
+    await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
+    await page.getByLabel('Case reference').fill(reference);
+    await Promise.all([
+        page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+        page.getByRole('button', { name: 'Apply filters' }).click(),
+    ]);
+}
+
+/**
  * Opens the summary for one day and reads the counts this spec checks.
  */
 async function summaryOf(page: Page, day: string) {
@@ -217,6 +231,20 @@ async function summaryOf(page: Page, day: string) {
 
 test.describe('administrator', () => {
     test.use({ role: 'administrator' });
+
+    test('is told once when an open case passes its target, as the activity log shows', { tag: ['@U6', '@N1', '@S6'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page, { receivedAt: daysAgo(30).dateTime });
+
+        // The nightly job, twice: the second run must not tell anyone again.
+        const artisan = process.env.E2E_ARTISAN ?? 'php artisan';
+        execSync(`${artisan} ghm:recount-working-days`);
+        execSync(`${artisan} ghm:recount-working-days`);
+
+        await activityLogOf(page, reference);
+        const escalated = page.getByRole('row').filter({ hasText: 'Escalated' }).filter({ hasText: reference });
+        await expect(escalated).toHaveCount(1);
+        await expect(escalated).toContainText('System or complainant');
+    });
 
     test('includes names and contacts in an export when asked', { tag: ['@N4'] }, async ({ page }) => {
         const day = `2023-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
@@ -390,13 +418,7 @@ test.describe('administrator, working a case', () => {
         await (await findCase(page, reference)).click();
         await setOnCase(page, 'Set status', 'Status', 'under_investigation');
 
-        await page.goto('/admin/activity-log');
-        await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
-        await page.getByLabel('Case reference').fill(reference);
-        await Promise.all([
-            page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
-            page.getByRole('button', { name: 'Apply filters' }).click(),
-        ]);
+        await activityLogOf(page, reference);
 
         const entry = page.getByRole('row').filter({ hasText: 'Status Changed' }).filter({ hasText: reference });
         await expect(entry).toContainText(reference);
