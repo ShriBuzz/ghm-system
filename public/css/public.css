@@ -298,14 +298,20 @@ textarea {
     font: inherit;
 }
 
-/* An error-summary link jumps to its field: leave room above it for the question, hint and error (S9).
-   Measured at 360 px: up to 136 px above a field, 222 px above the date's day box. */
+/* An error-summary link jumps to its field (S9). form.js brings the question into view first, a little below the
+   top; without JavaScript the field keeps room above it for the question, hint and error. Measured at 360 px:
+   up to 136 px above a field, 222 px above the date's day box, more with wider fonts. */
+legend,
+label {
+    scroll-margin-top: 1rem;
+}
+
 main :is(input, select, textarea) {
     scroll-margin-top: 10rem;
 }
 
 .date-parts select {
-    scroll-margin-top: 15rem;
+    scroll-margin-top: 18rem;
 }
 
 textarea {

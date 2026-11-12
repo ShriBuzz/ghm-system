@@ -297,7 +297,7 @@ The received page's framed card: 3 px teal border, large radius, 1.25rem padding
 The Counter Band panel above the form, in the company's words from Settings: the first paragraph is its heading (h2, 1.25rem), lines starting "- " are a bulleted list, the rest are paragraphs. A 1 px Quiet Line rules the points (the promise) off from the paragraphs after them.
 
 ### Error summary (signature)
-At the top of a refused form: 3 px Signal Red frame, medium radius, a red heading, and a list of red links at label weight, each jumping to its field with its question, hint and error still in view (form fields keep 10rem of scroll room above them, the date boxes 15rem). A refusal about the sending (rather than an answer) gets its own heading and no links. With JavaScript on, it takes focus on load.
+At the top of a refused form: 3 px Signal Red frame, medium radius, a red heading, and a list of red links at label weight, each jumping to its field with its question, hint and error still in view: `form.js` scrolls the question into view, then focuses the field; without JavaScript, form fields keep 10rem of scroll room above them and the date boxes 18rem. A refusal about the sending (rather than an answer) gets its own heading and no links. With JavaScript on, it takes focus on load.
 
 ### Message thread (signature)
 An ordered list of messages 1rem apart, each at most 90% wide with medium radius and 0.875rem by 1rem padding. Team messages: Counter Band ground, 1 px Quiet Line border, at the start. The visitor's own: Teal Wash ground, teal border, at the end. Each says who wrote it in bold Slate Ink, followed by the date in Soft Ink.

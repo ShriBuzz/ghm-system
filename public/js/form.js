@@ -4,6 +4,23 @@
     // action, to what it did. A message already on the page when it opens is rarely read out otherwise.
     (document.querySelector('[data-error-summary]') ?? document.querySelector('[data-notice]'))?.focus();
 
+    // An error link brings its field's question into view (the group's legend, or the field's own label) and then
+    // focuses the field, so the question, hint and error are never left above the screen, whatever the font.
+    // Without JavaScript, the scroll room in the stylesheet does the same for most fonts.
+    for (const link of document.querySelectorAll('[data-error-summary] a[href^="#"]')) {
+        link.addEventListener('click', (event) => {
+            const field = document.getElementById(link.hash.slice(1));
+            const question = field?.closest('.choices, .date-parts-group')?.querySelector('legend')
+                ?? (field ? document.querySelector(`label[for="${field.id}"]`) : null);
+            if (!field || !question) {
+                return;
+            }
+            event.preventDefault();
+            question.scrollIntoView();
+            field.focus({ preventScroll: true });
+        });
+    }
+
     // A file over the limit is refused before a slow upload on a phone connection, not after it.
     for (const input of document.querySelectorAll('input[type="file"][data-max-bytes]')) {
         const note = document.createElement('p');
