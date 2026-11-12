@@ -151,16 +151,16 @@ GHM_ADMIN_PASSWORD=
 | `APP_ENV` | `staging` on the staging server. Anything but `local` and `testing` sends plain HTTP to HTTPS (S1) |
 | `APP_DEBUG` | Always `false` on a server: error pages would show code and settings |
 | `APP_NAME` | Shows in emails, the staff panel and authenticator apps; the company's name replaces it at kick-off |
-| `LOG_*` | One log file a day, kept 14 days, warnings and errors only. The log holds no personal data (technical note) |
+| `LOG_*` | One log file a day, kept 14 days, warnings and errors only. The log holds no personal data (`docs/technical-reference.md`) |
 | `SESSION_LIFETIME` | 30 minutes idle and staff are signed out (S2). Leave `SESSION_SECURE_COOKIE` out: cookies are then Secure over HTTPS |
 | `MAIL_*` | The company's mail server or sending service. Never `MAIL_MAILER=log`: it writes every email, PINs included, into the log |
 | `BACKUP_ARCHIVE_PASSWORD` | Required. Without it the nightly archive is not encrypted. Keep it in the password manager with `APP_KEY` |
-| `BACKUP_DISKS` | Add the off-server copy here once the host is known (`docs/technical-note.md`, Backups) |
+| `BACKUP_DISKS` | Add the off-server copy here once the host is known (`docs/technical-reference.md`, Backups) |
 | `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
 | `GHM_SUBMISSIONS_PER_HOUR`, `GHM_FAILED_LOOKUPS_PER_HOUR` | Optional; leave them out for 10 each. Grievances accepted, and failed status lookups, per network per hour (P8, P9). Raise the first before posters go up if many workers share one Wi-Fi |
 
-If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (technical note, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups, see the table above) count all visitors as one, so real complainants get refused.
+If the host puts the site behind a proxy or load balancer (for example Cloudflare), set trusted proxies in `bootstrap/app.php` before the first deploy. Without them every visitor has the proxy's address: where the proxy ends HTTPS the redirect loops (`docs/technical-reference.md`, HTTPS), and in every case the public limits (10 grievances an hour, 10 failed status lookups, see the table above) count all visitors as one, so real complainants get refused.
 
 ## 6. Updating to a new version
 

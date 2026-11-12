@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-11 (the `main` and `main-backup` split, under Decisions). WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
+Last updated: 2026-11-11 (the handover package docs, branch `handover/docs`; before that the `main` and `main-backup` split, under Decisions). WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions go to NBI after contract signing; until then the code follows the assumptions in `docs/clarification-questions.md`.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -79,6 +79,25 @@ Plan approved in chat on 2026-11-02: the form is the home page, one page in sect
 | 8 | QR poster | P10 | Done | `e0eaa76`. A panel page for every role: the QR code of the form's address (error correction M, so a creased or partly covered poster still reads), Print poster (A4, the panel hidden, the address in words under the code, both languages) and Download QR code (PNG). `chillerlan/php-qrcode` came with Filament's two-factor login and is now declared in `composer.json`. Pest reads the image back with the library's decoder |
 | 9 | Close WP1: Impeccable critique and audit, walks, review, traceability | P1, P8, P9, S9 | Done | `/impeccable critique` (two isolated reviews, 28/40, no P0, four P1): the form scrolled sideways at 320 px (the file input's own width), "Close" read as closing the grievance (in Nepali the button and the status Closed were one word), refusals looked like wrong answers, and a reference or PIN typed with Nepali digits, spaces or no hyphens counted as a wrong PIN; plus one P2, a double tap could send twice. All fixed with failing tests first in `411169f`: "Finish and hide" saying the grievance stays open, a "Your grievance was not sent" box with the minutes to wait, the lookup reading what people type before the lock count, a 10-second guard on Send, and the anonymous question as its section's heading with steeper type steps. `/impeccable audit`: 16/20, no P0 or P1; its P2 (messages shown on arrival not read out) fixed in `110e731`. Walks with Playwright CLI (`public` at 360 px in Nepali with JavaScript on, `public-nojs` in English with JavaScript off, `focal` replying from the panel, `public` reading it at 1280 px): with JavaScript off a refused form opened with its summary out of view, so summaries sit under the heading and the title starts with "Error:" (`4b72782`). `/impeccable document` wrote `DESIGN.md` and its sidecar (`7ae5aa3`). `/ponytail-review`: no must-fix; one should-fix, the browser's Stop button left Send dead, fixed in `fd67f8b`. The critique's P3 list (stray last words, the Nepali day select cut at 360 px, the focus ring on a chosen card) stays in `.impeccable/critique/` for a polish pass |
 
+## Handover package
+
+The RFQ's handover deliverables, branch `handover/docs` (plan approved in chat on 2026-11-11).
+
+| Step | Work | Status | Commit or note |
+|---|---|---|---|
+| 1 | One-page technical note (S7) | Done | `52e0cf3`. The old four-page note is now `docs/technical-reference.md`, unchanged; `docs/technical-note.md` is the one page, checked in A4 print |
+| 2 | Database structure | Done | `e113b75`. `docs/database-schema.sql`, structure only, without DROP TABLE; regenerate it at go-live with the command in its header |
+| 3 | User guide for focal persons (A1 to A7, N1, N3, N4, P10) | Done | `d93f9ca`. English, five A4 pages, six screenshots taken on fake data in `ghm_testing` with the Playwright CLI session `focal`, wiped afterwards |
+| 4 | Credentials handover sheet (S8) | Done | `be58d3d`. `docs/credentials-handover.md`, blank fields only, vendor-side (in `DEV_ONLY`) |
+| 5 | `README.md` as the package index | Done | This commit |
+
+Still to do:
+
+- The Nepali user guide (`docs/user-guide.ne.md`), once the English one is approved, read by a Nepali speaker before training on 25 Nov.
+- The guide's "Use it when" column for each status is suggested wording; confirm it with NBI at UAT.
+- Re-take the screenshots if UAT changes the screens; regenerate `docs/database-schema.sql` if a migration is added.
+- Fill in the credentials sheet at go-live, once the host is known (NBI question 1).
+
 ## Open questions for the project lead
 
 Questions for NBI, with what to change once they answer, are in `docs/clarification-questions.md` (email due 2 Nov). Until then the code follows the assumptions listed there. The ones below are internal.
@@ -88,6 +107,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 3. The Nepali copy on public pages (site name, placeholder line) and in the acknowledgement email (`acknowledgement.*` in `lang/ne.json`) needs a Nepali speaker's read before UAT (P2 manual check). Since WP1 step 9 that includes "सकेर लुकाउनुहोस्" (Finish and hide) and the messages after it, and the refusal wording ("एउटै वाइफाइ वा मोबाइल नेटवर्कबाट…").
 4. The printed offline slip's language and wording (A6) is now part of NBI question 16, with how drop-box and phone complainants follow their case (`docs/client-discussion.md`).
 5. Ten accepted grievances an hour per network (`GHM_SUBMISSIONS_PER_HOUR`) was chosen for shared factory Wi-Fi. The day a canteen poster goes up, more than ten workers may send from one Wi-Fi within the hour; the 11th is asked to wait. Raise it before posters go up, or ask NBI how many people share one connection?
+6. The reply and note dialogs submit with Filament's default "Create" (and offer "Create & create another"); the user guide says "press Create". "Send reply" and "Save note", without the second button, would read better for focal persons. Change it before UAT?
 
 ## Decisions
 
@@ -97,6 +117,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 - The clarification questions are not sent by the RFQ's 2 Nov deadline: NBI is asked after contract signing (decided 2026-11-02). Until then build what does not depend on the answers, on the assumptions in `docs/clarification-questions.md`, and apply its "Apply when answered" table once they arrive.
 - WP3, for the WP1 public form: after saving a case, call `$case->acknowledge($pin)` with the plain PIN; it emails the reference and PIN if an email was given (P7, N2).
 - Handover split, decided 2026-11-11. The client gets a zip of `main` (`git archive`), without git history. `main-backup` (made from `8d8c0a4`) holds everything and is where work continues. `main` is `main-backup` without the dev-only files (agent tooling and the internal docs) and changes only through `scripts/sync-main.sh` and a pull request merged with a merge commit; the first cleanup of `main` was a direct commit, by the project lead's choice. The tests, Playwright and CI ship with the code; `laravel/pao` was removed; the breach-report template and production-access log stay vendor-side. Rules in `CLAUDE.md` (Branching), steps in `docs/handoff.md` (Branches and sync).
+- Handover docs, decided 2026-11-11: the source goes over as a zip only, so the RFQ's "repository credentials" are not applicable and the credentials sheet says so; the focal-person guide is English first, Markdown in `docs/` with screenshots, and the Nepali edition follows; the credentials sheet stays vendor-side like the breach-report template; `README.md` is the package index.
 
 Made so far (the commit messages have the detail):
 

@@ -67,10 +67,10 @@ What the code assumes until NBI answers, and what to change after. Everything no
 
 | # | Answer | Assumption in the repo today | Change once answered | Done |
 |---|---|---|---|---|
-| 1 | | Company host passes; no hosting quoted | Annex A item 5 if it fails; `docs/technical-note.md` hosting line; staging plan | [ ] |
+| 1 | | Company host passes; no hosting quoted | Annex A item 5 if it fails; `docs/technical-reference.md` hosting line; staging plan | [ ] |
 | 2 | | Placeholder categories ("Sexual harassment or abuse" restricted) and locations in `Database\Seeders\PlaceholderListsSeeder`, run outside production only; the notice above the form is a marked draft (`notice.default` in `lang/*.json`) | Edit the lists in Settings (or the seeder before go-live); enter the notice in Settings, Public notice (P3); kick-off date in `docs/progress.md` | [ ] |
 | 3 | | `MAIL_MAILER=array` locally (`.env.example`); never `log`, which writes recipients into `laravel.log` | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
-| 4 | | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in the technical note | [ ] |
+| 4 | | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in `docs/technical-reference.md` | [ ] |
 | 5 | | Enums `ComplainantType`, `Sex`, `AgeGroup`, `Ethnicity`, `Disability` with placeholder options, each with "prefer not to say" (`Grievance::OPTIONAL_ANSWERS`) | Edit the cases in those enums and their labels in `lang/en.json` and `lang/ne.json`, before production: the codes are stored encrypted | [ ] |
 | 6 | | `App\Enums\ContactMethod`: phone, email | Add or remove a case in `ContactMethod`, labels in `lang/en.json` and `lang/ne.json` | [ ] |
 | 7 | | `App\Enums\Channel`: web, phone, email, drop box, in person; offline entry offers all but web | Add a case in `Channel`, labels in `lang/en.json` and `lang/ne.json` | [ ] |
@@ -81,5 +81,5 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | 12 | | `CLAUDE.md` rule: only the Administrator removes a manual restriction; export without names or contacts for other roles | `GrievancePolicy` (step 7; `exportPersonalData()` for exports) if NBI differs | [ ] |
 | 13 | | No Administrator alerts, so a restricted case alerts nobody while the company has no active restricted-case officer (the deploy checks require one); no reply notification to complainants | `Grievance::alertStaff()` (drop the Administrator exclusion); a reply notification only if NBI asks for it | [ ] |
 | 14 | | The staff panel is in English (`App\Http\Middleware\SetPanelLocale`); `APP_LOCALE=ne` stays the public default | Nepali: change the locale in `SetPanelLocale`. A switch: a user setting read there instead | [ ] |
-| 15 | | No cleanup job; nothing is deleted | A scheduled cleanup and its note in `docs/technical-note.md` (WP3) | [ ] |
+| 15 | | No cleanup job; nothing is deleted | A scheduled cleanup and its note in `docs/technical-reference.md` (WP3) | [ ] |
 | 16 | | The slip is in English, with the reference, PIN, received date and a line for staff; staff hand it over, read it out or rely on the acknowledgement email; no P6 answers for offline cases; an anonymous drop-box case cannot be followed up. Staff choose the complainant's language for the email | Slip text in `RecordedCase` and its print view `resources/views/filament/slip-print.blade.php` (Impeccable); the P6 fields on `GrievanceForm` if staff should ask them; a drop-box form is printed outside the app | [ ] |
