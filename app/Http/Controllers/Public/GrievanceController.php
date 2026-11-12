@@ -34,7 +34,8 @@ class GrievanceController
         $notice = Setting::value("notice.{$locale}") ?: __('notice.default');
 
         return view('public.form', [
-            'notice' => preg_split('/\R{2,}/', trim($notice)),
+            // By character (u): without it, \R also matches a byte inside some Nepali letters, such as अ.
+            'notice' => preg_split('/\R{2,}/u', trim($notice)),
             'categories' => Category::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
             'locations' => Location::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
             // When the form was shown (P9). After a refusal or an expired session, the first showing still counts.

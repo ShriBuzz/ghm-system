@@ -1,6 +1,6 @@
 # Change plan: the company's answers and Policy updates
 
-Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 3, 10 and 12 of section 6 are built; the step status is in `docs/progress.md`. The work is WP4 (section 6). Step status goes in `docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
+Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 4, 10 and 12 of section 6 are built; the step status is in `docs/progress.md`. The work is WP4 (section 6). Step status goes in `docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
 
 **Decision, 2026-11-12: answers first.** The project lead chose to build now what answers our own clarification questions, together with what the company added while answering them. Everything that answers no question we asked is a new requirement, held until scope and price are agreed with NBI. Section 3 marks each ID's track. Section 6, "Answers first", has the items, the defaults for the conflicts and what to tell the company.
 
@@ -642,7 +642,7 @@ Order. Each step follows the definition of done in `CLAUDE.md`.
 
 1. Aim to finish before the 18 Nov test version: steps 1, 3, 2, 10 and 12 (items 1 to 8 and 14 to 16), about 3.5 days. Whatever does not fit moves to the UAT window.
 2. In the UAT window: steps 7, 5, 11 and 4 (items 10 to 13, 17 and 18), about 2 days. Step 4 moves before 18 Nov if there is room, since testers see the public pages first.
-3. Item 9 is entered on staging at its deploy, and in production at go-live.
+3. Item 9 is entered on staging at its deploy, and in production at go-live. Changed 2026-11-12 at step 4: the company's notice became the built-in default, so it needs no entry.
 4. Then step 16 closes the track.
 
 Defaults where the documents disagree, or a rule is not settled. Each can change before go-live; only C1 touches stored codes, and only fake data exists until then.

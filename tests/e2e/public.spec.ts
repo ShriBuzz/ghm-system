@@ -23,12 +23,35 @@ test('opens in Nepali and switches to English and back', { tag: ['@P2', '@S9'] }
     await page.getByRole('link', { name: 'English' }).click();
     await expect(page).toHaveURL(/\/en$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Send a grievance');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Raise a grievance');
 
     await page.getByRole('link', { name: 'नेपाली' }).click();
     await expect(page).toHaveURL(/\/ne$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'ne');
 });
+
+for (const [locale, number, points, otherWays] of [
+    ['ne', '१००', 'तपाईंको गुनासो हामीसँग सुरक्षित छ', 'गुनासो दर्ता गर्ने अन्य तरिका'],
+    ['en', '100', 'Your grievance is safe with us.', 'Other ways to raise a grievance'],
+]) {
+    test(`/${locale} shows the emergency line first, the company's notice and the other ways`, { tag: ['@U10', '@P3'] }, async ({ page }) => {
+        await page.goto(`/${locale}`);
+
+        // The emergency line heads the page, the whole sentence a phone link big enough to tap.
+        const call = page.getByRole('banner').getByRole('link').first();
+        await expect(call).toHaveAttribute('href', 'tel:100');
+        await expect(call).toContainText(number);
+        const callBox = (await call.boundingBox())!;
+        const siteNameBox = (await page.getByRole('banner').getByRole('link').nth(1).boundingBox())!;
+        expect(callBox.y + callBox.height).toBeLessThanOrEqual(siteNameBox.y);
+        expect(callBox.height).toBeGreaterThanOrEqual(44);
+        expect(callBox.width).toBeGreaterThanOrEqual(44);
+
+        const notice = page.getByRole('region', { name: points });
+        await expect(notice.getByRole('listitem')).toHaveCount(4);
+        await expect(page.getByRole('region', { name: otherWays })).toBeVisible();
+    });
+}
 
 test('remembers the language for the next visit to "/"', { tag: ['@P2'] }, async ({ page }) => {
     await page.goto('/en');
