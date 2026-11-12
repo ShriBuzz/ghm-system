@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 3 (the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 3 and 10 (Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -58,7 +58,7 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | On `/ne`, open the "About you" questions | तपाईं को हुनुहुन्छ? lists 11 answers and भन्न चाहँदिन; the age groups start with १८ वर्षभन्दा कम; जाति/जातीयता includes थारु |
 | On `/en`: day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
 | On `/ne`, open the date boxes | गते 1 to 32 and गते याद छैन; महिना बैशाख to चैत (the Bikram Sambat months); साल this BS year first, then the ten before |
-| On `/ne`: a past BS date, for example 22 कार्तिक 2083, the rest filled in, send | Sent. On the case page, "When it happened" shows the same day in AD (22 Kartik 2083 is 8 Nov 2026) |
+| On `/ne`: a past BS date, for example 22 कार्तिक 2083, the rest filled in, send | Sent. On the case page, "When it happened" shows "2083-07-22 (2026-11-08)" |
 | On `/ne`: गते याद छैन, कार्तिक 2083, send | On the case page: "Kartik 2083, exact day not remembered", not an AD month |
 | On `/ne`: 31 कार्तिक 2083 (Kartik 2083 has 30 days), or a date still to come | Refused: "यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।" or "यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।" |
 | On `/ne`, choose a date, then switch to English | The English form keeps what you typed but not the date: pick it again in AD |
@@ -143,6 +143,9 @@ A grievance that came by phone, email, drop box, in person, letter, a meeting or
 | Run the queue, then render the acknowledgement (section 7 commands) | The acknowledgement is in English, the language chosen. Enter another case with Nepali (the default) and it is in Nepali |
 | In the private window, http://127.0.0.1:8000/en/status with the slip's reference and PIN | The status page: Received, the received date, no messages yet |
 | Back on the case page, Messages → Send reply; then reload the status page | The reply shows as "Grievance team". "Add information or reply" there puts the message on the case page, and queues an alert |
+| Send a grievance from `/ne` with a description on two lines, then open it in the panel | Status "Received (प्राप्त)", the category with its Nepali name in brackets, the description on its two lines with no blank line above it, every date like "2083-07-26 (2026-11-12)" |
+| On that case, Messages → Send reply in Nepali on two lines; read it on the status page | The reply in Nepali, on its two lines, in the panel and on the status page |
+| Set status | Each status shows its Nepali name in brackets, for example "Closed (बन्द गरिएको)" |
 | On the case page, Documents → add a PDF, as for a scanned letter | It is listed and downloads; the complainant does not see it |
 | Enter a case with channel Drop box, Anonymous on | The slip still shows, but there is nobody to give it to |
 | Enter a case with channel Phone | The slip shows; staff read the reference and PIN out on the call, since the system sends no text messages |

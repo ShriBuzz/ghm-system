@@ -206,3 +206,12 @@ it('counts wrong PINs against the one reference, however it was typed', function
     lookUp($case)->assertRedirect(route('status.lookup', ['locale' => 'en']));
     $this->get('/en/status')->assertSee('locked for 15 minutes');
 })->group('P8');
+
+it('shows a staff reply written in Nepali exactly as written, line break included', function () {
+    $case = Grievance::factory()->create();
+    GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Staff, 'body' => "तपाईंको गुनासो हेर्दैछौं।\nभोलि सम्पर्क गर्नेछौं।"]);
+
+    lookUp($case, locale: 'ne')->assertRedirect(route('status.show', ['locale' => 'ne']));
+
+    $this->get('/ne/status/case')->assertOk()->assertSee('तपाईंको गुनासो हेर्दैछौं।<br />', false)->assertSee('भोलि सम्पर्क गर्नेछौं।');
+})->group('P8', 'U16');

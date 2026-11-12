@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Grievances\Tables;
 
 use App\Enums\Status;
 use App\Models\Grievance;
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -26,7 +28,7 @@ class GrievancesTable
             ->defaultSort('received_at', 'desc')
             ->columns([
                 TextColumn::make('reference')->searchable(),
-                TextColumn::make('received_at')->label('Received')->date()->sortable(),
+                TextColumn::make('received_at')->label('Received')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state))->sortable(),
                 // Next to the date, so the overdue badge is never scrolled out of view.
                 TextColumn::make('working_days_open')
                     ->label('Days open')

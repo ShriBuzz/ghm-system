@@ -37,4 +37,12 @@ enum Status: string implements HasLabel
     {
         return __("status.{$this->value}");
     }
+
+    /**
+     * The label with the Nepali the complainant reads, for staff: "Closed (बन्द गरिएको)" (U16).
+     */
+    public function withNepali(): string
+    {
+        return $this->getLabel().' ('.__("status.{$this->value}", [], 'ne').')';
+    }
 }

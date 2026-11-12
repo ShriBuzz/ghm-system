@@ -8,7 +8,9 @@ use App\Models\Category;
 use App\Models\Grievance;
 use App\Models\Holiday;
 use App\Models\User;
+use App\Support\BsDate;
 use BackedEnum;
+use Carbon\CarbonInterface;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -55,7 +57,7 @@ class ActivityLogResource extends Resource
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['subject', 'causer']))
             ->defaultSort('id', 'desc')
             ->columns([
-                TextColumn::make('created_at')->label('When')->dateTime(),
+                TextColumn::make('created_at')->label('When')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
                 TextColumn::make('event')->label('What')->formatStateUsing(fn (string $state): string => str($state)->headline()->toString()),
                 TextColumn::make('subject_id')->label('Case or setting')->formatStateUsing(fn (Activity $record): ?string => match (true) {
                     $record->subject instanceof Grievance => $record->subject->reference,

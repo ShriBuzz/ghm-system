@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Holidays;
 
 use App\Filament\Resources\Holidays\Pages\ManageHolidays;
 use App\Models\Holiday;
+use App\Support\BsDate;
 use BackedEnum;
+use Carbon\CarbonInterface;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -43,7 +45,7 @@ class HolidayResource extends Resource
         return $table
             ->defaultSort('date')
             ->columns([
-                TextColumn::make('date')->date()->sortable(),
+                TextColumn::make('date')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state))->sortable(),
                 TextColumn::make('name')->searchable(),
             ])
             ->recordActions([

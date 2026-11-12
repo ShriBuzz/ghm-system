@@ -47,3 +47,10 @@ it('refuses a date the calendar does not have', function (int $year, int $month,
 it('refuses an AD date outside the table', function () {
     BsDate::fromAd(CarbonImmutable::parse('2034-04-14'));
 })->throws(InvalidArgumentException::class)->group('U9', 'P5');
+
+it('writes a date for staff as BS with AD alongside, by Nepal time, and in AD only outside the table', function () {
+    expect(BsDate::forStaff(CarbonImmutable::parse('2026-11-08 10:05')))->toBe('2083-07-22 (2026-11-08)')
+        ->and(BsDate::forStaff(CarbonImmutable::parse('2026-11-08 10:05'), time: true))->toBe('2083-07-22 (2026-11-08) 10:05')
+        ->and(BsDate::forStaff(CarbonImmutable::parse('2026-11-08 18:30', 'UTC'), time: true))->toBe('2083-07-23 (2026-11-09) 00:15')
+        ->and(BsDate::forStaff(CarbonImmutable::parse('2207-05-13')))->toBe('2207-05-13');
+})->group('U9');

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Grievances\RelationManagers;
 
 use App\Enums\MessageDirection;
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -50,10 +52,11 @@ class MessagesRelationManager extends RelationManager
             ->heading('Messages with the complainant')
             ->defaultSort('created_at')
             ->columns([
-                TextColumn::make('created_at')->label('Date')->dateTime(),
+                TextColumn::make('created_at')->label('Date')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
                 TextColumn::make('direction')->label('From')->badge(),
                 TextColumn::make('author.name')->label('Staff member')->placeholder('—'),
-                TextColumn::make('body')->label('Message')->wrap(),
+                // The complainant's own words, line breaks kept (U16): escaped first, so typed HTML stays text.
+                TextColumn::make('body')->label('Message')->wrap()->formatStateUsing(fn (string $state): string => nl2br(e($state)))->html(),
             ])
             ->headerActions([
                 CreateAction::make()
