@@ -9,7 +9,7 @@ const wcag = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 /** The required answers, in English, with a fake description. */
 async function fillRequired(page: Page, description = 'Test grievance: wages unpaid for three months'): Promise<void> {
     await page.getByLabel('What is it about?').selectOption('Wages and benefits');
-    await page.getByLabel('Where did it happen?').selectOption('Head office');
+    await page.getByLabel('Where did it happen?').selectOption('Head office, Thapathali');
     await page.getByLabel('Day', { exact: true }).selectOption('3');
     await page.getByLabel('Month', { exact: true }).selectOption('10');
     await page.getByText('Once', { exact: true }).click();
@@ -51,11 +51,11 @@ test.describe('with JavaScript off', () => {
         await page.goto('/en');
         await expect(page.getByLabel('Your name')).toBeHidden();
 
-        await page.getByText('Yes, give my name and contact').click();
+        await page.getByText('With my name').click();
         await expect(page.getByLabel('Your name')).toBeVisible();
         await expect(page.getByLabel('Phone number')).toBeVisible();
 
-        await page.getByText('No, stay anonymous').click();
+        await page.getByText('Without my name (anonymous)').click();
         await expect(page.getByLabel('Your name')).toBeHidden();
     });
 
@@ -107,7 +107,7 @@ test('hides the spam trap from people and from screen readers', { tag: ['@P9', '
 
 test('carries what was typed across a language switch, then forgets the copy', { tag: ['@P2', '@P1'] }, async ({ page }) => {
     await page.goto('/en');
-    await page.getByText('Yes, give my name and contact').click();
+    await page.getByText('With my name').click();
     await page.getByLabel('Your name').fill('Test Complainant');
     await page.getByLabel('Describe what happened').fill('Test grievance typed before switching language');
 
@@ -235,4 +235,19 @@ test('the form weighs under 50 KB with everything it loads', { tag: ['@X1', '@P1
 
     expect(bytes).toBeGreaterThan(0);
     expect(bytes).toBeLessThan(50 * 1024);
+});
+
+test('asks a named complainant who does not want to be contacted for a phone or an email', { tag: ['@U8', '@P4'] }, async ({ page }) => {
+    await page.goto('/en');
+    await fillRequired(page);
+    await page.getByText('With my name').click();
+    await page.getByLabel('Your name').fill('Test Complainant');
+    await page.getByLabel('Do not contact me').check();
+    await page.getByRole('button', { name: 'Send grievance' }).click();
+
+    await expect(page.locator('[data-error-summary]')).toContainText('Give a phone number or an email.');
+
+    await page.getByLabel('Phone number').fill('9800000000');
+    await page.getByRole('button', { name: 'Send grievance' }).click();
+    await expect(page).toHaveURL(/\/en\/received$/);
 });

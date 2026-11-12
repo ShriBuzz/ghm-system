@@ -11,7 +11,7 @@ return [
         'body' => ['required' => 'Write your message.', 'max' => 'Shorten the message to 5,000 characters or fewer.'],
         'is_anonymous' => ['required' => 'Choose whether to give your name.'],
         'name' => ['required' => 'Write your name, or choose to stay anonymous.'],
-        'phone' => ['required_if' => 'Write the phone number we should call.'],
+        'phone' => ['required_if' => 'Write the phone number we should call.', 'required_without' => 'Give a phone number or an email.'],
         'email' => ['required_if' => 'Write the email address we should write to.', 'email' => 'Write the email address like name@example.com.'],
         'preferred_contact' => ['required' => 'Choose how we should contact you.'],
         'category_id' => ['required' => 'Choose what the grievance is about.', 'exists' => 'Choose one of the listed topics.'],
@@ -34,7 +34,7 @@ return [
         'complainant_type' => 'who you are',
         'sex' => 'sex',
         'age_group' => 'age group',
-        'ethnicity' => 'ethnic group',
+        'ethnicity' => 'caste/ethnicity',
         'disability' => 'disability',
     ],
 ];

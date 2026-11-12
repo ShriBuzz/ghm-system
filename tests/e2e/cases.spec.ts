@@ -7,10 +7,10 @@ import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOn
  */
 async function enterOfflineCase(
     page: Page,
-    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false, dayUnknown = false, language = '' } = {},
+    { category = 'Wages and benefits', location = 'Head office, Thapathali', receivedAt = '', anonymous = false, dayUnknown = false, language = '' } = {},
 ) {
     await page.goto('/admin/grievances/create');
-    await page.getByLabel('Channel').selectOption('Phone');
+    await page.getByLabel('Channel').selectOption('Phone / hotline');
 
     if (receivedAt) {
         await page.getByRole('textbox', { name: 'Received' }).fill(receivedAt);
@@ -116,7 +116,7 @@ test.describe('focal person', () => {
     });
 
     test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL, staff }) => {
-        const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment or abuse', anonymous: true });
+        const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment, exploitation and abuse', anonymous: true });
         expect(pin).toMatch(/^\d{6}$/);
 
         const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
@@ -137,7 +137,7 @@ test.describe('focal person', () => {
         const before = await summaryOf(page, day);
 
         await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
-        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment or abuse', anonymous: true });
+        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment, exploitation and abuse', anonymous: true });
 
         const after = await summaryOf(page, day);
         expect(after.received).toBe(before.received + 1);
@@ -153,7 +153,7 @@ test.describe('focal person', () => {
 
         expect(csv.startsWith('\uFEFF')).toBe(true);
         expect(csv).toContain(N4_HEADER);
-        expect(csv).toContain(`${reference},"${day} 09:00",,Phone,"Wages and benefits","Head office",,Received`);
+        expect(csv).toContain(`${reference},"${day} 09:00",,"Phone / hotline","Wages and benefits","Head office, Thapathali",,Received`);
         expect(csv).not.toContain('Test Worker');
         expect(csv).not.toContain('9800000000');
     });
@@ -203,7 +203,7 @@ async function summaryOf(page: Page, day: string) {
         return (await row.count()) ? Number(await row.getByRole('cell').innerText()) : 0;
     };
 
-    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment or abuse') };
+    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment, exploitation and abuse') };
 }
 
 test.describe('administrator', () => {
@@ -248,7 +248,7 @@ test.describe('administrator', () => {
 
     test('filters the case list and flags cases open past 15 working days', { tag: ['@A2'] }, async ({ page }) => {
         test.setTimeout(90_000);
-        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Production plant', receivedAt: daysAgo(30).dateTime });
+        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Factory, Hetauda', receivedAt: daysAgo(30).dateTime });
         const fresh = await enterOfflineCase(page);
 
         await (await findCase(page, fresh.reference)).click();
@@ -267,7 +267,7 @@ test.describe('administrator', () => {
             }, fresh, old],
             ['overdue only', () => page.getByRole('switch', { name: /Overdue only/ }).click(), old, fresh],
             ['category', () => page.getByLabel('Category').selectOption('Discrimination'), old, fresh],
-            ['location', () => page.getByLabel('Location').selectOption('Head office'), fresh, old],
+            ['location', () => page.getByLabel('Location').selectOption('Head office, Thapathali'), fresh, old],
             ['received dates', async () => {
                 await page.getByLabel('Received from').fill(daysAgo(31).day);
                 await page.getByLabel('Received until').fill(daysAgo(29).day);
@@ -376,7 +376,7 @@ test.describe('focal person, documents', () => {
     test('cannot download a document from a restricted case', { tag: ['@S4', '@A5'] }, async ({ page, browser, baseURL, staff }) => {
         const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
         const officerPage = await officer.newPage();
-        const { reference } = await enterOfflineCase(officerPage, { category: 'Sexual harassment or abuse', anonymous: true });
+        const { reference } = await enterOfflineCase(officerPage, { category: 'Sexual harassment, exploitation and abuse', anonymous: true });
         await (await findCase(officerPage, reference)).click();
         const address = await uploadDocument(officerPage);
         await officer.close();

@@ -53,7 +53,7 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling |
 | DevTools device toolbar, width 320, on `/ne` and `/en` | Nothing scrolls sideways; the photo field stays inside the page |
 | Tap "Send grievance" twice quickly (DevTools, Network, "Slow 4G", with a photo) | The button says "Sending…" and only one grievance arrives |
-| Choose "Yes, give my name and contact", then "No, stay anonymous" | The contact fields appear, then go away; with JavaScript off too |
+| Choose "With my name", then "Without my name (anonymous)" | The contact fields appear, then go away; with JavaScript off too |
 | Day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
 | Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
 | Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
@@ -88,7 +88,7 @@ Open http://127.0.0.1:8000/admin and sign in with the email and password from `.
 
 ## 5. Admin side: demo of the proof of concept
 
-The staff panel is in English. Start from a clean local database, so the demo shows only what you create. This deletes everything in `ghm`, which is only ever fake data, and loads your Administrator plus placeholder categories and locations:
+The staff panel is in English. Start from a clean local database, so the demo shows only what you create. This deletes everything in `ghm`, which is only ever fake data, and loads your Administrator plus the company's categories and locations:
 
 ```sh
 php artisan migrate:fresh --seed
@@ -101,7 +101,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 
 | Try | Expect |
 |---|---|
-| Sign in, open Settings → Categories | Five placeholder categories; "Sexual harassment or abuse" is restricted |
+| Sign in, open Settings → Categories | The company's 19 categories; "Sexual harassment, exploitation and abuse" and "Reporting wrongdoing (fraud, corruption, breach of law)" are restricted |
 | Settings → Users → New user: a focal person and a restricted-case officer, with fake names, `@example.com` emails and a password of at least 8 characters | Both appear in the list with their role |
 | Edit your own user | Role and Active cannot be changed: you cannot lock yourself out |
 | Settings → Holidays → add a date | It appears; holidays can be deleted, other settings cannot (deactivate them instead) |
@@ -115,7 +115,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Print slip, or the browser's print preview | Only the heading and the slip: no menu, no buttons, no staff name |
 | Reload the slip page | Back on the case list: the PIN is shown only once |
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
-| Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
+| Enter a case in "Sexual harassment, exploitation and abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
 | Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
 | Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |
 | Print poster, or the browser's print preview | One A4 page: the heading in Nepali and English, the code and the address, no panel menu or buttons |
@@ -248,7 +248,7 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 - The acknowledgement email's Nepali wording needs a native speaker's check.
 - Backups stay on the same machine until the off-server copy is set up, once the host is known.
 - The staff panel is in English; `APP_LOCALE=ne` stays the public pages' default.
-- Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
+- Categories, locations and the optional questions' answers are the company's lists, received 2026-11-12. Where its two documents differ, the WhatsApp answers' wording is used until the company decides.
 - The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are still to be agreed.
 - Notes, replies and documents are on the case page as tabs below the submission. The Administrator's menu has "Activity log": every case change, view, note, reply, document and sign-in, with who and when.
 - The public home page is a placeholder until the WP1 grievance form.

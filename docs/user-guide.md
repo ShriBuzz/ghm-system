@@ -114,14 +114,14 @@ A message from the complainant never changes the status. If a closed case needs 
 
 ## 6. Grievances received offline
 
-When a grievance arrives by phone, email, the drop box or in person, enter it so it is handled like any other. On **Cases**, press **Enter offline case**, then fill in:
+When a grievance arrives by phone, email, the drop box, in person, by letter, at a meeting or through another organisation, enter it so it is handled like any other. On **Cases**, press **Enter offline case**, then fill in:
 
-- **Channel:** **Phone**, **Email**, **Drop box** or **In person**.
+- **Channel:** **Phone / hotline**, **Email**, **Drop box**, **In person**, **Letter**, **Meeting**, **Referred by another organisation** or **Other**.
 - **Received:** when it reached the company. It cannot be in the future.
 - **Category**, **Location**, **When it happened**, **How often** and **Description.**
   - If the complainant knows only the month, tick "The complainant does not remember the day".
 - **Complainant's language:** Nepali or English. Any acknowledgement email is sent in this language.
-- **Anonymous:** switch it on when no name or contact is given. Otherwise a phone number or an email is needed.
+- **Anonymous:** switch it on when no name or contact is given. Otherwise a phone number or an email is needed, even when the complainant chooses **Do not contact me** as the preferred contact.
 
 Press **Create**. The **Offline case recorded** page shows the reference number and a PIN (picture 5).
 

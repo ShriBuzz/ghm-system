@@ -9,7 +9,7 @@ const wcag = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 async function sendGrievance(page: Page): Promise<{ reference: string; pin: string }> {
     await page.goto('/en');
     await page.getByLabel('What is it about?').selectOption('Wages and benefits');
-    await page.getByLabel('Where did it happen?').selectOption('Head office');
+    await page.getByLabel('Where did it happen?').selectOption('Head office, Thapathali');
     await page.getByLabel('Day', { exact: true }).selectOption('3');
     await page.getByLabel('Month', { exact: true }).selectOption('10');
     await page.getByText('Once', { exact: true }).click();

@@ -77,7 +77,7 @@ On the server, in `~/ghm`:
    ```
 
    Never add `--force`: in production the command then asks before replacing an existing key, and the answer is always no. Put `APP_KEY` from `.env` into the company's password manager straight away, next to `BACKUP_ARCHIVE_PASSWORD`. Every name, contact, description, message and note is encrypted with it (S3). A new key, or a lost one, makes them unreadable for good (`docs/restore.md`).
-3. Create the tables, then the first Administrator from the `GHM_ADMIN_*` lines. On staging this also loads the placeholder categories and locations; production gets the real lists through Settings:
+3. Create the tables, then the first Administrator from the `GHM_ADMIN_*` lines. This also loads the company's categories (two of them restricted) and locations, on staging and in production. It fills empty lists only, so it never undoes a change made later in Settings:
 
    ```sh
    php artisan migrate --force
@@ -215,7 +215,7 @@ On staging also:
 |---|---|---|
 | `APP_ENV` | `staging` | `production` |
 | Data | Fake only | Real. The vendor signs in only with the company's written permission, each time (S8) |
-| Categories and locations | Placeholders from `db:seed` | The real lists, entered in Settings |
+| Categories and locations | The company's lists, from `db:seed` | The company's lists, from `db:seed`; changed later in Settings |
 | Playwright | The full suite | `@smoke` only |
 | First Administrator | A test account | The company's own, named at kick-off |
 | Before go-live | | Every UAT case cleared |

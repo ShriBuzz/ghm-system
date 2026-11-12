@@ -60,7 +60,7 @@ The handover zip for the client: `git archive --format=zip -o ghm-system.zip mai
 | `.env` | Holds secrets | Copy `.env.example`, run `php artisan key:generate`, fill in the database settings |
 | `vendor/`, `node_modules/` | Installed dependencies | `composer install`, `npm ci` |
 | Playwright browsers | Installed per machine | `npx playwright install chromium` |
-| Local databases | Per machine, fake data only | Create `ghm` and `ghm_testing` as in `docs/local-setup.md` |
+| Local databases | Per machine, fake data only | Create `ghm` and `ghm_testing` as in `docs/local-setup.md`. On a machine set up before WP4 step 1, refresh both once, because the seeder fills empty lists only and leaves the old placeholder categories in place: `php artisan test` rebuilds `ghm_testing` (or `DB_DATABASE=ghm_testing php artisan migrate:fresh`), and `php artisan migrate:fresh --seed` rebuilds `ghm` |
 | Impeccable hook and engine | Per machine by design | `npx impeccable@4.8.0 install --providers=claude --scope=project -y` |
 | Ponytail plugin files | Claude Code installs plugins per machine | Accept Claude Code's offer, or `/plugin install ponytail@ponytail` |
 | Claude Code chat history and memory | Kept in the old machine's home folder | This file and `docs/progress.md` carry the context |

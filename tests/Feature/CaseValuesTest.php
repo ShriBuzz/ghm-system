@@ -19,6 +19,17 @@ it('lists the priorities exactly as RFQ A4 does', function () {
     ]);
 })->group('A4');
 
+it('uses the company\'s Nepali labels for statuses and priorities', function () {
+    app()->setLocale('ne');
+
+    expect(array_map(fn (Status $status) => $status->getLabel(), Status::cases()))->toBe([
+        'प्राप्त', 'प्रारम्भिक मूल्याङ्कनको क्रममा', 'छानबिनको क्रममा', 'अन्यत्र सिफारिश गरिएको / दायराबाहिर',
+        'समाधान भएको', 'बन्द गरिएको', 'पुनः खोलिएको',
+    ])->and(array_map(fn (Priority $priority) => $priority->getLabel(), Priority::cases()))->toBe([
+        'न्यून', 'मध्यम', 'उच्च', 'अति गम्भीर',
+    ]);
+})->group('A4', 'U8');
+
 it('labels every status and priority in Nepali', function (Status|Priority $case) {
     app()->setLocale('en');
     $english = $case->getLabel();
