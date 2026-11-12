@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 step 1 (the company's lists and wording). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 and 2 (the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -107,17 +107,20 @@ Use three browser windows that keep their sessions apart, for example a normal w
 | Settings → Users → New user: a focal person and a restricted-case officer, with fake names, `@example.com` emails and a password of at least 8 characters | Both appear in the list with their role |
 | Edit your own user | Role and Active cannot be changed: you cannot lock yourself out |
 | Settings → Holidays → add a date | It appears; holidays can be deleted, other settings cannot (deactivate them instead) |
+| Activity log, after a holiday is added, changed or deleted | "Holiday Added", "Holiday Changed" or "Holiday Deleted", with who did it, the date and the name |
 
 **Focal person: offline entry (A6)**
 
 | Try | Expect |
 |---|---|
-| Sign in as the focal person | Menu shows Dashboard, Cases, Summary and QR poster, no Settings. Opening `/admin/categories` shows "Forbidden" |
+| Sign in as the focal person | Menu shows Dashboard, Cases, Summary, QR poster and, under Settings, only Holidays. Opening `/admin/categories` shows "Forbidden" |
+| Settings → Holidays → New holiday: a date and a name | The holiday is saved; its row offers Edit but no Delete |
 | Open Channel and Preferred contact on the offline form | Channel: Phone / hotline, Email, Drop box, In person, Letter, Meeting, Referred by another organisation, Other (never "Online form"). Preferred contact: Phone, Email, Do not contact me |
 | Cases → Enter offline case: channel "Phone / hotline", category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
 | Print slip, or the browser's print preview | Only the heading and the slip: no menu, no buttons, no staff name |
 | Reload the slip page | Back on the case list: the PIN is shown only once |
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
+| Open that case, Set status Resolved, then Reopened | Working days open is 0 and the case page shows "Reopened on" with today's date; in the list its days open is no longer red |
 | Enter a case in "Sexual harassment, exploitation and abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
 | Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
 | Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |

@@ -6,7 +6,7 @@ This guide is for focal persons: the staff who handle grievances in the staff pa
 
 There are three roles in the system:
 
-- **Administrator:** sees every case and manages the settings (users, categories, locations, holidays and the public notice).
+- **Administrator:** sees every case and manages the settings (users, categories, locations and the public notice). The Administrator also checks the holidays you enter, and is the only one who can delete one.
 - **Focal person (you):** sees every case that is not restricted.
 - **Restricted-case officer:** sees the restricted cases.
 
@@ -60,8 +60,9 @@ You get no email for a restricted case, or for a case you entered yourself.
 
 - **Find a case.** Type its reference number, for example `GHM-2026-0001`, in the **Search** box above the table.
 - **Filter the list.** Use the funnel button to filter by **Status**, **Category**, **Location**, a date range (**Received from**, **Received until**), or **Overdue only (over 15 working days)**.
-- **Days open** counts working days since the case was received. Saturdays, and the holidays the Administrator enters, do not count. The number turns red when an open case passes 15 working days.
-- **When the count stops.** It stops when a case is **Referred / Out of scope**, **Resolved** or **Closed**. If you later set **Reopened**, it counts again from the day the case was received.
+- **Days open** counts working days since the case was received, or since it was last reopened. Saturdays, and the holidays in **Settings → Holidays**, do not count; Sundays do. The number turns red when an open case passes 15 working days.
+- **When the count stops.** It stops when a case is **Referred / Out of scope**, **Resolved** or **Closed**. If you later set **Reopened**, it counts again from that day, and the case page shows **Reopened on** with the date. Setting **Reopened** on a case that is still open does not restart the count.
+- **Holidays.** At the start of each year, enter the government's public holidays: **Settings → Holidays**, **New holiday**, then the date and its name. You can correct one with **Edit**. Only the Administrator can delete a holiday, and the Administrator checks your entries in the activity log.
 
 ## 5. Working a case
 

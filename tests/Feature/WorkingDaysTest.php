@@ -1,10 +1,13 @@
 <?php
 
+use App\Enums\Role;
 use App\Enums\Status;
+use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Models\Grievance;
 use App\Models\Holiday;
 use App\Support\WorkingDays;
 use Illuminate\Support\Carbon;
+use Livewire\Livewire;
 
 it('counts the days after receipt, skipping Saturdays and holidays', function () {
     $friday = Carbon::parse('2026-11-20 10:00');
@@ -38,9 +41,59 @@ it('stops the clock at Resolved, Referred or Closed and sets the closed date', f
     expect($case->working_days_open)->toBe(2)
         ->and($case->closed_at->toDateString())->toBe('2026-12-04');
 
+    // The company's answer: a reopened case counts again from the reopening date (U3).
     $case->forceFill(['status' => Status::Reopened])->save();
-    expect($case->closed_at)->toBeNull()->and($case->working_days_open)->toBe(12);
-})->group('A2');
+    expect($case->closed_at)->toBeNull()->and($case->working_days_open)->toBe(0);
+})->group('A2', 'U3');
+
+it('restarts the count from the reopening date, each time a stopped case is reopened', function () {
+    $this->travelTo('2026-11-20 10:00');
+    $case = Grievance::factory()->create();
+
+    $this->travelTo('2026-11-23 10:00');
+    $case->forceFill(['status' => Status::Resolved])->save();
+
+    $this->travelTo('2026-12-04 10:00');
+    $case->forceFill(['status' => Status::Reopened])->save();
+    expect($case->reopened_at->toDateString())->toBe('2026-12-04')->and($case->working_days_open)->toBe(0);
+
+    // The nightly recount and the next status change count from the reopening too (Saturday 5 Dec skipped).
+    $this->travelTo('2026-12-08 00:30');
+    $this->artisan('ghm:recount-working-days')->assertSuccessful();
+    expect($case->fresh()->working_days_open)->toBe(3);
+
+    $this->travelTo('2026-12-09 10:00');
+    $case->refresh()->forceFill(['status' => Status::UnderInvestigation])->save();
+    expect($case->working_days_open)->toBe(4);
+
+    $case->forceFill(['status' => Status::Closed])->save();
+    $this->travelTo('2026-12-14 10:00');
+    $case->forceFill(['status' => Status::Reopened])->save();
+    expect($case->reopened_at->toDateString())->toBe('2026-12-14')->and($case->working_days_open)->toBe(0);
+})->group('A2', 'U3');
+
+it('keeps counting from receipt when an open case is set to Reopened, so an overdue case stays overdue', function () {
+    $this->travelTo('2026-11-20 10:00');
+    $case = Grievance::factory()->create();
+    $case->forceFill(['status' => Status::UnderInvestigation])->save();
+
+    $this->travelTo('2026-11-24 10:00');
+    $case->forceFill(['status' => Status::Reopened])->save();
+
+    expect($case->reopened_at)->toBeNull()->and($case->working_days_open)->toBe(3);
+})->group('A2', 'U3');
+
+it('shows on the case page when the count restarted', function () {
+    app()->setLocale('en');
+    signedInAs(Role::Administrator);
+    $this->travelTo('2026-12-04 10:00');
+    $case = Grievance::factory()->create(['received_at' => '2026-11-20 10:00']);
+    $case->forceFill(['status' => Status::Resolved])->save();
+    $case->forceFill(['status' => Status::Reopened])->save();
+
+    Livewire::test(ViewGrievance::class, ['record' => $case->id])
+        ->assertSee('Reopened on')->assertSee('Dec 4, 2026');
+})->group('A2', 'U3');
 
 it('clears the closed date whenever a case leaves Closed, not only at Reopened', function (Status $next) {
     $case = Grievance::factory()->create();

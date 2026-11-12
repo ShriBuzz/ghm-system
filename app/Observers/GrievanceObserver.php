@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Enums\Status;
 use App\Models\Grievance;
-use App\Support\WorkingDays;
 use BackedEnum;
 
 class GrievanceObserver
@@ -66,8 +65,8 @@ class GrievanceObserver
     }
 
     /**
-     * Days open run while the case is open and freeze when it stops (A2).
-     * A reopened case counts again from the day it was received.
+     * Days open run while the case is open and freeze when it stops (A2). A stopped case that
+     * is reopened counts again from the reopening date (U3).
      */
     private function updateClock(Grievance $grievance): void
     {
@@ -76,8 +75,13 @@ class GrievanceObserver
         // Any status can follow Closed, so the date goes whenever the case leaves it.
         $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
 
+        // Only a stopped case restarts: an open, overdue case set to Reopened keeps its count.
+        if ($grievance->status === Status::Reopened && $was instanceof Status && ! $was->isOpen()) {
+            $grievance->reopened_at = now();
+        }
+
         if (! $was instanceof Status || $was->isOpen() || $grievance->status->isOpen()) {
-            $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
+            $grievance->working_days_open = $grievance->workingDaysSoFar();
         }
     }
 }

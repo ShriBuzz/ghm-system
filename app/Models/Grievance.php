@@ -16,6 +16,7 @@ use App\Enums\Status;
 use App\Notifications\Acknowledgement;
 use App\Notifications\CaseAlert;
 use App\Observers\GrievanceObserver;
+use App\Support\WorkingDays;
 use Database\Factories\GrievanceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -114,6 +115,17 @@ class Grievance extends Model
             || (! $message && $user->id === $this->created_by));
 
         Notification::send($recipients, new CaseAlert($this->id, $message));
+    }
+
+    /**
+     * Working days open until now, counted from the last reopening if there was one, else
+     * from receipt (A2, U3). The observer and the nightly recount both use it.
+     *
+     * @return int<0, max>
+     */
+    public function workingDaysSoFar(): int
+    {
+        return WorkingDays::between($this->reopened_at ?? $this->received_at, now());
     }
 
     /**
@@ -232,6 +244,7 @@ class Grievance extends Model
             'is_restricted' => 'boolean',
             'received_at' => 'datetime',
             'closed_at' => 'datetime',
+            'reopened_at' => 'datetime',
             'working_days_open' => 'integer',
         ];
     }

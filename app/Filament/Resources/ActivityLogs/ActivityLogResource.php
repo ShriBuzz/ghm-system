@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\Holiday;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -56,9 +57,10 @@ class ActivityLogResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('When')->dateTime(),
                 TextColumn::make('event')->label('What')->formatStateUsing(fn (string $state): string => str($state)->headline()->toString()),
-                TextColumn::make('subject_id')->label('Case or category')->formatStateUsing(fn (Activity $record): ?string => match (true) {
+                TextColumn::make('subject_id')->label('Case or setting')->formatStateUsing(fn (Activity $record): ?string => match (true) {
                     $record->subject instanceof Grievance => $record->subject->reference,
                     $record->subject instanceof Category => "Category: {$record->subject->name_en}",
+                    $record->subject instanceof Holiday => "Holiday: {$record->subject->name}",
                     default => null,
                 }),
                 // After what and which case, so a narrow screen shows those first.

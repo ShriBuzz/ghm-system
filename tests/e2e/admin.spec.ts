@@ -74,7 +74,7 @@ test.describe('on a server whose sessions last one idle minute', () => {
 
 const menus = {
     administrator: ['Dashboard', 'Cases', 'Summary', 'Activity log', 'QR poster', 'Public notice', 'Categories', 'Holidays', 'Locations', 'Users'],
-    focal_person: ['Dashboard', 'Cases', 'Summary', 'QR poster'],
+    focal_person: ['Dashboard', 'Cases', 'Summary', 'QR poster', 'Holidays'],
     restricted_officer: ['Dashboard', 'Cases', 'Summary', 'QR poster'],
 };
 
@@ -90,12 +90,15 @@ for (const role of roles) {
     });
 }
 
+// Focal persons enter each year's holidays (the company's answer); every other setting is the Administrator's.
+const refused = { focal_person: ['categories', 'locations', 'users'], restricted_officer: ['categories', 'holidays', 'locations', 'users'] };
+
 for (const role of ['focal_person', 'restricted_officer'] as const) {
     test.describe(role, () => {
         test.use({ role });
 
-        test('is refused the settings pages', { tag: ['@A7', '@A5'] }, async ({ page }) => {
-            for (const settings of ['categories', 'holidays', 'locations', 'users']) {
+        test('is refused the Administrator\'s settings pages', { tag: ['@A7', '@A5', '@A2'] }, async ({ page }) => {
+            for (const settings of refused[role]) {
                 expect((await page.goto(`/admin/${settings}`))!.status()).toBe(403);
             }
         });
