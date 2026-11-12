@@ -113,14 +113,14 @@ class Grievance extends Model
 
     /**
      * Alert staff to this case, as the company set out (N1, U6):
-     * - a new case, or a message on a case with no active assignee: the active staff who can
-     *   see it, but not the Administrators;
+     * - a new case, a case just marked restricted, or a message on a case with no active assignee:
+     *   the active staff who can see it, but not the Administrators;
      * - a message on a case whose assignee is active and can see it: the assignee alone, even
      *   when that is an Administrator;
      * - a restricted case while no restricted-case officer is active: the Administrators,
      *   since nobody else can see it;
      * - a case set to Critical, or past its target: the Administrators.
-     * Whoever entered a case, or set it to Critical, already knows and is not told.
+     * Whoever entered a case, marked it restricted or set it to Critical already knows and is not told.
      */
     public function alertStaff(AlertKind $kind = AlertKind::NewCase): void
     {
@@ -136,7 +136,7 @@ class Grievance extends Model
         };
         $informed = match ($kind) {
             AlertKind::NewCase => $this->created_by,
-            AlertKind::Critical => auth()->id(),
+            AlertKind::Restricted, AlertKind::Critical => auth()->id(),
             default => null,
         };
 

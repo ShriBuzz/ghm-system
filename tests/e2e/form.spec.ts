@@ -146,6 +146,47 @@ test('takes the visitor to what needs fixing, each message linked to its field',
     expect(scan.violations).toEqual([]);
 });
 
+for (const locale of ['ne', 'en']) {
+    test(`/${locale}: each error link shows its question and its error, not just the field`, { tag: ['@S9', '@P1'] }, async ({ page }) => {
+        await page.goto(`/${locale}`);
+        await page.locator('#send').click();
+        const links = page.locator('.error-summary a');
+        await expect(links.first()).toBeVisible();
+
+        for (const href of await links.evaluateAll((all) => all.map((a) => a.getAttribute('href')!))) {
+            await page.locator(`.error-summary a[href="${href}"]`).click();
+            // The question (label or legend) and its error line are inside the screen, not above it.
+            const inView = await page.evaluate((id) => {
+                const field = document.getElementById(id)!;
+                const group = field.closest('fieldset') ?? field.closest('.field')!;
+                const question = group.querySelector('legend') ?? group.querySelector('label')!;
+                const error = group.querySelector('.error')!;
+                return [question, error].every((el) => el.getBoundingClientRect().top >= 0);
+            }, href.slice(1));
+            expect(inView, href).toBe(true);
+            await page.evaluate(() => window.scrollTo(0, 0));
+        }
+    });
+}
+
+test('shows the day box\'s longest choice in full, on a phone and on a desktop, in both languages', { tag: ['@P5', '@U9', '@S9'] }, async ({ page }) => {
+    for (const [locale, day] of [['ne', '#incident_bs_day'], ['en', '#incident_day']]) {
+        for (const width of [320, 360, 1280]) {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto(`/${locale}`);
+            await page.locator(day).selectOption('unknown');
+            // The chosen text's own width against the room inside the box (its padding and arrow taken off).
+            const [need, room] = await page.locator(day).evaluate((select: HTMLSelectElement) => {
+                const style = getComputedStyle(select);
+                const canvas = document.createElement('canvas').getContext('2d')!;
+                canvas.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                return [canvas.measureText(select.selectedOptions[0].text).width, select.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 20];
+            });
+            expect(need, `${locale} at ${width} px`).toBeLessThanOrEqual(room);
+        }
+    }
+});
+
 test('the received page passes an axe WCAG 2.2 AA scan in both languages', { tag: ['@S9', '@P7'] }, async ({ page }) => {
     await page.goto('/en');
     await fillRequired(page);

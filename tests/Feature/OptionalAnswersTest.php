@@ -108,3 +108,9 @@ it('shows a remembered month as the month and year only', function () {
     Livewire::test(ViewGrievance::class, ['record' => $case->id])
         ->assertSee('June 2026, exact day not remembered');
 })->group('P5');
+
+it('says who sees the optional answers and why, never that they show who is complaining', function () {
+    $this->get('/en')->assertSee('These answers show which groups of people raise grievances. Only the staff who handle grievances see them. Skip any question.')
+        ->assertDontSee('see who raises grievances');
+    $this->get('/ne')->assertSee('यी उत्तरले कस्ता समूहका मानिसले गुनासो दिन्छन् भनेर देखाउँछन्। गुनासो हेर्ने कर्मचारीले मात्र यी उत्तर देख्छन्। चाहेको प्रश्न छोड्न सक्नुहुन्छ।');
+})->group('P6');

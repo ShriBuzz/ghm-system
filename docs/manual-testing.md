@@ -4,7 +4,7 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 to 12 ("<5" for small groups in the summary; a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 to 12 and the WP4 review fixes (error links that keep the question in view, the day box on its own row on phones, Finish and hide clearing the PIN page, an alert when a case is marked restricted; "<5" for small groups in the summary; a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
@@ -52,14 +52,14 @@ The page is the grievance form (P1 to P9). Fill it with fake details only.
 | Try | Expect |
 |---|---|
 | Read the form page in both languages | Titled "Raise a grievance" (गुनासो दर्ता गर्नुहोस्). The notice "Your grievance is safe with us." with four points, then what happens next and that the service is free; the police line is only at the top. Below the Send button, "Other ways to raise a grievance" (गुनासो दर्ता गर्ने अन्य तरिका) |
-| Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling |
+| Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling Each link lands on its field with the question, hint and red message still in view |
 | DevTools device toolbar, width 320, on `/ne` and `/en` | Nothing scrolls sideways; the photo field stays inside the page |
 | Tap "Send grievance" twice quickly (DevTools, Network, "Slow 4G", with a photo) | The button says "Sending…" and only one grievance arrives |
 | Choose "With my name", then "Without my name (anonymous)" | The contact fields appear, then go away; with JavaScript off too |
 | Choose "With my name", write a name, choose "Do not contact me", leave phone and email empty, fill in the rest and send | "Give a phone number or an email." in the box under the heading and at the phone field; with a phone number added, the grievance goes through |
 | On `/ne`, open the "About you" questions | तपाईं को हुनुहुन्छ? lists 11 answers and भन्न चाहँदिन; the age groups start with १८ वर्षभन्दा कम; जाति/जातीयता includes थारु |
 | On `/en`: day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
-| On `/ne`, open the date boxes | गते 1 to 32 and गते याद छैन; महिना बैशाख to चैत (the Bikram Sambat months); साल this BS year first, then the ten before |
+| On `/ne`, open the date boxes | गते 1 to 32 and गते याद छैन; महिना बैशाख to चैत (the Bikram Sambat months); साल this BS year first, then the ten before. At 360 px the day box has its own row and shows "गते याद छैन" in full; from 40rem the three share one row |
 | On `/ne`: a past BS date, for example 22 कार्तिक 2083, the rest filled in, send | Sent. On the case page, "When it happened" shows "2083-07-22 (2026-11-08)" |
 | On `/ne`: गते याद छैन, कार्तिक 2083, send | On the case page: "Kartik 2083, exact day not remembered", not an AD month |
 | On `/ne`: 31 कार्तिक 2083 (Kartik 2083 has 30 days), or a date still to come | Refused: "यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।" or "यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।" |
@@ -80,7 +80,7 @@ The status page (P8), at http://127.0.0.1:8000/en/status or from the link on the
 | Write in "Add information or reply" and send | "Your message was sent." and the message in the thread as "You". The case page's Messages tab in the panel shows it, and the staff who can see the case get an alert (in the queue) |
 | A wrong PIN five times | The fifth says the reference is locked for 15 minutes; the right PIN is refused until then. An unknown reference gets the same message as a wrong PIN |
 | Leave the status page untouched for 10 minutes, then reload | Back on the lookup, asked for the reference and PIN again |
-| Finish and hide | Back on the lookup with "Hidden on this phone. Your grievance is still open with the team."; the status page needs the PIN again |
+| Finish and hide | Back on the lookup with "Hidden on this phone. Your grievance is still open with the team."; the status page needs the PIN again, and the page with the reference and PIN (`/en/received`) is gone too |
 
 ## 4. Staff panel
 
@@ -218,6 +218,7 @@ Who gets which alert (U6). Count the queued alerts with `php artisan tinker --ex
 | Assign a case to the focal person, then send a message on it from the status page | One alert, to the focal person only. On an unassigned case, every focal person gets one |
 | As the focal person, Set priority → Critical | One alert to each active Administrator: "Grievance set to Critical". Setting another priority, or Critical again, sends none |
 | Deactivate every restricted-case officer, then send a grievance in a restricted category | The Administrator gets "New grievance received". Reactivate the officer afterwards |
+| As the focal person, Mark restricted on a case | One alert to each active restricted-case officer: "Grievance marked restricted" (with none active, to the Administrator); none to the focal person who marked it |
 | Enter an offline case received 30 days ago, then run `php artisan ghm:recount-working-days` twice | One "Grievance past its target" alert per active Administrator, and one "Escalated" entry for the case in the activity log, by "System or complainant". Closing and reopening the case starts its count again |
 
 Delete the two files afterwards: `rm storage/app/email-*.html`.

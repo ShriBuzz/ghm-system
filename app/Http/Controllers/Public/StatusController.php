@@ -127,7 +127,8 @@ class StatusController
 
     public function close(Request $request): RedirectResponse
     {
-        $request->session()->forget(['status', 'status_draft']);
+        // The page with the reference and PIN too, so "Hidden on this phone" holds for both (P7, P8).
+        $request->session()->forget(['status', 'status_draft', 'received']);
 
         return redirect()->route('status.lookup')->with('status_notice', __('track.closed'));
     }

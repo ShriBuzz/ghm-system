@@ -101,6 +101,10 @@ class StoreGrievanceRequest extends FormRequest
             $this->merge(['is_anonymous' => filter_var($this->input('is_anonymous'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE)]);
         }
 
+        // The server decides the calendar: only the Nepali form's own selects make a date BS, so a sent-in
+        // "bs" can never mark a date outside the BS table, which the case page could not show.
+        $this->merge(['incident_date_calendar' => 'ad']);
+
         $bs = $this->has('incident_bs_year');
         $prefix = $bs ? 'incident_bs_' : 'incident_';
         $day = $this->text($prefix.'day');

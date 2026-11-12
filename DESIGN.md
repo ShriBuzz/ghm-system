@@ -242,7 +242,7 @@ One column, centred, at a 40rem measure. The header and main share the same inli
 
 The rhythm is "more room between groups than inside them". The form's sections sit 2.5rem apart, each opened by a 1 px Quiet Line rule and 2rem of top padding; inside a section, questions sit 1.5rem apart; inside a question, label, hint, error and control sit 0.5rem apart. Panels (notice, contact group, error summary, "keep these" card, status facts) all take 1.25rem padding. The status pages use the same 1.5rem stack. The form page ends with "Other ways to raise a grievance", one more section opened the same way, 2.5rem below the Send button.
 
-There is one breakpoint, 40rem. Below it the primary button is full width; at and above it the three status facts sit in one row spread across the measure. The day, month and year selects share one row at every width, the year keeping the width its four digits need. Nothing scrolls sideways at 320 px; the file input's minimum width is released for that reason.
+There is one breakpoint, 40rem. Below it the primary button is full width; at and above it the three status facts sit in one row spread across the measure. Below 40rem the day select has a row of its own, so its longest choice ("I don't remember the day", "गते याद छैन") is never cut, and month and year share the next row; from 40rem the three share one row, the day widest and the year keeping the width its four digits need. Nothing scrolls sideways at 320 px; the file input's minimum width is released for that reason.
 
 ## Elevation & Depth
 
@@ -297,7 +297,7 @@ The received page's framed card: 3 px teal border, large radius, 1.25rem padding
 The Counter Band panel above the form, in the company's words from Settings: the first paragraph is its heading (h2, 1.25rem), lines starting "- " are a bulleted list, the rest are paragraphs. A 1 px Quiet Line rules the points (the promise) off from the paragraphs after them.
 
 ### Error summary (signature)
-At the top of a refused form: 3 px Signal Red frame, medium radius, a red heading, and a list of red links at label weight, each jumping to its field. A refusal about the sending (rather than an answer) gets its own heading and no links. With JavaScript on, it takes focus on load.
+At the top of a refused form: 3 px Signal Red frame, medium radius, a red heading, and a list of red links at label weight, each jumping to its field with its question, hint and error still in view: `form.js` scrolls the question into view, then focuses the field; without JavaScript, form fields keep 10rem of scroll room above them and the date boxes 18rem. A refusal about the sending (rather than an answer) gets its own heading and no links. With JavaScript on, it takes focus on load.
 
 ### Message thread (signature)
 An ordered list of messages 1rem apart, each at most 90% wide with medium radius and 0.875rem by 1rem padding. Team messages: Counter Band ground, 1 px Quiet Line border, at the start. The visitor's own: Teal Wash ground, teal border, at the end. Each says who wrote it in bold Slate Ink, followed by the date in Soft Ink.

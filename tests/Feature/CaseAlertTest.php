@@ -130,6 +130,28 @@ it('alerts the Administrators about a restricted case and its messages while no 
         ->and(Notification::sent($this->officer, CaseAlert::class))->toBeEmpty();
 })->group('U6', 'N1');
 
+it('alerts the restricted-case officers when a case is marked restricted, or the Administrators while none is active', function () {
+    $case = Grievance::factory()->create();
+    $this->actingAs($this->focal);
+    $case->update(['manually_restricted' => true]);
+
+    expect([alertsOf($this->officer, AlertKind::Restricted), alertsOf($this->admin, AlertKind::Restricted), alertsOf($this->focal, AlertKind::Restricted)])
+        ->toBe([1, 0, 0]);
+
+    // With no active officer, the Administrators, but not the one who marked it.
+    $this->officer->update(['is_active' => false]);
+    $second = User::factory()->create(['role' => Role::Administrator]);
+    $this->actingAs($this->admin);
+    Grievance::factory()->create()->update(['manually_restricted' => true]);
+
+    expect([alertsOf($second, AlertKind::Restricted), alertsOf($this->admin, AlertKind::Restricted)])->toBe([1, 0]);
+
+    // Already restricted by its category: marking it changes nothing anyone can see, so no alert.
+    Grievance::factory()->create(['category_id' => Category::factory()->create(['is_restricted' => true])])->update(['manually_restricted' => true]);
+
+    expect(alertsOf($second, AlertKind::Restricted))->toBe(1);
+})->group('U6', 'N1', 'A5');
+
 it('alerts the other active Administrators when a case is set to Critical, each time it becomes Critical', function () {
     $second = User::factory()->create(['role' => Role::Administrator]);
     $case = Grievance::factory()->create(['priority' => Priority::Low]);

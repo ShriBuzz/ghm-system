@@ -216,3 +216,13 @@ it('shows a staff reply written in Nepali exactly as written, line break include
 
     $this->get('/ne/status/case')->assertOk()->assertSee('तपाईंको गुनासो हेर्दैछौं।<br />', false)->assertSee('भोलि सम्पर्क गर्नेछौं।');
 })->group('P8', 'U16');
+
+it('also hides the reference and PIN page on Finish and hide, so they are not left on a shared phone', function () {
+    $this->post('/en', formInput())->assertRedirect(route('grievance.received', ['locale' => 'en']));
+    preg_match('/data-pin>(\d{6})</', $this->get('/en/received')->getContent(), $pin);
+
+    lookUp(Grievance::sole(), $pin[1])->assertRedirect(route('status.show', ['locale' => 'en']));
+    $this->post('/en/status/close')->assertRedirect(route('status.lookup', ['locale' => 'en']));
+
+    $this->get('/en/received')->assertRedirect(route('home', ['locale' => 'en']));
+})->group('P7', 'P8');

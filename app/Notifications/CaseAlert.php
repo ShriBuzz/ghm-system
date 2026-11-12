@@ -36,6 +36,7 @@ class CaseAlert extends Notification implements ShouldQueue
     {
         [$subject, $line] = match ($this->kind) {
             AlertKind::NewCase => ['New grievance received', 'A new grievance has been received.'],
+            AlertKind::Restricted => ['Grievance marked restricted', 'A grievance has been marked restricted. Only restricted-case officers and the Administrator can now see it.'],
             AlertKind::Message => ['New message on a grievance', 'A complainant has sent a new message.'],
             AlertKind::Critical => ['Grievance set to Critical', 'A grievance has been set to Critical priority. It needs action today.'],
             AlertKind::PastTarget => ['Grievance past its target', 'An open grievance has passed its target time without being resolved.'],

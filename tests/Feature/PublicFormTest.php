@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\ContactMethod;
+use App\Enums\Role;
+use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Models\Attachment;
 use App\Models\Grievance;
 use App\Models\Setting;
@@ -12,6 +14,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
 
 beforeEach(function () {
     $this->travelTo('2026-11-02 10:00');
@@ -237,3 +240,28 @@ it('refuses crafted list values in place of text, without an error page', functi
 
     expect(Grievance::count())->toBe(0);
 })->group('P9', 'P5');
+
+it('decides the calendar itself, so a hand-made post cannot store a case its staff page cannot show', function () {
+    // No date selects, a typed date before the Bikram Sambat table starts, and a claim that it is BS.
+    $input = formInput(['incident_date' => '2000-01-01', 'incident_date_exact' => '0', 'incident_date_calendar' => 'bs']);
+    unset($input['incident_day'], $input['incident_month'], $input['incident_year']);
+    $this->post('/en', $input)->assertRedirect(route('grievance.received', ['locale' => 'en']));
+
+    $case = Grievance::sole();
+    expect($case->incident_date_calendar)->toBe('ad');
+
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    signedInAs(Role::Administrator);
+    Livewire::test(ViewGrievance::class, ['record' => $case->id])->assertOk()->assertSee('January 2000, exact day not remembered');
+})->group('P5', 'U9');
+
+it('links each date box to the date\'s hint and error, as every other field is linked to its own', function (string $locale, string $day) {
+    $this->from("/{$locale}")->post("/{$locale}", formInput(['incident_day' => '', 'incident_bs_day' => '']));
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8"?>'.$this->get("/{$locale}")->getContent());
+    $select = (new DOMXPath($dom))->query("//select[@id='{$day}']")->item(0);
+
+    expect($select->getAttribute('aria-describedby'))->toBe('incident_date-hint incident_date-error')
+        ->and($select->getAttribute('aria-invalid'))->toBe('true');
+})->with([['en', 'incident_day'], ['ne', 'incident_bs_day']])->group('S9', 'P5');
