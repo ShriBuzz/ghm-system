@@ -54,3 +54,8 @@ it('writes a date for staff as BS with AD alongside, by Nepal time, and in AD on
         ->and(BsDate::forStaff(CarbonImmutable::parse('2026-11-08 18:30', 'UTC'), time: true))->toBe('2083-07-23 (2026-11-09) 00:15')
         ->and(BsDate::forStaff(CarbonImmutable::parse('2207-05-13')))->toBe('2207-05-13');
 })->group('U9');
+
+it('writes a BS date alone for the export, by Nepal time, and nothing outside the table', function () {
+    expect(BsDate::format(CarbonImmutable::parse('2026-11-08 18:30', 'UTC')))->toBe('2083-07-23')
+        ->and(BsDate::format(CarbonImmutable::parse('2207-05-13')))->toBeNull();
+})->group('U9', 'N4');

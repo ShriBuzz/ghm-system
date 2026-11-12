@@ -146,7 +146,7 @@ test.describe('focal person', () => {
         expect(after.restricted).toBe(0);
     });
 
-    test('exports a CSV of the N4 columns without names or contacts, and is not offered them', { tag: ['@N4', '@A5'] }, async ({ page }) => {
+    test('exports a CSV of the N4 columns, dates in AD and BS, without names or contacts, and is not offered them', { tag: ['@N4', '@A5', '@U9'] }, async ({ page }) => {
         const day = `2022-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
         const { reference } = await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
 
@@ -154,13 +154,14 @@ test.describe('focal person', () => {
 
         expect(csv.startsWith('\uFEFF')).toBe(true);
         expect(csv).toContain(N4_HEADER);
-        expect(csv).toContain(`${reference},"${day} 09:00",,"Phone / hotline","Wages and benefits","Head office, Thapathali",,Received`);
+        // The BS date is checked exactly in Pest; here, that the column holds one.
+        expect(csv).toMatch(new RegExp(`${reference},"${day} 09:00",\\d{4}-\\d{2}-\\d{2},,,"Phone / hotline","Wages and benefits","Head office, Thapathali",,Received`));
         expect(csv).not.toContain('Test Worker');
         expect(csv).not.toContain('9800000000');
     });
 });
 
-const N4_HEADER = 'Reference,Received,Closed,Channel,Category,Location,Priority,Status,"Complainant type",Sex,"Age group",Ethnicity,Disability';
+const N4_HEADER = 'Reference,"Received (AD)","Received (BS)","Closed (AD)","Closed (BS)",Channel,Category,Location,Priority,Status,"Complainant type",Sex,"Age group",Ethnicity,Disability';
 
 /**
  * Exports the cases received on one day as CSV, with names and contacts if asked and offered,
@@ -223,7 +224,7 @@ test.describe('administrator', () => {
 
         const csv = await exportCsv(page, day, { personal: true });
 
-        expect(csv).toContain('Reference,Name,Phone,Email,Received');
+        expect(csv).toContain('Reference,Name,Phone,Email,"Received (AD)","Received (BS)"');
         expect(csv).toContain(`${reference},"Test Worker",9800000000,,"${day} 09:00"`);
     });
 
