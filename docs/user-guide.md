@@ -10,7 +10,7 @@ There are three roles in the system:
 - **Focal person (you):** sees every case that is not restricted.
 - **Restricted-case officer:** sees the restricted cases.
 
-A case is restricted when its category is restricted (for example sexual harassment or abuse) or when someone marks it restricted. Restricted cases never appear for you: not in the list, the search, the summary, the export or the email alerts.
+A case is restricted when its category is restricted (sexual harassment, exploitation and abuse, and reporting wrongdoing, unless the Administrator changes them) or when someone marks it restricted. Restricted cases never appear for you: not in the list, the search, the summary, the export or the email alerts.
 
 Your menu has four items: **Dashboard**, **Cases**, **Summary** and **QR poster**.
 
@@ -83,11 +83,11 @@ Click a reference to open the case (picture 3).
 | Status | Nepali | Use it when |
 |---|---|---|
 | Received | प्राप्त | The case has arrived (set automatically) |
-| Under assessment | मूल्याङ्कनमा | You are checking what the case is about |
-| Under investigation | छानबिनमा | The case is being investigated |
-| Referred / Out of scope | अन्यत्र पठाइएको / दायराबाहिर | Another body handles it, or it is not a grievance for this system |
+| Under assessment | प्रारम्भिक मूल्याङ्कनको क्रममा | You are checking what the case is about |
+| Under investigation | छानबिनको क्रममा | The case is being investigated |
+| Referred / Out of scope | अन्यत्र सिफारिश गरिएको / दायराबाहिर | Another body handles it, or it is not a grievance for this system |
 | Resolved | समाधान भएको | Action has been taken |
-| Closed | बन्द | Nothing more will be done; the closing date is recorded |
+| Closed | बन्द गरिएको | Nothing more will be done; the closing date is recorded |
 | Reopened | पुनः खोलिएको | A resolved or closed case needs more work |
 
 A message from the complainant never changes the status. If a closed case needs more work, set **Reopened** yourself.
@@ -114,14 +114,14 @@ A message from the complainant never changes the status. If a closed case needs 
 
 ## 6. Grievances received offline
 
-When a grievance arrives by phone, email, the drop box or in person, enter it so it is handled like any other. On **Cases**, press **Enter offline case**, then fill in:
+When a grievance arrives by phone, email, the drop box, in person, by letter, at a meeting or through another organisation, enter it so it is handled like any other. On **Cases**, press **Enter offline case**, then fill in:
 
-- **Channel:** **Phone**, **Email**, **Drop box** or **In person**.
+- **Channel:** **Phone / hotline**, **Email**, **Drop box**, **In person**, **Letter**, **Meeting**, **Referred by another organisation** or **Other**.
 - **Received:** when it reached the company. It cannot be in the future.
 - **Category**, **Location**, **When it happened**, **How often** and **Description.**
   - If the complainant knows only the month, tick "The complainant does not remember the day".
 - **Complainant's language:** Nepali or English. Any acknowledgement email is sent in this language.
-- **Anonymous:** switch it on when no name or contact is given. Otherwise a phone number or an email is needed.
+- **Anonymous:** switch it on when no name or contact is given. Otherwise a phone number or an email is needed, even when the complainant chooses **Do not contact me** as the preferred contact.
 
 Press **Create**. The **Offline case recorded** page shows the reference number and a PIN (picture 5).
 

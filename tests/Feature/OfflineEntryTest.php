@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Channel;
+use App\Enums\ContactMethod;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Filament\Resources\Grievances\Pages\CreateGrievance;
@@ -170,6 +171,26 @@ it('stores no contact details for an anonymous case, even if some were typed', f
         ->and($case->preferred_contact)->toBeNull();
 })->group('A6', 'P4');
 
+it('offers the company\'s offline channels, and takes a letter from someone who asks not to be contacted', function () {
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    $this->travelTo('2026-11-02 10:00');
+    signedInAs(Role::FocalPerson);
+
+    expect(array_map(fn (Channel $channel) => $channel->getLabel(), Channel::cases()))->toBe([
+        'Online form', 'Phone / hotline', 'Email', 'Drop box', 'In person', 'Letter',
+        'Meeting, e.g. Labour Relations Committee or community meeting',
+        'Referred by another organisation, e.g. Labour Office, NHRC or a union', 'Other',
+    ]);
+
+    Livewire::test(CreateGrievance::class)
+        ->fillForm(offlineCase(['channel' => Channel::Letter->value, 'preferred_contact' => 'do_not_contact']))
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    expect(Grievance::sole()->channel)->toBe(Channel::Letter)
+        ->and(Grievance::sole()->preferred_contact)->toBe(ContactMethod::DoNotContact);
+})->group('A6', 'P4', 'U8');
+
 it('refuses an incomplete or invalid entry', function (array $overrides, string $field) {
     signedInAs(Role::FocalPerson);
 
@@ -182,6 +203,7 @@ it('refuses an incomplete or invalid entry', function (array $overrides, string 
 })->with([
     'web is not an offline channel' => [['channel' => Channel::Web->value], 'channel'],
     'named without phone or email' => [['phone' => null, 'email' => null], 'phone'],
+    'not to be contacted, and no phone or email' => [['preferred_contact' => 'do_not_contact', 'phone' => null, 'email' => null], 'phone'],
     'named without a name' => [['name' => null], 'name'],
     'prefers email but gave only a phone' => [['preferred_contact' => 'email'], 'email'],
     'prefers phone but gave only an email' => [['preferred_contact' => 'phone', 'phone' => null, 'email' => 'worker@example.com'], 'phone'],

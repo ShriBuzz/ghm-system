@@ -10,7 +10,7 @@ use App\Models\Grievance;
 use App\Models\Holiday;
 use App\Models\Location;
 use App\Models\User;
-use Database\Seeders\PlaceholderListsSeeder;
+use Database\Seeders\CompanyListsSeeder;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -131,11 +131,28 @@ it('keeps the Administrator from deactivating or demoting themselves', function 
         ->and($admin->fresh()->is_active)->toBeTrue();
 })->group('A7', 'A1');
 
-it('seeds the placeholder lists, safely more than once', function () {
-    $this->seed(PlaceholderListsSeeder::class);
-    $this->seed(PlaceholderListsSeeder::class);
+it('loads the company\'s categories and locations into empty lists, in production too', function () {
+    app()['env'] = 'production';
+    config(['ghm.admin' => ['name' => 'Test Administrator', 'email' => 'admin@example.com', 'password' => 'a-long-test-password']]);
 
-    expect(Category::count())->toBe(5)
-        ->and(Category::where('is_restricted', true)->pluck('name_en')->all())->toBe(['Sexual harassment or abuse'])
-        ->and(Location::count())->toBe(3);
-})->group('A7');
+    // As the deploy guide runs it on a new server.
+    $this->artisan('db:seed', ['--force' => true])->assertSuccessful();
+
+    expect(Category::count())->toBe(19)
+        ->and(Category::orderBy('sort')->first()->only('name_en', 'name_ne'))->toBe(['name_en' => 'Wages and benefits', 'name_ne' => 'तलब तथा सुविधा'])
+        ->and(Category::where('is_restricted', true)->orderBy('sort')->pluck('name_en')->all())->toBe([
+            'Sexual harassment, exploitation and abuse', 'Reporting wrongdoing (fraud, corruption, breach of law)',
+        ])
+        ->and(Location::orderBy('sort')->pluck('name_en')->all())->toBe(['Head office, Thapathali', 'Factory, Hetauda', 'Other']);
+})->group('A7', 'U5', 'U8');
+
+it('leaves lists the Administrator has already edited alone when seeded again', function () {
+    $this->seed(CompanyListsSeeder::class);
+    Category::where('name_en', 'Other')->update(['name_en' => 'Something else']);
+    Location::where('name_en', 'Other')->update(['name_en' => 'Elsewhere']);
+
+    $this->seed(CompanyListsSeeder::class);
+
+    expect(Category::count())->toBe(19)->and(Category::where('name_en', 'Other')->exists())->toBeFalse()
+        ->and(Location::count())->toBe(3)->and(Location::where('name_en', 'Other')->exists())->toBeFalse();
+})->group('A7', 'U8');

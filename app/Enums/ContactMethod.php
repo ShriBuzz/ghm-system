@@ -5,12 +5,13 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * How a named complainant prefers to be contacted (P4). Kick-off default until NBI confirms the list.
+ * How a named complainant prefers to be contacted (P4), as the company lists it (U8).
  */
 enum ContactMethod: string implements HasLabel
 {
     case Phone = 'phone';
     case Email = 'email';
+    case DoNotContact = 'do_not_contact';
 
     public function getLabel(): string
     {

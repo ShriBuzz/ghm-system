@@ -1,6 +1,11 @@
 <?php
 
+use App\Enums\AgeGroup;
+use App\Enums\ComplainantType;
+use App\Enums\Disability;
+use App\Enums\Ethnicity;
 use App\Enums\Role;
+use App\Enums\Sex;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Category;
@@ -37,28 +42,52 @@ it('offers "prefer not to say" for every optional question, in both languages', 
         foreach (['en', 'ne'] as $locale) {
             app()->setLocale($locale);
             foreach ($enum::cases() as $case) {
-                expect($case->getLabel())->not->toContain('.');
+                expect($case->getLabel())->not->toMatch('/^[a-z_]+\.[a-z0-9_]+$/'); // an untranslated key
             }
         }
     }
 })->group('P6');
+
+it('offers the company\'s lists, in its order and words', function () {
+    $labels = function (string $enum, string $locale): array {
+        app()->setLocale($locale);
+
+        return array_map(fn ($answer) => $answer->getLabel(), $enum::cases());
+    };
+
+    expect($labels(ComplainantType::class, 'en'))->toBe([
+        'Permanent employee', 'Temporary or probationary employee', 'Contract worker, e.g. security, cleaning, driver',
+        'Former employee', 'Supplier or supply-chain worker', 'Customer', 'Community member', 'Trade union',
+        'Worker representative', 'Civil society organisation', 'Other', 'Prefer not to say',
+    ])
+        ->and($labels(Sex::class, 'en'))->toBe(['Female', 'Male', 'Other', 'Prefer not to say'])
+        ->and($labels(AgeGroup::class, 'en'))->toBe(['Under 18', '18–24', '25–34', '35–44', '45–59', '60 and above', 'Prefer not to say'])
+        ->and($labels(Ethnicity::class, 'en'))->toBe([
+            'Brahmin/Chhetri', 'Janajati / Indigenous Nationalities', 'Dalit', 'Madhesi', 'Tharu', 'Muslim', 'Other', 'Prefer not to say',
+        ])
+        ->and($labels(Disability::class, 'en'))->toBe(['Yes', 'No', 'Prefer not to say'])
+        ->and($labels(AgeGroup::class, 'ne'))->toBe(['१८ वर्षभन्दा कम', '१८–२४', '२५–३४', '३५–४४', '४५–५९', '६० वर्ष वा माथि', 'भन्न चाहँदिन'])
+        ->and($labels(Disability::class, 'ne'))->toBe(['हो', 'होइन', 'भन्न चाहँदिन'])
+        ->and($labels(ComplainantType::class, 'ne')[2])->toBe('करार कामदार, जस्तै सुरक्षाकर्मी, सरसफाई, चालक आदि')
+        ->and($labels(Ethnicity::class, 'ne')[4])->toBe('थारु');
+})->group('P6', 'U8');
 
 it('accepts a case with every optional answer left out or blank, and refuses an unknown answer', function () {
     $blank = array_fill_keys(array_keys(Grievance::OPTIONAL_ANSWERS), null);
 
     expect(Validator::make(caseInput(), StoreGrievanceRequest::caseRules())->passes())->toBeTrue()
         ->and(Validator::make(caseInput($blank), StoreGrievanceRequest::caseRules())->passes())->toBeTrue()
-        ->and(Validator::make(caseInput(['sex' => 'prefer_not_to_say', 'age_group' => '18_29']), StoreGrievanceRequest::caseRules())->passes())->toBeTrue()
+        ->and(Validator::make(caseInput(['sex' => 'prefer_not_to_say', 'age_group' => '18_24']), StoreGrievanceRequest::caseRules())->passes())->toBeTrue()
         ->and(Validator::make(caseInput(['sex' => 'unknown']), StoreGrievanceRequest::caseRules())->errors()->keys())->toBe(['sex']);
 })->group('P6');
 
 it('shows the optional answers on the case page by their labels', function () {
     app()->setLocale('en'); // As SetPanelLocale does for every panel request.
     signedInAs(Role::Administrator);
-    $case = Grievance::factory()->create(['complainant_type' => 'worker', 'sex' => 'prefer_not_to_say', 'age_group' => '30_44', 'ethnicity' => null, 'disability' => 'no']);
+    $case = Grievance::factory()->create(['complainant_type' => 'permanent_employee', 'sex' => 'prefer_not_to_say', 'age_group' => '35_44', 'ethnicity' => null, 'disability' => 'no']);
 
     Livewire::test(ViewGrievance::class, ['record' => $case->id])
-        ->assertSee('Worker')->assertSee('Prefer not to say')->assertSee('30–44')->assertSee('Not given')
+        ->assertSee('Permanent employee')->assertSee('Prefer not to say')->assertSee('35–44')->assertSee('Not given')
         ->assertDontSee('prefer_not_to_say');
 })->group('P6');
 

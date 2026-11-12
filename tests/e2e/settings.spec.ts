@@ -59,7 +59,7 @@ test('adds a category and marks it restricted', { tag: ['@A7', '@A5'] }, async (
     const name = `Spec category ${unique()}`;
     await create(page, 'categories', 'category', async (dialog) => {
         await dialog.getByLabel('Name in English').fill(name);
-        await dialog.getByLabel('Name in Nepali').fill('परीक्षण वर्ग');
+        await dialog.getByLabel('Name in Nepali').fill(`परीक्षण वर्ग ${unique()}`); // Nepali names are unique too
         await dialog.getByRole('switch', { name: 'Offered on the forms' }).click();
     });
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContactMethod;
 use App\Models\Attachment;
 use App\Models\Grievance;
 use App\Models\Setting;
@@ -47,6 +48,29 @@ it('needs a name, and the contact its preferred method names, from a named compl
 
     expect(Grievance::count())->toBe(0);
 })->group('P4');
+
+it('lets a named complainant ask not to be contacted, yet still needs a phone or an email', function () {
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'preferred_contact' => 'do_not_contact']))
+        ->assertSessionHasErrors(['phone' => 'Give a phone number or an email.']);
+    expect(Grievance::count())->toBe(0);
+
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'email' => 'sita@example.com', 'preferred_contact' => 'do_not_contact']))
+        ->assertSessionHasNoErrors();
+
+    $case = Grievance::sole();
+    expect($case->preferred_contact)->toBe(ContactMethod::DoNotContact);
+    // P7: the reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
+    Notification::assertSentTo($case, Acknowledgement::class);
+})->group('P4', 'P7', 'U8');
+
+it('words the identity, contact and frequency choices as the company does, in both languages', function () {
+    $this->get('/en')->assertOk()->assertSeeInOrder(['Without my name (anonymous)', 'With my name'])
+        ->assertSee('Do not contact me')->assertSee('Repeatedly')->assertSee('Caste/ethnicity');
+
+    $this->get('/ne')->assertOk()->assertSeeInOrder(['नाम नखुलाई (बेनामी)', 'नाम सहित'])
+        ->assertSee('मलाई सम्पर्क नगर्नुहोस्')->assertSee('घटना कतिपटक भएको हो?')->assertSee('पटक-पटक')
+        ->assertSee('तपाईं को हुनुहुन्छ?')->assertSee('जाति/जातीयता')->assertSee('भन्न चाहँदिन');
+})->group('P4', 'P5', 'P6', 'U8');
 
 it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both until Done', function () {
     $this->post('/ne', formInput())->assertRedirect(route('grievance.received', ['locale' => 'ne']));
@@ -102,10 +126,10 @@ it('stores one photo or PDF up to 5 MB, and refuses a larger file or a renamed p
 it('accepts every optional question left blank, and stores the answers given', function () {
     $blank = array_fill_keys(array_keys(Grievance::OPTIONAL_ANSWERS), '');
     $this->post('/en', formInput($blank))->assertSessionHasNoErrors();
-    $this->post('/en', formInput(['sex' => 'prefer_not_to_say', 'age_group' => '30_44']))->assertSessionHasNoErrors();
+    $this->post('/en', formInput(['sex' => 'prefer_not_to_say', 'age_group' => '35_44']))->assertSessionHasNoErrors();
 
     [$first, $second] = Grievance::orderBy('id')->get()->all();
-    expect($first->sex)->toBeNull()->and($second->sex)->toBe('prefer_not_to_say')->and($second->age_group)->toBe('30_44');
+    expect($first->sex)->toBeNull()->and($second->sex)->toBe('prefer_not_to_say')->and($second->age_group)->toBe('35_44');
 })->group('P6');
 
 it('keeps what was typed when something needs fixing, with a summary that links to the field', function () {
