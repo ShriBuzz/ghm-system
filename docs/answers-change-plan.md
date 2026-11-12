@@ -545,6 +545,52 @@ Result:
 - The additions built now (U5's reason, U11, U6's Critical and past-target alerts, and the Nepali names in U16) are also beyond the RFQ. They are built because the company asked for them while answering our questions, and each is small. So is the brief's public text (U10), which the project lead moved in because the answers announced it.
 - The RFQ never mentions Bikram Sambat, so U9 is not an RFQ requirement either. It is built because our question 8 offered it and the company answered.
 
+### Where each new requirement comes from
+
+Every requirement beyond the RFQ, with the place in the company's documents that asks for it, so each can be tracked back to its source. Section numbers are the documents' own:
+
+- **the brief** is "Brief on NEEK's Online Grievance Handling System" (sections 1 to 8);
+- **the answers** are the WhatsApp answers (their headings);
+- **Annex A** is "Grievances type", Policy Annex A.
+
+The Word files match the PDFs.
+
+New requirements, held for a separately priced phase (not in this contract):
+
+| ID | New requirement | Where the company asks for it | What the RFQ has | Status |
+|---|---|---|---|---|
+| U1 | Target time per category (15, 30 or 45 working days); the case list flags cases past their own target | Brief 1 (row 1), 3.3 "Resolution", 4 (the target column). Answers, "Case Handling and Permissions" 1, "Target times". Annex A (the target days) | A2: one limit of 15 working days | Held; every case uses 15 working days meanwhile |
+| U2 | The Administrator extends a case's due date, with a reason; once up to 15 working days, further ones recorded as approved by the Grievance Redressal Committee | Brief 1 (row 2), 3.3 "Extension". Answers, "Case Handling and Permissions" 1 | Nothing | Held (C17) |
+| U4 | Feedback before closure: a "Feedback due" date 30 days after Resolved, the closure rule, and the optional structured form with six questions | Brief 1 (row 4, marked optional), 3.1 "Closed", 3.3 "Feedback", 6 (all of it) | A4 lists statuses only; P8 lets the complainant reply | Held (C10, C13, C18); a complainant can answer by message today |
+| U12 | Status rules: a reply required for Referred / Out of scope; a reason note for Reopened; an appeal within 15 working days, decided within 15 | Brief 3.1 "Referred / Out of scope" and "Reopened", 3.3 "Appeal" | A3 and P8: notes and replies, with no rule tying them to a status | Held (C16, C19) |
+| U13 | Dashboard indicators by quarter: by category, location, channel, complainant type, sex and age; resolution time, share within target, extensions, reopened, feedback | Brief 8, "Dashboard indicators" | N3: counts by status and by category for a date range | Held (C23) |
+| U14 (rest) | Export columns: the date of each status change, resolved date, days taken, within target, extension, reopened, a restricted mark, feedback answers | Brief 8, "Export" | N4's columns | Held (C26); the dates in both calendars are built (step 12) |
+| U15 | Case records kept 5 years after closure, then deleted by the Administrator after the Senior Manager's approval, logged | Brief 8, "Data and security" | Nothing | Held (C27) |
+| (no ID) | A Nepali toggle for the staff screens | Answers, "Alerts and Staff Screens" 2 ("a Nepali toggle is preferable") | P2 covers the public pages only | Held (C14) |
+
+Additions built now: beyond the RFQ, but asked for while answering our questions.
+
+| ID | Addition | Where the company asks for it | Built in |
+|---|---|---|---|
+| U5 (reason) | A reason when the Administrator removes a restricted mark, shown in the activity log | Answers, "Case Handling and Permissions" 2. Brief 1 (row 5) | Step 5 |
+| U6 (part) | The Administrator alerted for a Critical case and a case past its target | Answers, "Alerts and Staff Screens" 1, (b) and (c). Brief 2 (the alert table), 3.2 "Critical" | Step 7 |
+| U6 (ours) | A case marked restricted alerts the officers, or the Administrator while none is active | Not asked: our decision of 2026-11-12, from the review; in the call brief as a default to confirm | Step 17 |
+| U9 | Bikram Sambat on the Nepali form; BS with AD on staff screens and in the export | Answers, "Public Form Fields and Language" 3. Brief 1 (row 9), 5 "Language and dates" | Steps 3, 10, 12 |
+| U10 (part) | The page title, emergency line, received page, status page title and "Other ways to raise a grievance" | Brief 7 (the table) | Step 4 |
+| U11 | Groups under 5 shown as "<5" | Answers, "Public Form Fields and Language" 1, "Other fields". Brief 1 (row 11), 8 ("Any breakdown with fewer than 5 cases shows '<5'") | Step 11 |
+| U16 | Nepali beside English for status and category; the complainant's text exactly as entered | Answers, "Alerts and Staff Screens" 2. Brief 5 "Language and dates" | Step 10 |
+
+Points in the documents that ask for no system change yet (to watch):
+
+| Point | Where | Note |
+|---|---|---|
+| Time frames by priority: High acknowledged within 1 working day and assessed within 2 | Brief 3.2 | Staff guidance today; a flag on the case list would be new |
+| Initial assessment within 7 working days | Brief 3.3. Also in the public text, "We will tell you within 7 working days" | C25 asks whether the case list should flag it |
+| Export "Administrator only", restricted cases by the Administrator alone | Brief 8, "Export" | Conflicts with the answers ("Case Handling and Permissions" 2) and the RFQ; C6 |
+| Referrals to outside services recorded as internal notes | Brief 8, "Data and security" | Nothing to build: notes exist |
+| No IP addresses in logs; no third-party analytics or tracking on the public page | Brief 8, "Data and security" | Already so (S5, X1) |
+| The IT contact has server access only, no panel login | Brief 2 (the roles table) | A deploy and handover step, not code |
+
 ## 4. Conflicts and questions for the company
 
 To send back in one message. Listed by urgency: the first group decides stored codes and the public text, so it blocks go-live.
