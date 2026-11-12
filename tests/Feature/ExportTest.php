@@ -16,7 +16,7 @@ use Livewire\Livewire;
 use OpenSpout\Reader\XLSX\Reader;
 use Spatie\Activitylog\Models\Activity;
 
-const N4_COLUMNS = ['Reference', 'Received', 'Closed', 'Channel', 'Category', 'Location', 'Priority', 'Status',
+const N4_COLUMNS = ['Reference', 'Received (AD)', 'Received (BS)', 'Closed (AD)', 'Closed (BS)', 'Channel', 'Category', 'Location', 'Priority', 'Status',
     'Complainant type', 'Sex', 'Age group', 'Ethnicity', 'Disability'];
 
 beforeEach(function () {
@@ -75,15 +75,16 @@ function exportRows(Role|User $user, string $format = 'csv', bool $personal = fa
     return $rows;
 }
 
-it('exports the N4 columns for the cases received in the range, without names or contacts', function (string $format) {
+it('exports the N4 columns for the cases received in the range, dates in AD and BS, without names or contacts', function (string $format) {
     $rows = exportRows(Role::Administrator, $format);
 
     expect($rows[0])->toBe(N4_COLUMNS)
         ->and($rows)->toHaveCount(3)
-        ->and($rows[1])->toBe(['GHM-2026-0001', '2026-11-03 09:15', '2026-11-20 12:00', 'Phone / hotline', 'Wages', 'Head office', 'High', 'Closed',
+        ->and($rows[1])->toBe(['GHM-2026-0001', '2026-11-03 09:15', '2083-07-17', '2026-11-20 12:00', '2083-08-04', 'Phone / hotline', 'Wages', 'Head office', 'High', 'Closed',
             'Permanent employee', 'Female', '18–24', 'Prefer not to say', 'No'])
+        ->and(array_slice($rows[2], 1, 4))->toBe(['2026-11-05 10:00', '2083-07-19', '', '']) // Still open.
         ->and(implode(' ', array_merge(...$rows)))->not->toContain('complainant@example.com')->not->toContain('9800000000');
-})->with(['csv', 'xlsx'])->group('N4');
+})->with(['csv', 'xlsx'])->group('N4', 'U9');
 
 it('adds names and contacts only when the Administrator asks, with formulas made harmless', function () {
     $rows = exportRows(Role::Administrator, personal: true);

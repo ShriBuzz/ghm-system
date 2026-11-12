@@ -97,18 +97,26 @@ final class BsDate
     }
 
     /**
+     * The BS date of the Nepal day a moment falls on, such as "2083-07-22", or null outside the table.
+     */
+    public static function format(CarbonInterface $date): ?string
+    {
+        try {
+            return vsprintf('%04d-%02d-%02d', self::fromAd($date));
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    /**
      * A date as staff read it (U9): BS first, AD in brackets, such as "2083-07-22 (2026-11-08)",
      * then the Nepal time when asked. A date outside the table shows in AD only.
      */
     public static function forStaff(CarbonInterface $date, bool $time = false): string
     {
         $nepal = $date->copy()->setTimezone(Config::string('app.timezone'));
-
-        try {
-            $text = vsprintf('%04d-%02d-%02d', self::fromAd($nepal))." ({$nepal->toDateString()})";
-        } catch (InvalidArgumentException) {
-            $text = $nepal->toDateString();
-        }
+        $bs = self::format($nepal);
+        $text = $bs === null ? $nepal->toDateString() : "{$bs} ({$nepal->toDateString()})";
 
         return $time ? "{$text} {$nepal->format('H:i')}" : $text;
     }

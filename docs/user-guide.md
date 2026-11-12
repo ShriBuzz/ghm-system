@@ -154,7 +154,8 @@ The PIN cannot be shown again. With the reference and PIN, the complainant can f
 
 **Export**, on **Cases**, downloads the cases received in a date range as **CSV** or **Excel (XLSX)**.
 
-- **What the file holds:** the reference, dates, channel, category, location, priority, status and the optional answers.
+- **What the file holds:** the reference, the received and closed dates, channel, category, location, priority, status and the optional answers.
+- **Dates in both calendars:** each date has two columns. The AD one has the date and time, such as 2026-11-08 10:05; the Bikram Sambat (BS) one has the date, such as 2083-07-22.
 - **No personal details:** your exports never include names or contact details.
 - **Logged:** every export is recorded in the activity log.
 
