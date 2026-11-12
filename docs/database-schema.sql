@@ -170,6 +170,7 @@ CREATE TABLE `grievances` (
   `locale` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
   `received_at` timestamp NOT NULL,
   `closed_at` timestamp NULL DEFAULT NULL,
+  `reopened_at` timestamp NULL DEFAULT NULL,
   `working_days_open` smallint unsigned NOT NULL DEFAULT '0',
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,

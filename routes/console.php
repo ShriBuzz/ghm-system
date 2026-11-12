@@ -4,7 +4,6 @@ use App\Enums\Role;
 use App\Enums\Status;
 use App\Models\Grievance;
 use App\Models\User;
-use App\Support\WorkingDays;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -18,7 +17,7 @@ use Symfony\Component\Finder\Finder;
 Artisan::command('ghm:recount-working-days', function () {
     // Quietly: a system job, not a staff action, so no observer or activity entry.
     Grievance::whereIn('status', Status::open())->lazyById()->each(function (Grievance $grievance): void {
-        $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
+        $grievance->working_days_open = $grievance->workingDaysSoFar();
         $grievance->saveQuietly();
     });
 })->purpose('Recount working days open for open cases (A2)');

@@ -14,11 +14,18 @@ use Database\Seeders\CompanyListsSeeder;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use Spatie\Activitylog\Models\Activity;
 
 dataset('settings pages', [
     'categories' => ['/admin/categories'],
     'locations' => ['/admin/locations'],
     'holidays' => ['/admin/holidays'],
+    'users' => ['/admin/users'],
+]);
+
+dataset('Administrator-only settings pages', [
+    'categories' => ['/admin/categories'],
+    'locations' => ['/admin/locations'],
     'users' => ['/admin/users'],
 ]);
 
@@ -30,12 +37,45 @@ it('opens every settings page for the Administrator', function (string $url) {
 })->with('settings pages')->group('A7');
 
 // One role per test: Filament builds the menu once per app, and tests reuse one app across requests.
-it('keeps other roles out of every settings page and its menu item', function (Role $role, string $url) {
+it('keeps other roles out of the Administrator\'s settings pages and their menu items', function (Role $role, string $url) {
     signedInAs($role);
 
     $this->get('/admin')->assertOk()->assertDontSee($url);
     $this->get($url)->assertForbidden();
-})->with([Role::FocalPerson, Role::RestrictedOfficer])->with('settings pages')->group('A7');
+})->with([Role::FocalPerson, Role::RestrictedOfficer])->with('Administrator-only settings pages')->group('A7');
+
+it('opens the holiday list to focal persons, who enter each year\'s holidays, and to no other role', function (Role $role, bool $allowed) {
+    signedInAs($role);
+
+    $allowed ? $this->get('/admin')->assertOk()->assertSee('/admin/holidays') : $this->get('/admin')->assertOk()->assertDontSee('/admin/holidays');
+    $this->get('/admin/holidays')->assertStatus($allowed ? 200 : 403);
+})->with([[Role::FocalPerson, true], [Role::RestrictedOfficer, false]])->group('A2', 'A7');
+
+it('lets a focal person enter and correct holidays but not delete them, and logs every change for the Administrator', function () {
+    $focal = signedInAs(Role::FocalPerson);
+
+    Livewire::test(ManageHolidays::class)
+        ->callAction('create', data: ['date' => '2026-11-11', 'name' => 'Laxmi Puja'])
+        ->assertHasNoFormErrors();
+    $holiday = Holiday::sole();
+
+    Livewire::test(ManageHolidays::class)
+        ->callAction(TestAction::make('edit')->table($holiday), data: ['date' => '2026-11-10', 'name' => 'Laxmi Puja'])
+        ->assertHasNoFormErrors()
+        ->assertActionHidden(TestAction::make('delete')->table($holiday));
+
+    expect($focal->can('delete', $holiday))->toBeFalse()
+        ->and(Activity::where('causer_id', $focal->id)->orderBy('id')->get()->map(fn (Activity $entry) => [$entry->event, $entry->properties->toArray()])->all())->toBe([
+            ['holiday_added', ['date' => '2026-11-11', 'name' => 'Laxmi Puja']],
+            ['holiday_changed', ['date' => '2026-11-10', 'name' => 'Laxmi Puja', 'before' => '2026-11-11 Laxmi Puja']],
+        ]);
+
+    $admin = signedInAs(Role::Administrator);
+    Livewire::test(ManageHolidays::class)->callAction(TestAction::make('delete')->table($holiday->fresh()));
+
+    expect(Activity::where('causer_id', $admin->id)->where('event', 'holiday_deleted')->sole()->properties->toArray())
+        ->toBe(['date' => '2026-11-10', 'name' => 'Laxmi Puja']);
+})->group('A2', 'A7', 'S6');
 
 it('lets the Administrator add and edit a category, restricted flag included', function () {
     signedInAs(Role::Administrator);

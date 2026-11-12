@@ -29,6 +29,9 @@ class GrievanceInfolist
                         TextEntry::make('received_at')->label('Received')->dateTime(),
                         TextEntry::make('working_days_open')->label('Working days open'),
                         TextEntry::make('closed_at')->label('Closed')->dateTime()->placeholder('Not closed'),
+                        // Working days count from here once a stopped case is reopened (U3).
+                        TextEntry::make('reopened_at')->label('Reopened on')->dateTime()
+                            ->visible(fn (Grievance $record): bool => $record->reopened_at !== null),
                         TextEntry::make('channel'),
                         IconEntry::make('is_restricted')->label('Restricted')->boolean(),
                     ]),

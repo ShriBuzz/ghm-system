@@ -290,6 +290,22 @@ test.describe('administrator', () => {
             });
         }
     });
+
+    test('restarts the working-day count when a resolved case is reopened', { tag: ['@U3', '@A2'] }, async ({ page }) => {
+        const old = await enterOfflineCase(page, { receivedAt: daysAgo(30).dateTime });
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).toHaveClass(/fi-color-danger/);
+
+        await (await findCase(page, old.reference)).click();
+        await setOnCase(page, 'Set status', 'Status', 'Resolved');
+        await setOnCase(page, 'Set status', 'Status', 'Reopened');
+        const caseSection = page.getByRole('region', { name: 'Case' });
+        await expect(caseSection).toContainText('Reopened on');
+        await expect(caseSection).toContainText(/Working days open\s+0/);
+
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).not.toHaveClass(/fi-color-danger/);
+    });
 });
 
 /**
