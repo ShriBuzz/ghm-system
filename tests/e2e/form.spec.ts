@@ -169,6 +169,24 @@ for (const locale of ['ne', 'en']) {
     });
 }
 
+test('shows the day box\'s longest choice in full, on a phone and on a desktop, in both languages', { tag: ['@P5', '@U9', '@S9'] }, async ({ page }) => {
+    for (const [locale, day] of [['ne', '#incident_bs_day'], ['en', '#incident_day']]) {
+        for (const width of [320, 360, 1280]) {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto(`/${locale}`);
+            await page.locator(day).selectOption('unknown');
+            // The chosen text's own width against the room inside the box (its padding and arrow taken off).
+            const [need, room] = await page.locator(day).evaluate((select: HTMLSelectElement) => {
+                const style = getComputedStyle(select);
+                const canvas = document.createElement('canvas').getContext('2d')!;
+                canvas.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                return [canvas.measureText(select.selectedOptions[0].text).width, select.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 20];
+            });
+            expect(need, `${locale} at ${width} px`).toBeLessThanOrEqual(room);
+        }
+    }
+});
+
 test('the received page passes an axe WCAG 2.2 AA scan in both languages', { tag: ['@S9', '@P7'] }, async ({ page }) => {
     await page.goto('/en');
     await fillRequired(page);

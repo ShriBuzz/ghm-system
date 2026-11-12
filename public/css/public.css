@@ -376,9 +376,25 @@ form:has(#is_anonymous-1:checked) .contact {
 
 .date-parts {
     display: grid;
-    /* The year keeps the width its four digits need; day and month share the rest. */
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) max-content;
+    /* On a phone the day has a row of its own, so its longest choice ("I don't remember the day",
+       "गते याद छैन") is never cut; month and year share the next row. */
+    grid-template-columns: minmax(0, 1fr) max-content;
     gap: 0.5rem;
+}
+
+.date-parts .field:first-child {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 40rem) {
+    /* One row from 40rem: the day gets the most room, the year only what its four digits need. */
+    .date-parts {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) max-content;
+    }
+
+    .date-parts .field:first-child {
+        grid-column: auto;
+    }
 }
 
 .date-parts label {
