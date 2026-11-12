@@ -298,6 +298,16 @@ textarea {
     font: inherit;
 }
 
+/* An error-summary link jumps to its field: leave room above it for the question, hint and error (S9).
+   Measured at 360 px: up to 136 px above a field, 222 px above the date's day box. */
+main :is(input, select, textarea) {
+    scroll-margin-top: 10rem;
+}
+
+.date-parts select {
+    scroll-margin-top: 15rem;
+}
+
 textarea {
     min-height: 10rem;
     resize: vertical;

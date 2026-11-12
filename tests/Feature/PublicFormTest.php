@@ -254,3 +254,14 @@ it('decides the calendar itself, so a hand-made post cannot store a case its sta
     signedInAs(Role::Administrator);
     Livewire::test(ViewGrievance::class, ['record' => $case->id])->assertOk()->assertSee('January 2000, exact day not remembered');
 })->group('P5', 'U9');
+
+it('links each date box to the date\'s hint and error, as every other field is linked to its own', function (string $locale, string $day) {
+    $this->from("/{$locale}")->post("/{$locale}", formInput(['incident_day' => '', 'incident_bs_day' => '']));
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8"?>'.$this->get("/{$locale}")->getContent());
+    $select = (new DOMXPath($dom))->query("//select[@id='{$day}']")->item(0);
+
+    expect($select->getAttribute('aria-describedby'))->toBe('incident_date-hint incident_date-error')
+        ->and($select->getAttribute('aria-invalid'))->toBe('true');
+})->with([['en', 'incident_day'], ['ne', 'incident_bs_day']])->group('S9', 'P5');
