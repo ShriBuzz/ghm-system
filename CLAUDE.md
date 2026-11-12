@@ -6,7 +6,7 @@ Status, decisions and open questions are in `docs/progress.md`. In a new session
 
 ## Order of authority
 
-1. RFQ section 3 requirements (P1 to P10, A1 to A7, N1 to N4, S1 to S10), word for word in `docs/rfq-requirements.md`
+1. RFQ section 3 requirements (P1 to P10, A1 to A7, N1 to N4, S1 to S10), word for word in `docs/rfq-requirements.md`, and the company's updates U1 to U16 at the end of the same file. An update wins over the RFQ row it changes
 2. The project rules in this file
 3. Karpathy guidelines (appended at the end of this file)
 4. Ponytail
@@ -17,8 +17,8 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 ## Scope
 
-- Build exactly what RFQ section 3 asks for. Nothing speculative.
-- Every commit message names its requirement IDs, for example `feat(P7): reference number and PIN`.
+- Build exactly what RFQ section 3 and the company's updates U1 to U16 ask for. Build an update only once the project lead has accepted it (WP4 in `docs/progress.md`; plan in `docs/answers-change-plan.md`). Nothing speculative.
+- Every commit message names its requirement IDs, for example `feat(P7): reference number and PIN` or `feat(U1): target time per category`.
 - Open questions go to the person, not into guesses in code.
 
 ## Stack (fixed)

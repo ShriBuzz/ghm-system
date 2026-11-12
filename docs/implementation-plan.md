@@ -2,6 +2,8 @@
 
 Plan dated 30 Oct 2026. This file is a Markdown copy of the shared plan doc (revision 26), kept at `docs/implementation-plan.md` so coding agents can read it. The shared doc stays the source of truth: when the doc changes, regenerate this file. Diagrams are rendered here as a Mermaid chart and a dated table, and the checklist's status column lives in the doc and in `docs/requirements-traceability.md`.
 
+Section 12 was added to this copy on 2026-11-12 and is not in the shared doc yet. Copy it there before regenerating this file, or it is lost.
+
 ## 1. Summary
 
 Recommended build: one Laravel application with plain Blade public pages and a Filament admin panel, on MySQL, deployed to the company's existing shared hosting with no Node or build step on the server. It covers every mandatory item with the least custom code, adds both desirable items (P10 QR posters, S10 two-factor login) at little extra cost, and S3's "framework's built-in encryption" maps directly to Laravel's `encrypted` cast.
@@ -516,3 +518,43 @@ The hosting question is the one that can change the price, so it goes first in t
 | One developer, about 9 to 11 build days needed by 18 Nov | Missed milestone | Start before contract; daily pushes so progress is visible; cut nothing mandatory, defer only desirable items if needed |
 
 Sources: [Laravel 13 release notes](https://laravel.com/docs/13.x/releases); [Tihar 2026 public holidays](https://calendarific.com/holidays/2026/np); [Impeccable](https://github.com/pbakaus/impeccable); [Ponytail](https://github.com/dietrichgebert/ponytail); [Karpathy guidelines](https://github.com/multica-ai/andrej-karpathy-skills); [Playwright CLI](https://github.com/microsoft/playwright-cli).
+
+## 12. After contract signing: the company's answers and Policy updates (2026-11-12)
+
+On 12 Nov the company sent three documents:
+
+- answers to most section 11 questions, sent by WhatsApp;
+- a brief of the updates its GHM Policy and SOP make, as approved by UNDP;
+- Policy Annex A, the grievance types with their target times.
+
+They add 16 requirements, U1 to U16. U1 to U11 are the brief's own "Updates since the RFQ" table. The wording is at the end of `docs/rfq-requirements.md` and the status in `docs/requirements-traceability.md`. The full change plan is in `docs/answers-change-plan.md`: one section per answer, the size of each change, the conflicts between the documents, the follow-up questions C1 to C27, and the steps.
+
+**What this section overrides in sections 2 to 11.**
+
+- Section 2, implied requirements: A2's "15 working days" becomes a target per category of 15, 30 or 45 working days (U1), which the Administrator can extend (U2). The clock restarts from the reopening date (U3). The weekend is Saturday only, with the government's holidays. The Bikram Sambat incident date is confirmed for the Nepali form (U9).
+- Section 6, access by role:
+  - Alerts (U6): new cases to all focal persons, or all restricted-case officers; complainant messages to the assignee once assigned; the Administrator only for a restricted case with no active restricted-case officer, a Critical case, or a case past its target.
+  - Removing a restricted mark needs a reason (U5), and extending a due date is the Administrator's (U2).
+  - Who may export is unsettled: the brief's section 8 says "Administrator only", and its section 2 and the answers do not (C6).
+- Section 6, the two Nepal-specific details: the incident date is BS on the Nepali form and AD on the English one, and staff screens show BS with AD alongside (U9). Cases past their own target get the red badge (U1). The focal person enters each year's holidays and the Administrator checks them.
+- Section 9, the checklist: rows A2, A4, N1, N3 and N4 change with U1, U8, U6, U11 and U13, and U14. U1 to U16 get their own Pest and Playwright checks under their IDs.
+- Section 11: questions 2 (the lists and notice), 3, 4, 6, 7 and 9 are answered. Question 8 is answered only by implication: the brief makes the status page the only route for anonymous complainants. Questions 1 (hosting), 5 (email) and 10 (access logs) are still open, as is how offline complainants follow their case.
+
+**What it adds to section 8, the work plan.** WP4 is about 10 to 12 working days, in three proposed phases:
+
+| Phase | When | Steps |
+| --- | --- | --- |
+| 1 | Before the 18 Nov test version | The company's lists and labels, the real categories and locations; target per category and the restarting clock; Bikram Sambat on the Nepali form; the public text, if the company's files arrive |
+| 2 | UAT window, if NBI agrees, otherwise after go-live | Note kinds and reasons; extensions; alerts; status rules; feedback due and the closure rule; both languages and BS dates on the case page; "<5" in the summary |
+| 3 | After go-live, as change requests or support | Export contents; dashboard indicators; the optional structured feedback form; retention |
+
+Decided 2026-11-12, replacing these phases for now: the answers to our questions, and what the company added while answering them, are built first, with the brief's public page text (about 6 working days). The new requirements wait until scope and price are agreed. The steps and their order are in the change plan, section 6, and the WP4 table in `docs/progress.md`.
+
+**New risks.**
+
+| Risk | Effect | Mitigation |
+| --- | --- | --- |
+| New requirements arrive after the price was fixed | Unpaid scope; the 18 Nov and 27 Nov dates slip | Project lead agrees with NBI what is in the fixed price and what is a change request; phases put the data-shaping work first |
+| The PDFs' Nepali cannot be copied | Typos in public text and option labels | Ask the company for its source files (C11); a Nepali speaker checks before UAT |
+| The Bikram Sambat month-length table is wrong or runs out | Wrong incident dates and staff dates | Check it against the published calendar; extend it yearly with the holiday list (support checklist) |
+| The repository is public and the brief names staff | Personal data and internal policy exposed | PDFs stay untracked; make the repository private before committing anything client-internal |
