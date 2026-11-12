@@ -95,7 +95,7 @@ Still to do:
 
 - The Nepali user guide (`docs/user-guide.ne.md`), once the English one is approved, read by a Nepali speaker before training on 25 Nov.
 - The guide's "Use it when" column for each status is suggested wording; confirm it with NBI at UAT.
-- Re-take the screenshots if UAT changes the screens; regenerate `docs/database-schema.sql` if a migration is added.
+- Re-take the screenshots if UAT changes the screens; regenerate `docs/database-schema.sql` if a migration is added. Since WP4 step 1, pictures 2 (case list) and 6 (summary) show the old placeholder category "Working conditions and safety". Re-take all six after WP4 step 10, which changes the case list and case page again (Nepali names, Bikram Sambat dates), so they are taken once.
 - Fill in the credentials sheet at go-live, once the host is known (NBI question 1).
 
 ## WP4 The company's answers and Policy updates
