@@ -6,6 +6,8 @@ use App\Models\Attachment;
 use App\Models\Grievance;
 use App\Models\User;
 use App\Support\AttachmentStore;
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -46,7 +48,7 @@ class AttachmentsRelationManager extends RelationManager
                     ->url(fn (Attachment $record): string => route('filament.admin.attachments.download', $record)),
                 TextColumn::make('size')->formatStateUsing(fn (int $state): string => number_format($state / 1024).' KB'),
                 TextColumn::make('uploader.name')->label('Uploaded by')->placeholder('Complainant'),
-                TextColumn::make('created_at')->label('Date')->dateTime(),
+                TextColumn::make('created_at')->label('Date')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
             ])
             ->headerActions([
                 Action::make('upload')

@@ -92,7 +92,7 @@ it('shows on the case page when the count restarted', function () {
     $case->forceFill(['status' => Status::Reopened])->save();
 
     Livewire::test(ViewGrievance::class, ['record' => $case->id])
-        ->assertSee('Reopened on')->assertSee('Dec 4, 2026');
+        ->assertSee('Reopened on')->assertSee('2083-08-18 (2026-12-04) 10:00');
 })->group('A2', 'U3');
 
 it('clears the closed date whenever a case leaves Closed, not only at Reopened', function (Status $next) {

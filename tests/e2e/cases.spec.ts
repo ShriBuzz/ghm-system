@@ -47,7 +47,8 @@ async function enterOfflineCase(
 }
 
 /**
- * Picks a value in one of the case page's dialogs, such as Set status, and saves it.
+ * Picks a value in one of the case page's dialogs, such as Set status, and saves it. Statuses are picked
+ * by their value, such as 'resolved': their labels carry the Nepali too.
  */
 async function setOnCase(page: Page, action: string, field: string, value: string) {
     const dialog = page.getByRole('dialog', { name: action });
@@ -226,7 +227,7 @@ test.describe('administrator', () => {
         expect(csv).toContain(`${reference},"Test Worker",9800000000,,"${day} 09:00"`);
     });
 
-    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page, staff }, testInfo) => {
+    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5', '@U16', '@U9'] }, async ({ page, staff }, testInfo) => {
         // This worker's focal person and restricted-case officer, so both exist to be offered or not.
         await staff.sessionOf('focal_person');
         await staff.sessionOf('restricted_officer');
@@ -236,8 +237,17 @@ test.describe('administrator', () => {
         await (await findCase(page, reference)).click();
         await expect(page.getByRole('heading', { name: `View ${reference}` })).toBeVisible();
 
-        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        const statusDialog = page.getByRole('dialog', { name: 'Set status' });
+        await open(page.getByRole('button', { name: 'Set status' }), headingOf(statusDialog));
+        await expect(statusDialog.getByLabel('Status').getByRole('option', { name: 'Closed (बन्द गरिएको)' })).toBeAttached();
+        await page.keyboard.press('Escape');
+        await expect(headingOf(statusDialog)).toBeHidden();
+        await setOnCase(page, 'Set status', 'Status', 'under_assessment');
         await setOnCase(page, 'Set priority', 'Priority', 'High');
+        const caseRegion = page.getByRole('region', { name: 'Case' });
+        await expect(caseRegion).toContainText('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)');
+        await expect(caseRegion).toContainText(/Received\s+\d{4}-\d{2}-\d{2} \(\d{4}-\d{2}-\d{2}\) \d{2}:\d{2}/);
+        await expect(page.getByRole('region', { name: 'Grievance' })).toContainText('Wages and benefits (तलब तथा सुविधा)');
 
         const assign = page.getByRole('dialog', { name: 'Assign' });
         await open(page.getByRole('button', { name: 'Assign' }), headingOf(assign));
@@ -259,7 +269,7 @@ test.describe('administrator', () => {
         const fresh = await enterOfflineCase(page);
 
         await (await findCase(page, fresh.reference)).click();
-        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await setOnCase(page, 'Set status', 'Status', 'under_assessment');
         await expect(page.getByRole('region', { name: 'Case' })).toContainText('Under assessment');
 
         await findCase(page, old.reference);
@@ -304,8 +314,8 @@ test.describe('administrator', () => {
         await expect(daysOpenBadge(page, old.reference)).toHaveClass(/fi-color-danger/);
 
         await (await findCase(page, old.reference)).click();
-        await setOnCase(page, 'Set status', 'Status', 'Resolved');
-        await setOnCase(page, 'Set status', 'Status', 'Reopened');
+        await setOnCase(page, 'Set status', 'Status', 'resolved');
+        await setOnCase(page, 'Set status', 'Status', 'reopened');
         const caseSection = page.getByRole('region', { name: 'Case' });
         await expect(caseSection).toContainText('Reopened on');
         await expect(caseSection).toContainText(/Working days open\s+0/);
@@ -377,7 +387,7 @@ test.describe('administrator, working a case', () => {
     test('sees a status change on the activity log', { tag: ['@S6'] }, async ({ page }) => {
         const { reference } = await enterOfflineCase(page);
         await (await findCase(page, reference)).click();
-        await setOnCase(page, 'Set status', 'Status', 'Under investigation');
+        await setOnCase(page, 'Set status', 'Status', 'under_investigation');
 
         await page.goto('/admin/activity-log');
         await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));

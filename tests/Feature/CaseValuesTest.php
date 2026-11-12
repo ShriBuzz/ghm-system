@@ -30,6 +30,13 @@ it('uses the company\'s Nepali labels for statuses and priorities', function () 
     ]);
 })->group('A4', 'U8');
 
+it('names each status for staff with the Nepali the complainant reads beside it', function () {
+    app()->setLocale('en');
+
+    expect(Status::Closed->withNepali())->toBe('Closed (बन्द गरिएको)')
+        ->and(Status::UnderAssessment->withNepali())->toBe('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)');
+})->group('A4', 'U16');
+
 it('labels every status and priority in Nepali', function (Status|Priority $case) {
     app()->setLocale('en');
     $english = $case->getLabel();

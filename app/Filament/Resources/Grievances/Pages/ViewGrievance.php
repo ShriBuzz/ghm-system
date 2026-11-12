@@ -33,8 +33,9 @@ class ViewGrievance extends ViewRecord
             Action::make('status')
                 ->label('Set status')
                 ->authorize('update')
-                ->schema([Select::make('status')->options(Status::class)->required()])
-                ->fillForm(fn (Grievance $record): array => ['status' => $record->status])
+                ->schema([Select::make('status')->required()
+                    ->options(collect(Status::cases())->mapWithKeys(fn (Status $status): array => [$status->value => $status->withNepali()]))])
+                ->fillForm(fn (Grievance $record): array => ['status' => $record->status->value])
                 ->action(fn (Grievance $record, array $data) => $record->update($data)),
 
             Action::make('priority')

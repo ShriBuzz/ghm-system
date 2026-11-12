@@ -52,6 +52,8 @@ You get no email for a restricted case, or for a case you entered yourself.
 
 ## 4. The case list
 
+Dates on the staff screens are in Bikram Sambat with AD in brackets, for example 2083-07-22 (2026-11-08). Fields where you type or pick a date (the filters, offline entry, holidays) take AD.
+
 **Cases** lists every case you can see, the newest first (picture 2).
 
 <img src="images/user-guide/02-case-list.png" width="560" alt="The case list with reference, received date, days open, status, priority and category columns; one case shows 30 days open in red">
@@ -72,7 +74,9 @@ Click a reference to open the case (picture 3).
 
 *Picture 3: a case page. The actions are at the top right.*
 
-Complainants who use the Nepali form give the incident date in Bikram Sambat. The case page shows it in AD, or, when they did not remember the day, as the Bikram Sambat month, for example "Kartik 2083, exact day not remembered".
+Complainants who use the Nepali form give the incident date in Bikram Sambat. The case page shows it like every other date, Bikram Sambat with AD in brackets, or, when they did not remember the day, as the Bikram Sambat month, for example "Kartik 2083, exact day not remembered".
+
+The status and the category show their Nepali name next to the English, as the complainant reads them, for example "Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)". The complainant's description and messages keep their own line breaks, in Nepali or English. You can reply in Nepali.
 
 **What the page shows.** Opening a case is recorded in the activity log. The page has four sections:
 
@@ -81,7 +85,7 @@ Complainants who use the Nepali form give the incident date in Bikram Sambat. Th
 - **Complainant:** name and contact details, or "Anonymous"
 - **About the complainant:** the optional answers
 
-**Set status.** The complainant sees the status on the status page, in the language they chose:
+**Set status.** The complainant sees the status on the status page, in the language they chose. The dialog lists each status with its Nepali name:
 
 | Status | Nepali | Use it when |
 |---|---|---|

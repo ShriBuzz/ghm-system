@@ -97,6 +97,23 @@ final class BsDate
     }
 
     /**
+     * A date as staff read it (U9): BS first, AD in brackets, such as "2083-07-22 (2026-11-08)",
+     * then the Nepal time when asked. A date outside the table shows in AD only.
+     */
+    public static function forStaff(CarbonInterface $date, bool $time = false): string
+    {
+        $nepal = $date->copy()->setTimezone(Config::string('app.timezone'));
+
+        try {
+            $text = vsprintf('%04d-%02d-%02d', self::fromAd($nepal))." ({$nepal->toDateString()})";
+        } catch (InvalidArgumentException) {
+            $text = $nepal->toDateString();
+        }
+
+        return $time ? "{$text} {$nepal->format('H:i')}" : $text;
+    }
+
+    /**
      * @throws InvalidArgumentException when the calendar has no such month
      */
     public static function daysInMonth(int $year, int $month): int

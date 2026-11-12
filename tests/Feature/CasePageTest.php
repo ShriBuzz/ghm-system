@@ -1,12 +1,20 @@
 <?php
 
+use App\Enums\MessageDirection;
 use App\Enums\Priority;
 use App\Enums\Role;
 use App\Enums\Status;
+use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Filament\Resources\Grievances\Pages\ListGrievances;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
+use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
+use App\Filament\Resources\Grievances\RelationManagers\NotesRelationManager;
+use App\Filament\Resources\Holidays\Pages\ManageHolidays;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\GrievanceMessage;
+use App\Models\GrievanceNote;
+use App\Models\Holiday;
 use App\Models\Location;
 use App\Models\User;
 use Livewire\Features\SupportTesting\Testable;
@@ -145,3 +153,41 @@ it('clears every assignment of a user who is deactivated', function () {
     expect($case->fresh()->assigned_to)->toBeNull()
         ->and($untouched->fresh()->assigned_to)->not->toBeNull();
 })->group('A3', 'A7');
+
+it('shows status and category with their Nepali names, as the complainant sees them', function () {
+    $case = Grievance::factory()->create([
+        'status' => Status::UnderAssessment,
+        'category_id' => Category::factory()->create(['name_en' => 'Wages and benefits', 'name_ne' => 'तलब तथा सुविधा']),
+    ]);
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    signedInAs(Role::FocalPerson);
+
+    viewCase($case)->assertSee('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)')->assertSee('Wages and benefits (तलब तथा सुविधा)');
+})->group('A3', 'A4', 'U16');
+
+it('shows the complainant\'s Nepali text and its line breaks as written, in the submission and the messages', function () {
+    $case = Grievance::factory()->create(['description' => "पहिलो लाइन: तीन महिनादेखि तलब आएको छैन।\nदोस्रो लाइन: <b>सुपरभाइजर</b>लाई भनें।"]);
+    GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant, 'body' => "थप जानकारी।\nआज फेरि भयो।"]);
+    signedInAs(Role::FocalPerson);
+
+    // Each line break becomes <br />; anything typed as HTML stays visible text.
+    viewCase($case)->assertSeeHtml('पहिलो लाइन: तीन महिनादेखि तलब आएको छैन।<br />')->assertSee('दोस्रो लाइन:')
+        ->assertSeeHtml('&lt;b&gt;सुपरभाइजर&lt;/b&gt;')->assertDontSeeHtml('<b>सुपरभाइजर</b>');
+    Livewire::test(MessagesRelationManager::class, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class])
+        ->assertSeeHtml('थप जानकारी।<br />')->assertSee('आज फेरि भयो।');
+})->group('A3', 'U16');
+
+it('shows every date staff read in Bikram Sambat with AD alongside', function () {
+    $this->travelTo('2026-11-08 10:00');
+    $case = Grievance::factory()->create(['incident_date' => '2026-10-28', 'incident_date_exact' => true]);
+    GrievanceNote::factory()->for($case)->create(['body' => 'A note']);
+    Holiday::forceCreate(['date' => '2026-11-08', 'name' => 'A holiday']);
+    Holiday::forceCreate(['date' => '2207-05-13', 'name' => 'Beyond the BS table']);
+    signedInAs(Role::Administrator);
+
+    viewCase($case)->assertSee('2083-07-22 (2026-11-08) 10:00')->assertSee('2083-07-11 (2026-10-28)');
+    Livewire::test(ListGrievances::class)->assertSee('2083-07-22 (2026-11-08)');
+    Livewire::test(NotesRelationManager::class, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class])->assertSee('2083-07-22 (2026-11-08) 10:00');
+    Livewire::test(ManageActivityLogs::class)->assertSee('2083-07-22 (2026-11-08) 10:00');
+    Livewire::test(ManageHolidays::class)->assertSee('2083-07-22 (2026-11-08)')->assertSee('2207-05-13');
+})->group('A2', 'A3', 'U9');
