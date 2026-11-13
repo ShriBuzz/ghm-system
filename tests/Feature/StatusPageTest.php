@@ -9,7 +9,9 @@ use App\Models\GrievanceMessage;
 use App\Models\GrievanceNote;
 use App\Models\User;
 use App\Notifications\CaseAlert;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Testing\TestResponse;
 
 // Factory cases have the PIN 123456.
@@ -85,6 +87,36 @@ it('locks a reference for 15 minutes after 5 wrong PINs, then opens it again', f
 
     $this->travel(15)->minutes();
     lookUp($case)->assertRedirect(route('status.show', ['locale' => 'en']));
+})->group('P8');
+
+it('counts each lookup before its slow PIN check, so lookups sent at once are counted too', function () {
+    $case = Grievance::factory()->create();
+    $wrongPins = 'status-wrong-pins:'.hash('sha256', $case->reference);
+    $countedBeforeCheck = [];
+    Hash::shouldReceive('check')->andReturnUsing(function () use ($wrongPins, &$countedBeforeCheck): bool {
+        $countedBeforeCheck[] = RateLimiter::attempts($wrongPins);
+
+        return false;
+    });
+
+    foreach (range(1, 6) as $ignored) {
+        lookUp($case, '000000');
+    }
+
+    // Five checks, each already counted; the sixth finds the reference locked and is not checked.
+    expect($countedBeforeCheck)->toBe([1, 2, 3, 4, 5]);
+})->group('P8');
+
+it('refuses a lookup that arrives while five are still being checked, without checking it', function () {
+    $case = Grievance::factory()->create();
+    // Five lookups counted, their PINs still being checked (bcrypt takes about 0.4 s).
+    foreach (range(1, 5) as $ignored) {
+        RateLimiter::hit('status-wrong-pins:'.hash('sha256', $case->reference), 15 * 60);
+    }
+    Hash::shouldReceive('check')->never();
+
+    lookUp($case)->assertRedirect(route('status.lookup', ['locale' => 'en']));
+    $this->get('/en/status')->assertSee('locked for 15 minutes');
 })->group('P8');
 
 it('stops one visitor guessing across many references, not another visitor', function () {
