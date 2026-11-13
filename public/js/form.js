@@ -77,15 +77,6 @@
         const key = 'grievance-draft';
         const skip = new Set(['_token', 'form_started', 'website']);
         const fields = () => [...form.elements].filter((el) => el.name && !skip.has(el.name) && !['file', 'hidden', 'submit'].includes(el.type));
-        const changed = (el) => {
-            if (el.type === 'radio') {
-                return el.checked !== el.defaultChecked;
-            }
-            if (el.tagName === 'SELECT') {
-                return [...el.options].some((option) => option.selected !== option.defaultSelected);
-            }
-            return el.value !== el.defaultValue;
-        };
 
         let draft = null;
         try {
@@ -107,10 +98,9 @@
         }
 
         for (const link of document.querySelectorAll('.language-switch a')) {
+            // Always, even when nothing was edited here: a form sent back with an error was filled in by the
+            // server, and its answers would be lost too.
             link.addEventListener('click', () => {
-                if (!fields().some(changed)) {
-                    return;
-                }
                 const values = {};
                 for (const el of fields()) {
                     if (el.type !== 'radio' || el.checked) {

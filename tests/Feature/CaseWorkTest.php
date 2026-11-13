@@ -24,6 +24,22 @@ function onCasePage(string $relationManager, Grievance $case): Testable
     return Livewire::test($relationManager, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class]);
 }
 
+it('refuses every case tab to a focal person once the case is restricted, a page left open included', function () {
+    $case = Grievance::factory()->create();
+    signedInAs(Role::FocalPerson);
+    // Opened while the case was visible, then left open.
+    $notes = onCasePage(NotesRelationManager::class, $case)->assertOk();
+
+    $case->update(['manually_restricted' => true]);
+
+    // The open tab's next request is refused, and so is each tab opened afresh. Each tab checks this itself:
+    // Filament does not check the case page again when a tab sends a request.
+    $notes->call('$refresh')->assertForbidden();
+    foreach ([NotesRelationManager::class, MessagesRelationManager::class, AttachmentsRelationManager::class] as $tab) {
+        onCasePage($tab, $case)->assertForbidden();
+    }
+})->group('A5', 'S4');
+
 it('adds dated internal notes with their author, which cannot be edited or deleted', function () {
     $case = Grievance::factory()->create();
     $staff = signedInAs(Role::FocalPerson);

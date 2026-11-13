@@ -117,8 +117,8 @@ class Grievance extends Model
      *   the active staff who can see it, but not the Administrators;
      * - a message on a case whose assignee is active and can see it: the assignee alone, even
      *   when that is an Administrator;
-     * - a restricted case while no restricted-case officer is active: the Administrators,
-     *   since nobody else can see it;
+     * - a case nobody else can see (no active restricted-case officer for a restricted case, no active
+     *   focal person for another): the Administrators;
      * - a case set to Critical, or past its target: the Administrators.
      * Whoever entered a case, marked it restricted or set it to Critical already knows and is not told.
      */
@@ -131,7 +131,7 @@ class Grievance extends Model
         $recipients = match (true) {
             $kind === AlertKind::Critical, $kind === AlertKind::PastTarget => $administrators,
             $kind === AlertKind::Message && $assignee !== null => collect([$assignee]),
-            $this->is_restricted && $staff->doesntContain('role', Role::RestrictedOfficer) => $administrators,
+            $staff->diff($administrators)->isEmpty() => $administrators,
             default => $staff->diff($administrators),
         };
         $informed = match ($kind) {

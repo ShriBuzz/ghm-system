@@ -137,6 +137,27 @@ test('carries what was typed across a language switch, then forgets the copy', {
     expect(await page.evaluate(() => sessionStorage.getItem('grievance-draft'))).toBeNull();
 });
 
+test('carries what was typed across a language switch after the form came back with an error', { tag: ['@P2', '@P1'] }, async ({ page }) => {
+    // Every question answered, the optional ones too, but the email mistyped: the server fills every field back
+    // in, which is when people switch language to read the error.
+    await page.goto('/en');
+    await fillRequired(page, 'Test grievance sent with a mistyped email');
+    for (const question of ['Who are you?', 'Sex', 'Age group', 'Caste/ethnicity', 'Do you have a disability?']) {
+        await page.getByLabel(question, { exact: true }).selectOption({ index: 1 });
+    }
+    await page.getByText('With my name').click();
+    await page.getByLabel('Your name').fill('Test Complainant');
+    await page.getByRole('textbox', { name: 'Email' }).fill('not-an-email');
+    await page.getByRole('button', { name: 'Send grievance' }).click();
+    await expect(page.locator('[data-error-summary]')).toBeVisible();
+
+    await page.getByRole('link', { name: 'नेपाली' }).click();
+
+    await expect(page).toHaveURL(/\/ne$/);
+    await expect(page.getByLabel('के भयो, लेख्नुहोस्')).toHaveValue('Test grievance sent with a mistyped email');
+    await expect(page.getByLabel('तपाईंको नाम')).toHaveValue('Test Complainant');
+});
+
 test('turns away a file over 5 MB before it is sent', { tag: ['@P5'] }, async ({ page }) => {
     await page.goto('/en');
     const file = page.getByLabel('A photo or document (optional)');

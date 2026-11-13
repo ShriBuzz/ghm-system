@@ -52,7 +52,7 @@ You see every restricted case. Restricted-case officers work them as focal perso
 |---|---|---|
 | **Grievance set to Critical** | Someone set a case to Critical, which means it needs action today | Open it at once and make sure someone is working on it |
 | **Grievance past its target** | An open case has passed 15 working days. Sent once, overnight | Find out why, and who is working on it |
-| A new restricted case, or a message on one | No restricted-case officer is active | Work the case yourself, and activate or add a restricted-case officer |
+| A new case, or a message on one | Nobody else can see it: no restricted-case officer is active for a restricted case, or no focal person for another | Work the case yourself, and activate or add a restricted-case officer or focal person |
 
 You are not emailed about a change you made yourself.
 
