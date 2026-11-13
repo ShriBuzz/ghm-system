@@ -130,6 +130,17 @@ it('alerts the Administrators about a restricted case and its messages while no 
         ->and(Notification::sent($this->officer, CaseAlert::class))->toBeEmpty();
 })->group('U6', 'N1');
 
+it('alerts the Administrators about a case and its messages while no focal person is active', function () {
+    // The only focal person is on leave and deactivated: otherwise nobody would hear of the case.
+    $this->focal->update(['is_active' => false]);
+
+    $case = Grievance::factory()->create();
+    GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant]);
+
+    expect([alertsOf($this->admin, AlertKind::NewCase), alertsOf($this->admin, AlertKind::Message)])->toBe([1, 1])
+        ->and(Notification::sent($this->officer, CaseAlert::class))->toBeEmpty();
+})->group('U6', 'N1');
+
 it('alerts the restricted-case officers when a case is marked restricted, or the Administrators while none is active', function () {
     $case = Grievance::factory()->create();
     $this->actingAs($this->focal);

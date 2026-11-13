@@ -50,7 +50,7 @@ The email holds no details of the grievance on purpose. Use its **Log in to view
 
 You get no email for a restricted case, or for a case you entered yourself. When you mark a case restricted, the restricted-case officers are emailed, so it does not wait unseen.
 
-The Administrator gets its own alerts: when a case is set to **Critical** (it needs action the same day), when an open case passes its target of 15 working days, and when a restricted case arrives while no restricted-case officer is active. Set a case to Critical when someone is in danger: the Administrator is told at once.
+The Administrator gets its own alerts: when a case is set to **Critical** (it needs action the same day), when an open case passes its target of 15 working days, and when a case arrives that nobody else can see: a restricted case while no restricted-case officer is active, or any other case while no focal person is active. Set a case to Critical when someone is in danger: the Administrator is told at once.
 
 ## 4. The case list
 

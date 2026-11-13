@@ -192,7 +192,7 @@ Carry on with the users and cases from section 5.
 | The same as the Administrator, with "Include names and contact details" on | Name, phone and email columns after the reference. Opened in Excel or Numbers, Nepali text shows correctly |
 | Activity log, as the Administrator | "Cases exported", with the dates, the format and whether personal data was included |
 
-Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, nor the Administrator, unless it is restricted and no restricted-case officer is active) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
+Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, nor the Administrator, unless nobody else can see it: no active restricted-case officer for a restricted case, no active focal person for another) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
 
 ```sh
 php artisan queue:work --stop-when-empty
