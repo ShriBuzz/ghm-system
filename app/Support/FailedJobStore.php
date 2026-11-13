@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Throwable;
 
 /**
@@ -24,8 +25,11 @@ class FailedJobStore extends DatabaseUuidFailedJobProvider
      */
     public static function withoutAddress(Throwable $e): Throwable
     {
-        return $e instanceof TransportExceptionInterface
-            ? new RuntimeException('An email could not be sent (mail server code '.$e->getCode().').')
-            : $e;
+        return match (true) {
+            $e instanceof TransportExceptionInterface => new RuntimeException('An email could not be sent (mail server code '.$e->getCode().').'),
+            // The mailer refuses an address it cannot use before sending, quoting it the same way.
+            $e instanceof RfcComplianceException => new RuntimeException('An email could not be sent (the address is not valid).'),
+            default => $e,
+        };
     }
 }
