@@ -4,7 +4,6 @@ namespace App\Support;
 
 use App\Models\Attachment;
 use App\Models\Grievance;
-use App\Models\GrievanceMessage;
 use App\Models\User;
 use GdImage;
 use Illuminate\Http\UploadedFile;
@@ -38,7 +37,7 @@ class AttachmentStore
      * metadata such as GPS position and phone model removed. Errors are
      * reported under the caller's form field name.
      */
-    public static function store(UploadedFile $file, Grievance $grievance, ?User $uploader = null, ?GrievanceMessage $message = null, string $field = 'file'): Attachment
+    public static function store(UploadedFile $file, Grievance $grievance, ?User $uploader = null, string $field = 'file'): Attachment
     {
         // Arr::set, so a dotted Filament name such as "data.attachment" validates the nested value.
         $data = [];
@@ -53,7 +52,6 @@ class AttachmentStore
             || throw new RuntimeException('Attachment could not be written to the private disk.');
 
         return $grievance->attachments()->create([
-            'message_id' => $message?->id,
             'uploaded_by' => $uploader?->id,
             'stored_name' => $storedName,
             'original_name' => $file->getClientOriginalName(),
