@@ -78,7 +78,7 @@ php artisan backup:run
 |---|---|
 | `mysqldump: not found` or `command not found` | Ask the host where `mysqldump` is, and set `dump_binary_path` (`docs/deploy.md`, section 1) |
 | `Access denied` and `LOCK TABLES` | The database user needs the LOCK TABLES privilege. On cPanel: MySQL Databases, the user, ALL PRIVILEGES |
-| `No space left` or `Disk quota exceeded` | The account is full. `du -sh storage/app/backups storage/logs`. Archives may use 5,000 MB in all; the host's quota may be smaller |
+| `No space left` or `Disk quota exceeded` | The account is full. `du -sh storage/app/backups storage/logs`. The backup check warns only above 5,000 MB, which may be more than the host's quota |
 | Backup completes, but `php artisan about` shows `NOT SET` | `BACKUP_ARCHIVE_PASSWORD` is empty: the archives are not encrypted. Set it, then `php artisan config:cache` |
 
 **"Unhealthy backup" email** from the 02:00 check: the newest backup is older than a day (the backup failed, or cron stopped), or the archives passed 5,000 MB. `php artisan backup:list` shows which.

@@ -31,7 +31,7 @@ All free and open source. Dev tools (Pest, Larastan, Pint, Playwright) stay off 
 
 ## Backup and restore
 
-**Backup.** Nightly at 01:00 Nepal time: database and uploads in one AES-256 zip (`BACKUP_ARCHIVE_PASSWORD`) in `storage/app/backups/ghm/`, kept 15 days, at most 5,000 MB. Failures email `BACKUP_MAIL_TO`. No off-server copy yet: it needs storage from the host and a release.
+**Backup.** Nightly at 01:00 Nepal time: database and uploads in one AES-256 zip (`BACKUP_ARCHIVE_PASSWORD`) in `storage/app/backups/ghm/`, kept 15 days; an email above 5,000 MB. Failures email `BACKUP_MAIL_TO`. No off-server copy yet: it needs storage from the host and a release.
 
 **Restore** (`restore.md`). `php artisan down`; unzip with the archive password; load the dump; copy `attachments/` back; with the backup's `APP_KEY`, `migrate --force`, `config:cache`, `up`.
 
