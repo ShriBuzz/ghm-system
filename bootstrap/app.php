@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,8 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Mail servers quote the recipient's address when they refuse an email; it never reaches the log (S5).
+        // Mail servers, and the mailer itself, quote the recipient's address when they refuse an email; it never reaches the log (S5).
         $exceptions->map(TransportExceptionInterface::class, fn (TransportExceptionInterface $e) => FailedJobStore::withoutAddress($e));
+        $exceptions->map(RfcComplianceException::class, fn (RfcComplianceException $e) => FailedJobStore::withoutAddress($e));
 
         // A public form sent after the session ended (S2's 30 minutes) fails its CSRF check, which Laravel
         // turns into a 419 before this runs. Send the visitor back to the form by name, with what they typed,

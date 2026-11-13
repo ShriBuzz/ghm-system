@@ -255,6 +255,15 @@ it('never refills the form from a post another site sent, so it cannot plant whe
         ->and(session()->getOldInput('email'))->toBe('planted@example.com');
 })->group('S2', 'P7');
 
+it('refuses an email address the mailer would refuse, so the complainant can correct it and gets the acknowledgement', function () {
+    $named = ['is_anonymous' => '0', 'name' => 'Sita', 'preferred_contact' => 'email'];
+
+    $this->post('/en', formInput([...$named, 'email' => 'ram(home)@gmail.com']))->assertRedirect()->assertSessionHasErrors('email');
+    expect(Grievance::count())->toBe(0);
+
+    $this->post('/en', formInput([...$named, 'email' => 'rām.k+gunaso@उदाहरण.नेपाल']))->assertRedirect(route('grievance.received', ['locale' => 'en']));
+})->group('P4', 'N2');
+
 it('refuses crafted list values in place of text, without an error page', function () {
     $this->post('/en', formInput(['incident_day' => ['1']]))->assertRedirect()->assertSessionHasErrors('incident_date');
     $this->post('/en', formInput(['form_started' => ['x']]))->assertRedirect()->assertSessionHasErrors('form');
