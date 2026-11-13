@@ -177,6 +177,7 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
   - Step 4, decided the same day: the company's notice is the built-in default instead of being entered in Settings at each deploy, and the Nepali heading of "Other ways to raise a grievance" is गुनासो दर्ता गर्ने अन्य तरिका, which reuses the company's page title.
   - The question wording that counts is `docs/client-discussion.md`'s, which the WhatsApp answers follow.
 - Handover docs, decided 2026-11-11: the source goes over as a zip only, so the RFQ's "repository credentials" are not applicable and the credentials sheet says so; the focal-person guide is English first, Markdown in `docs/` with screenshots, and the Nepali edition follows; the credentials sheet stays vendor-side like the breach-report template; `README.md` is the package index.
+- Audit of 2026-11-13, decided by the project lead the same day: a case that nobody but the Administrators can see alerts them (finding 7, widening C21, built on `fix/P8-N1-audit-should-fix`); making a whole category restricted alerts nobody (finding 8, kept as is: the Administrator who changes it can tell the officers). The should-fix branch also holds findings 4, 5, 6, 9 and 10; the deploy guide's part of 10 and finding 11 (cPanel's PHP files and `rsync --delete`, to check on staging) are for the handover branch, which rewrites that guide.
 
 Made so far (the commit messages have the detail):
 
