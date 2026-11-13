@@ -18,7 +18,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Offline entry (A6). The fields mirror the public form; validation comes
+ * Offline entry. The fields mirror the public form; validation comes
  * from StoreGrievanceRequest::caseRules() in CreateGrievance, so the asterisks
  * here only mark what those rules require.
  */
@@ -49,7 +49,7 @@ class GrievanceForm
                             ->relationship('location', 'name_en', fn (Builder $query) => $query->where('is_active', true)->orderBy('sort'))
                             ->markAsRequired(),
                         DatePicker::make('incident_date')->label('When it happened')->maxDate(now())->markAsRequired(),
-                        // As on the public form: a remembered month is kept as the month only (P5).
+                        // As on the public form: a remembered month is kept as the month only.
                         Checkbox::make('day_unknown')->label('The complainant does not remember the day: keep the month and year only'),
                         Select::make('recurrence')->label('How often')->options(Recurrence::class)->markAsRequired(),
                         Textarea::make('description')->rows(6)->columnSpanFull()->markAsRequired(),

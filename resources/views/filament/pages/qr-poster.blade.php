@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    {{-- The poster (P10): both languages, the code large, the address in words for those who type it. --}}
+    {{-- The poster: both languages, the code large, the address in words for those who type it. --}}
     <div class="ghm-poster">
         <p class="ghm-poster-title" lang="ne">{{ __('form.title', locale: 'ne') }}</p>
         <p class="ghm-poster-title" lang="en">{{ __('form.title', locale: 'en') }}</p>

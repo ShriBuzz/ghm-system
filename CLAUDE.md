@@ -19,6 +19,7 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 - Build exactly what RFQ section 3 and the company's updates U1 to U16 ask for. Build an update only once the project lead has accepted it (WP4 in `docs/progress.md`; plan in `docs/answers-change-plan.md`). Nothing speculative.
 - Every commit message names its requirement IDs, for example `feat(P7): reference number and PIN` or `feat(U1): target time per category`.
+- Code comments never cite requirement IDs, the RFQ or internal documents: the client's developers get the code, not those documents. A comment says the why in plain words. Commit messages, Pest groups and Playwright tags keep the IDs.
 - Open questions go to the person, not into guesses in code.
 
 ## Stack (fixed)

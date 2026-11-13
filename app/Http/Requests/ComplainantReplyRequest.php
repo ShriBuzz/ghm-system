@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * More information or a reply from the complainant, on the status page (P8).
+ * More information or a reply from the complainant, on the status page.
  */
 class ComplainantReplyRequest extends FormRequest
 {

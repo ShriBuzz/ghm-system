@@ -18,9 +18,8 @@ use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
- * Documents on the case: the complainant's attachment and staff uploads (A3).
- * Files are stored and opened only through AttachmentStore and the case-checked
- * download route (S4).
+ * Documents on the case: the complainant's attachment and staff uploads. Files are
+ * stored and opened only through AttachmentStore and the case-checked download route.
  */
 class AttachmentsRelationManager extends RelationManager
 {
@@ -71,7 +70,7 @@ class AttachmentsRelationManager extends RelationManager
                             AttachmentStore::store($upload, $case, $user, field: "mountedActions.{$action->getNestingIndex()}.data.file");
                         } finally {
                             // Livewire's copy is the uncleaned original, and its .json holds the file name; both would
-                            // stay for a day, stored or refused (S5).
+                            // stay for a day, stored or refused.
                             $upload->delete();
                             FileUploadConfiguration::storage()->delete(FileUploadConfiguration::path($upload->getFilename().'.json'));
                         }

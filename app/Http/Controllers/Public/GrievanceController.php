@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 /**
- * The public grievance form and the page that hands out the reference and PIN (P1, P3–P7).
+ * The public grievance form and the page that hands out the reference and PIN.
  */
 class GrievanceController
 {
@@ -38,7 +38,8 @@ class GrievanceController
             'notice' => preg_split('/\R{2,}/u', trim($notice)),
             'categories' => Category::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
             'locations' => Location::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
-            // When the form was shown (P9). After a refusal or an expired session, the first showing still counts.
+            // When the form was shown, for the spam check. After a refusal or an expired session, the
+            // first showing still counts.
             'started' => old('form_started') ?: Crypt::encryptString((string) now()->getTimestamp()),
         ]);
     }

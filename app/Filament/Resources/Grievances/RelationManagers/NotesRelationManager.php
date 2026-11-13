@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Internal notes: dated, with author, never shown to the complainant, and
- * never edited or deleted (A3).
+ * never edited or deleted.
  */
 class NotesRelationManager extends RelationManager
 {

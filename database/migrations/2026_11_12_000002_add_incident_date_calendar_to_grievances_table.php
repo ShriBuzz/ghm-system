@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * The calendar the complainant gave the incident date in, "bs" or "ad" (P5, U9). The date
+     * The calendar the complainant gave the incident date in, "bs" or "ad". The date
      * itself is always stored in AD; this only lets a month-only BS date show as that BS month.
      */
     public function up(): void

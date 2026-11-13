@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * HTTPS and security headers for every response (S1). Public pages get a
+ * HTTPS and security headers for every response. Public pages get a
  * self-only policy; the admin panel gets the least Filament needs.
  */
 class SecurityHeaders

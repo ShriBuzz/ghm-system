@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 
 /**
- * Places a grievance can be about (A7).
+ * Places a grievance can be about.
  */
 class LocationResource extends Resource
 {

@@ -17,8 +17,8 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * The notice above the public form, on confidentiality, no retaliation and what happens next (P3).
- * The Administrator changes it without a developer (A7); NBI provides the final wording.
+ * The notice above the public form, on confidentiality, no retaliation and what happens next.
+ * The Administrator changes it without a developer; the company provides the final wording.
  *
  * @property-read Schema $form
  */

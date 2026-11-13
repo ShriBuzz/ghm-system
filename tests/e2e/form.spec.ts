@@ -27,7 +27,7 @@ test.describe('with JavaScript off', () => {
         // The Nepali page lists categories and locations by their Nepali names.
         await page.getByLabel('गुनासो केबारे हो?').selectOption({ index: 1 });
         await page.getByLabel('कहाँ भयो?').selectOption({ index: 1 });
-        // The Nepali form takes the date in Bikram Sambat (U9): 3 Kartik of last BS year, always in the past.
+        // The Nepali form takes the date in Bikram Sambat: 3 Kartik of last BS year, always in the past.
         await expect(page.getByLabel('महिना', { exact: true }).locator('option')).toContainText(['बैशाख', 'कार्तिक', 'चैत']);
         await page.getByLabel('गते', { exact: true }).selectOption('3');
         await page.getByLabel('महिना', { exact: true }).selectOption('7');

@@ -20,9 +20,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 /**
- * Cases received in a date range, counted by status and by category (N3).
+ * Cases received in a date range, counted by status and by category.
  * Counts only what the signed-in user may see, through the one visibility rule.
- * A count from 1 to 4 shows as "<5", so a small group cannot be picked out (U11).
+ * A count from 1 to 4 shows as "<5", so a small group cannot be picked out.
  *
  * @property-read Schema $form
  */
@@ -75,8 +75,8 @@ class Summary extends Page
     }
 
     /**
-     * A count as the page shows it (U11). 0 stays 0, as nobody is singled out by it (default for
-     * the company's question C22); the total line above the tables stays exact.
+     * A count as the page shows it. 0 stays 0, as nobody is singled out by it; the total line
+     * above the tables stays exact.
      */
     private static function shown(int $count): string
     {

@@ -71,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             // Persistent, so Livewire's background requests stay in English too.
             ->middleware([SetPanelLocale::class], isPersistent: true)
-            // Behind the panel's sign-in; the controller checks the case policy (S4).
+            // Behind the panel's sign-in; the controller checks the case policy.
             ->authenticatedRoutes(fn () => Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download'))
             ->authMiddleware([
                 Authenticate::class,

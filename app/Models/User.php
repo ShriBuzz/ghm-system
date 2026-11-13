@@ -38,7 +38,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 
     /**
      * A user who is deactivated, or whose new role cannot see a case, stops
-     * being its assignee, so no case looks owned by someone who cannot open it (A3, A5).
+     * being its assignee, so no case looks owned by someone who cannot open it.
      */
     protected static function booted(): void
     {
@@ -58,7 +58,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
-     * Whether this user may see the case, by the one visibility rule (A1, A5).
+     * Whether this user may see the case, by the one visibility rule.
      * A deactivated user sees nothing.
      */
     public function canSee(Grievance $grievance): bool

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class ReferenceNumber
 {
     /**
-     * The next case reference, GHM-YYYY-NNNN, restarting each Nepal year (P7).
+     * The next case reference, GHM-YYYY-NNNN, restarting each Nepal year.
      *
      * One statement creates the year's row at 1 or moves it up by one, and LAST_INSERT_ID()
      * hands back this connection's number. Submissions made at the same moment queue on that

@@ -41,7 +41,7 @@ it('stops the clock at Resolved, Referred or Closed and sets the closed date', f
     expect($case->working_days_open)->toBe(2)
         ->and($case->closed_at->toDateString())->toBe('2026-12-04');
 
-    // The company's answer: a reopened case counts again from the reopening date (U3).
+    // A reopened case counts again from the reopening date.
     $case->forceFill(['status' => Status::Reopened])->save();
     expect($case->closed_at)->toBeNull()->and($case->working_days_open)->toBe(0);
 })->group('A2', 'U3');

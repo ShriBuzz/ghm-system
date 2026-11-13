@@ -7,7 +7,7 @@ use App\Models\Grievance;
 use App\Models\User;
 
 /**
- * Case access by role (A1, A5). Visibility comes from Grievance::visibleTo(),
+ * Case access by role. Visibility comes from Grievance::visibleTo(),
  * so the policy and every list agree. No one may delete a case.
  */
 class GrievancePolicy
@@ -23,7 +23,7 @@ class GrievancePolicy
     }
 
     /**
-     * Every role enters cases received offline (A6).
+     * Every role enters cases received offline.
      */
     public function create(User $user): bool
     {
@@ -44,7 +44,7 @@ class GrievancePolicy
     }
 
     /**
-     * Names and contact details in an export (N4). Every role exports without them.
+     * Names and contact details in an export. Every role exports without them.
      */
     public function exportPersonalData(User $user): bool
     {

@@ -10,7 +10,7 @@ use Throwable;
 
 /**
  * Laravel's failed_jobs table, keeping a failed job's error the way the log does: a mail
- * server that refuses an email quotes the recipient's address, which is never stored in clear (S3, S5).
+ * server that refuses an email quotes the recipient's address, which is never stored in clear.
  */
 class FailedJobStore extends DatabaseUuidFailedJobProvider
 {

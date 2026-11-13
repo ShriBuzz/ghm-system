@@ -6,7 +6,7 @@ use App\Enums\Role;
 use App\Models\User;
 
 /**
- * The holiday list (A2): the focal person enters each year's holidays and the Administrator
+ * The holiday list: the focal person enters each year's holidays and the Administrator
  * checks them in the activity log, as the company asked. Only the Administrator removes one.
  */
 class HolidayPolicy extends SettingsPolicy

@@ -4,7 +4,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Notification;
 
 /**
- * The company's text on the public pages, word for word (U10).
+ * The company's text on the public pages, word for word.
  */
 beforeEach(function () {
     Notification::fake();

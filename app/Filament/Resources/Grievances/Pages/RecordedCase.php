@@ -15,7 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 /**
- * The slip after an offline entry (A6): reference and PIN, shown once. It reads
+ * The slip after an offline entry: reference and PIN, shown once. It reads
  * only the one-time session message, never the case, so a focal person who
  * entered a restricted case can still hand the slip over.
  */

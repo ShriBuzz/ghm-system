@@ -1,4 +1,4 @@
-{{-- Laravel's header, without its laravel.com logo for an app named "Laravel": an email loads nothing from another site (S5). --}}
+{{-- Laravel's header, without its laravel.com logo for an app named "Laravel": an email loads nothing from another site. --}}
 @props(['url'])
 <tr>
 <td class="header">
