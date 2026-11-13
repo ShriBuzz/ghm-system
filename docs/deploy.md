@@ -64,10 +64,12 @@ Keep the zip of every version you deploy: it is the code to go back to (section 
 ## 4. Upload
 
 ```sh
-rsync -az --delete --exclude=/.env --filter='protect /storage/**' ./ <user>@<host>:ghm/
+rsync -az --delete --exclude=/.env --exclude=/public/.user.ini --exclude=/public/php.ini --filter='protect /storage/**' ./ <user>@<host>:ghm/
 ```
 
 Run it from `../ghm-release`. The same command does the first upload and every update. It never touches the server's `.env` or anything stored under `storage/` (attachments, backups, sessions, logs), and it deletes files a new version no longer has, stale caches included.
+
+On cPanel, MultiPHP INI Editor keeps the PHP settings from section 1 in `public/.user.ini` and `public/php.ini`; the command leaves both alone. MultiPHP Manager keeps the PHP version in a block it adds to `public/.htaccess`, and every upload replaces that file with the release's copy. So after every upload, check the PHP version (section 7). On staging, note which of these files cPanel creates.
 
 ## 5. First deploy
 
@@ -167,7 +169,7 @@ GHM_ADMIN_PASSWORD=
 | `MAIL_*` | The company's mail server or sending service. Port 587 with `MAIL_SCHEME=null` (STARTTLS); for port 465 use `MAIL_SCHEME=smtps`. Never `MAIL_MAILER=log`: it writes every email, PINs included, into the log |
 | `BACKUP_ARCHIVE_PASSWORD` | Required. Without it the nightly archive is not encrypted. Keep it in the password manager with `APP_KEY` |
 | `BACKUP_DISKS` | `backups` only, until an off-server copy is built (`docs/technical-reference.md`, Backups) |
-| `BACKUP_MAIL_TO` | Who is told when a backup fails or is missing |
+| `BACKUP_MAIL_TO` | Required. Who is told when a backup fails or is missing. Without it nobody is told |
 | `GHM_ADMIN_*` | First deploy only; deleted after `db:seed` |
 | `GHM_SUBMISSIONS_PER_HOUR`, `GHM_FAILED_LOOKUPS_PER_HOUR` | Optional; leave them out for 10 each. Grievances accepted, and failed status lookups, per network per hour (P8, P9). Raise the first before posters go up if many workers share one Wi-Fi |
 
@@ -208,6 +210,7 @@ To go back, deploy the previous version the same way. If the new version changed
 | Settings, Users, in the staff panel | At least one active restricted-case officer. New restricted cases alert only them (N1); with none, the Administrator is alerted instead, and is the only one who can work them |
 | From a developer machine: `BASE_URL=https://<subdomain> npx playwright test` | The `@smoke` specs pass: pages load over HTTPS with the security headers, and the staff sign-in is reachable. Against a non-local address Playwright runs nothing else |
 | `http://<subdomain>` in a browser | It moves to `https://` |
+| cPanel: MultiPHP Manager, then MultiPHP INI Editor | The subdomain still runs PHP 8.4, and `upload_max_filesize`, `post_max_size` and `memory_limit` are still those of section 1. An upload replaces `public/.htaccess`, where MultiPHP Manager keeps the version: if another version shows, choose 8.4 again. With an older PHP every page fails |
 | [SSL Labs](https://www.ssllabs.com/ssltest/) for the subdomain | Grade A (S1) |
 | The morning after: `ls storage/app/backups/ghm/` | Last night's zip (S7) |
 

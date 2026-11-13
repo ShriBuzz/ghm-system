@@ -92,7 +92,7 @@ Restoring a backup: `docs/restore.md`.
 | Log says | Fix |
 |---|---|
 | `Permission denied` under `storage/` or `bootstrap/cache/` | PHP cannot write there (`docs/deploy.md`, section 2) |
-| `Your Composer dependencies require a PHP version >= 8.4.1` | The website runs an older PHP. On cPanel: MultiPHP Manager |
+| `Your Composer dependencies require a PHP version >= 8.4.1` | The website runs an older PHP. On cPanel: MultiPHP Manager, PHP 8.4 for the subdomain. An update can reset it (`docs/deploy.md`, section 4) |
 | `No application encryption key has been specified` | `APP_KEY` is missing from `.env`. Put back the one from the password manager. Never generate a new one on a live site |
 | `The MAC is invalid` or `DecryptException` | `.env` has a different `APP_KEY` from the one the data was encrypted with. Put back the right one, then `php artisan config:cache` |
 | `SQLSTATE[HY000] [1045]` or `[2002]` | The `DB_*` lines in `.env` are wrong, or the database is down |
