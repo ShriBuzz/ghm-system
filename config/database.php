@@ -59,6 +59,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // TIMESTAMP columns are read and written in the connection's time zone, the server's own unless set:
+            // Nepal time here, so a restore on a host in another zone shifts no date. An offset, since named zones
+            // need MySQL's time zone tables, which shared hosts often lack; Nepal has no daylight saving.
+            'timezone' => '+05:45',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
