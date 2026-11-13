@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
+import { baseURL } from './target';
 
 // The public grievance form and the page with the reference and PIN, on a 360 px phone (mobile project).
 const photo = fileURLToPath(new URL('./fixtures/photo.jpg', import.meta.url));
@@ -101,6 +102,18 @@ async function expectTypedTextSurvivesAnEndedSession(page: Page): Promise<void> 
 
 test('sends the grievance even when the session ended while it was being typed, with JavaScript on', { tag: ['@S2', '@P1'] }, async ({ page }) => {
     await expectTypedTextSurvivesAnEndedSession(page);
+});
+
+test('never fills in the form from a post another page sent, so no site can choose where the PIN is emailed', { tag: ['@S2', '@P7'] }, async ({ page }) => {
+    // A page of no origin posts a named form with its own email, as another site's page could.
+    await page.setContent(`<form method="post" action="${new URL('/en', baseURL)}">
+        <input name="is_anonymous" value="0"><input name="email" value="planted@example.com"><button>Post</button></form>`);
+    const answer = page.waitForResponse((response) => response.request().method() === 'POST');
+    await page.getByRole('button', { name: 'Post' }).click();
+
+    expect((await answer).status()).toBe(419);
+    await page.goto('/en');
+    await expect(page.locator('#email')).toHaveValue('');
 });
 
 test('hides the spam trap from people and from screen readers', { tag: ['@P9', '@S9'] }, async ({ page }) => {
