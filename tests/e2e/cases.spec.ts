@@ -117,6 +117,17 @@ test.describe('focal person', () => {
         await expect(page.getByRole('definition').filter({ hasText: pin })).toBeVisible();
     });
 
+    test('prints the reference and PIN in dark ink on white, also from a dark staff panel', { tag: ['@A6'] }, async ({ page }) => {
+        // In print the dark panel's background is dropped, so its white text would come out pale on paper.
+        await page.emulateMedia({ colorScheme: 'dark' });
+        const { reference, pin } = await enterOfflineCase(page);
+        await page.emulateMedia({ colorScheme: 'dark', media: 'print' });
+
+        await expect(page.getByText(reference, { exact: true })).toHaveCSS('color', 'rgb(27, 36, 40)');
+        await expect(page.getByText(pin, { exact: true })).toHaveCSS('color', 'rgb(27, 36, 40)');
+        await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    });
+
     test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL, staff }) => {
         const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment, exploitation and abuse', anonymous: true });
         expect(pin).toMatch(/^\d{6}$/);

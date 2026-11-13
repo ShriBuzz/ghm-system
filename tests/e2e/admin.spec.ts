@@ -122,4 +122,16 @@ test.describe('focal person, QR poster', () => {
         const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('link', { name: 'Download QR code (PNG)' }).click()]);
         expect(download.suggestedFilename()).toBe('grievance-form-qr.png');
     });
+
+    test('keeps the poster text in dark ink when the staff panel is dark, on screen and on paper', { tag: ['@P10'] }, async ({ page }) => {
+        // The panel follows the computer's dark setting; the poster stays white, so its text must not turn white.
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await page.goto('/admin/qr-poster');
+        const title = page.getByText('Raise a grievance', { exact: true });
+        await expect(title).toHaveCSS('color', 'rgb(27, 36, 40)');
+
+        await page.emulateMedia({ colorScheme: 'dark', media: 'print' });
+        await expect(title).toHaveCSS('color', 'rgb(27, 36, 40)');
+        await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    });
 });

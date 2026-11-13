@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['message_id', 'uploaded_by', 'stored_name', 'original_name', 'mime', 'size'])]
+#[Fillable(['uploaded_by', 'stored_name', 'original_name', 'mime', 'size'])]
 class Attachment extends Model
 {
     /** @use HasFactory<AttachmentFactory> */
@@ -26,14 +26,6 @@ class Attachment extends Model
     public function grievance(): BelongsTo
     {
         return $this->belongsTo(Grievance::class);
-    }
-
-    /**
-     * @return BelongsTo<GrievanceMessage, $this>
-     */
-    public function message(): BelongsTo
-    {
-        return $this->belongsTo(GrievanceMessage::class, 'message_id');
     }
 
     /**

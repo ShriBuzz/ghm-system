@@ -208,14 +208,6 @@ class Grievance extends Model
     }
 
     /**
-     * @return BelongsTo<User, $this>
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
      * @return HasMany<GrievanceMessage, $this>
      */
     public function messages(): HasMany

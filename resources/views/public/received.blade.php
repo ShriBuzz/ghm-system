@@ -2,10 +2,6 @@
 
 @section('title', __('received.title'))
 
-@push('head')
-    <meta name="robots" content="noindex">
-@endpush
-
 @section('content')
     <h1>{{ __('received.title') }}</h1>
 

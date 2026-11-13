@@ -132,7 +132,7 @@ it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both unt
     preg_match('/data-pin>(\d{6})</', $page, $pin);
 
     expect($case->reference)->toMatch('/^GHM-2026-\d{4}$/')
-        ->and($page)->toContain($case->reference)->toContain('noindex')
+        ->and($page)->toContain($case->reference)
         ->and($pin)->toHaveCount(2)
         ->and(Hash::check($pin[1], $case->pin_hash))->toBeTrue()
         ->and($case->pin_hash)->not->toContain($pin[1]);

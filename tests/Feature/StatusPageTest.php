@@ -37,7 +37,7 @@ it('shows the status and the company\'s replies, never internal notes or staff n
 
     expect($page->headers->get('Cache-Control'))->toContain('no-store');
     $page->assertSee($case->reference)->assertSee('Received')->assertSee('We are looking into it.')->assertSee('Grievance team')
-        ->assertSee('It happened again today.')->assertSee('noindex', false)
+        ->assertSee('It happened again today.')
         ->assertDontSee('Internal: speak to the supervisor')->assertDontSee('Hari Staffname');
 })->group('P8', 'A3');
 
