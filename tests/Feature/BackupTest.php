@@ -7,10 +7,13 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event as Events;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Backup\Config\Config;
+use Spatie\Backup\Events\UnhealthyBackupWasFound;
+use Spatie\Backup\Tasks\Backup\DbDumperFactory;
 
 function scheduled(string $command): ?Event
 {
@@ -58,6 +61,13 @@ it('writes a password-protected archive of the database and private files, witho
         ->and($entries->reject(fn (array $entry) => str_ends_with($entry['name'], '/'))
             ->every(fn (array $entry) => $entry['encryption_method'] === ZipArchive::EM_AES_256))->toBeTrue();
 })->group('S7', 'S4');
+
+it('dumps the database without tablespaces, which a shared-hosting MySQL user may not read', function () {
+    // MySQL 8.0.21+ refuses a plain mysqldump to a user without the PROCESS privilege, as on most cPanel hosts.
+    $command = DbDumperFactory::createFromConnection('mysql')->getDumpCommand('dump.sql', 'credentials.cnf');
+
+    expect($command)->toContain('--no-tablespaces');
+})->group('S7');
 
 it('holds case details in the backup only as ciphertext, which the app key alone decrypts', function () {
     Storage::fake('backups');
@@ -120,4 +130,31 @@ it('keeps backups for 14 days', function () {
         "{$folder}/2026-11-07-01-00-00.zip",
         "{$folder}/2026-11-19-01-00-00.zip",
     ]);
+})->group('S7');
+
+it('never deletes a backup younger than 15 days for size, and warns when the backups grow too big instead', function () {
+    Storage::fake('backups');
+    Events::fake([UnhealthyBackupWasFound::class]);
+    $this->travelTo('2026-11-20 01:30');
+    $folder = config('backup.backup.name');
+
+    // 14 nights of 400 MB archives, 5,600 MB in all: sparse files, so they take no real disk space.
+    foreach (range(0, 13) as $daysAgo) {
+        $date = now()->subDays($daysAgo)->setTime(1, 0);
+        $path = Storage::disk('backups')->path("{$folder}/{$date->format('Y-m-d-H-i-s')}.zip");
+        File::ensureDirectoryExists(dirname($path));
+        $file = fopen($path, 'w');
+        ftruncate($file, 400 * 1024 * 1024);
+        fclose($file);
+        touch($path, $date->getTimestamp());
+    }
+
+    $this->artisan('backup:clean --disable-notifications')->assertSuccessful();
+    expect(Storage::disk('backups')->files($folder))->toHaveCount(14);
+
+    // Too big now: the monitor reports it, which emails BACKUP_MAIL_TO.
+    $this->artisan('backup:monitor')->assertFailed();
+    Events::assertDispatched(UnhealthyBackupWasFound::class);
+
+    File::deleteDirectory(Storage::disk('backups')->path($folder));
 })->group('S7');

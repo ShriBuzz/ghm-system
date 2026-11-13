@@ -1,93 +1,77 @@
 # User guide for focal persons
 
-This guide is for focal persons: the staff who handle grievances in the staff panel. It covers signing in, working a case, entering grievances that arrive offline, and the summary and export. The panel's screens are in English, and this guide quotes their labels in **bold**.
+This guide is for the staff who handle grievances in the staff panel: focal persons, and restricted-case officers, who work the same way on restricted cases. The panel's screens are in English, and this guide shows their labels in **bold**.
+
+## How a grievance moves through the system
+
+1. **It arrives** through the online form (from the company website or the QR poster), or you enter one that came by phone, letter, drop box or in person (section 6).
+2. **The complainant gets a reference number and a 6-digit PIN.** With both, they open the status page to see where their case stands and read your replies. They never see staff names, internal notes or staff documents.
+3. **You are told by email**, and open the case in the panel.
+4. **You work the case:** look into it, reply, and move it through the statuses until it is resolved or closed. The target is 15 working days.
 
 ## 1. Your role
 
-There are three roles in the system:
+- **Administrator:** sees every case and manages the settings: users, categories, locations and the public notice.
+- **Focal person:** sees every case that is not restricted.
+- **Restricted-case officer:** sees only the restricted cases.
 
-- **Administrator:** sees every case and manages the settings (users, categories, locations and the public notice). The Administrator also checks the holidays you enter, and is the only one who can delete one.
-- **Focal person (you):** sees every case that is not restricted.
-- **Restricted-case officer:** sees the restricted cases.
+A case is restricted when its category is restricted (sexual harassment, exploitation and abuse, and reporting wrongdoing) or when someone marks it restricted. Focal persons never see a restricted case: not in the list, the search, the summary, the export or the emails.
 
-A case is restricted when its category is restricted (sexual harassment, exploitation and abuse, and reporting wrongdoing, unless the Administrator changes them) or when someone marks it restricted. Restricted cases never appear for you: not in the list, the search, the summary, the export or the email alerts.
-
-Your menu has four items: **Dashboard**, **Cases**, **Summary** and **QR poster**.
+Your menu has **Dashboard**, **Cases**, **Summary**, **QR poster**, and **Settings → Holidays**.
 
 ## 2. Signing in
 
-Open the staff address the Administrator gives you. It is the grievance site's address followed by `/admin`.
+Open the staff address the Administrator gives you: the grievance site's address followed by `/admin`.
 
 **The first time.**
 
 1. Enter your **Email address** and **Password** and press **Sign in**.
-2. The panel asks you to set up two-factor authentication. Install an authenticator app on your phone, for example Google Authenticator or Microsoft Authenticator.
-3. Scan the QR code shown on screen with the app.
-4. Type the 6-digit code the app shows, together with your password.
-5. The panel then shows your **recovery codes**. Write them down and keep them somewhere safe, away from your phone. Each code works once, and it lets you in if your phone is lost.
+2. The panel asks you to set up two-factor authentication, a second check with a code from your phone. Install an authenticator app on your phone, such as Google Authenticator or Microsoft Authenticator, and press **Set up**.
+3. Scan the QR code with the app. Type the 6-digit code the app shows and your password, and press **Next**.
+4. The panel shows 8 **recovery codes**. Write them down and keep them away from your phone. Each works once, in place of the app's code, if your phone is lost. Press **Enable authenticator app**, then **Continue**.
 
-**Every day.** Sign in with your email and password, then type the 6-digit code from the app (picture 1). If you do not have your phone, choose **Use a recovery code instead**.
+**Every day.** Your email and password, then, under **Verify your identity**, the 6-digit code the app shows at that moment.
 
-<img src="images/user-guide/01-sign-in-code.png" width="300" alt="The Verify your identity step, asking for the 6-digit code from the authenticator app">
-
-*Picture 1: the second step of signing in.*
-
-**Good to know.**
-
-- **Wrong password:** after 5 wrong tries, your account is locked for 15 minutes. Wait, then try again.
-- **Idle sign-out:** after 30 minutes without activity, the panel signs you out. Anything you had not saved is lost, so save your work before you step away.
-- **Changing your password:** open the menu under your initials at the top right and choose **Profile**. You need your current password. The same page makes new recovery codes.
-- **Lost phone and no recovery codes left:** ask the Administrator.
+**Good to know.** 5 wrong passwords lock the account for 15 minutes. 30 minutes without activity sign you out, and anything not saved is lost. **Profile**, in the menu under your initials at the top right, changes your password (it asks for the current one) and makes new recovery codes (**Regenerate recovery codes**).
 
 ## 3. Email alerts
 
-You get an email for:
+You get an email:
 
-- each new grievance (**New grievance received**)
-- each new message from a complainant (**New message on a grievance**). When the case is assigned to you, only you get it; when it is assigned to nobody, everyone who can see the case does.
+- for each new grievance (**New grievance received**), except one you entered yourself;
+- for each new message from a complainant (**New message on a grievance**): to the person the case is assigned to, or to everyone who can see it when it is assigned to nobody.
 
-The email holds no details of the grievance on purpose. Use its **Log in to view** button and read the case in the panel.
+The email holds no details of the grievance, on purpose. Press its **Log in to view** button.
 
-You get no email for a restricted case, or for a case you entered yourself. When you mark a case restricted, the restricted-case officers are emailed, so it does not wait unseen.
-
-The Administrator gets its own alerts: when a case is set to **Critical** (it needs action the same day), when an open case passes its target of 15 working days, and when a restricted case arrives while no restricted-case officer is active. Set a case to Critical when someone is in danger: the Administrator is told at once.
+When you mark a case restricted, the restricted-case officers are emailed. Set a case to **Critical** when someone is in danger: the Administrator is emailed at once.
 
 ## 4. The case list
 
-Dates on the staff screens are in Bikram Sambat with AD in brackets, for example 2083-07-22 (2026-11-08). Fields where you type or pick a date (the filters, offline entry, holidays) take AD.
+**Dates.** The panel shows dates in Bikram Sambat (BS), the Nepali calendar, with the international (AD) date in brackets: 2083-07-22 (2026-11-08). When you type or pick a date, in a filter, an offline case or a holiday, use AD. The offline slip shows AD only.
 
-**Cases** lists every case you can see, the newest first (picture 2).
+**Cases** lists the cases you can see, newest first (picture 1).
 
-<img src="images/user-guide/02-case-list.png" width="560" alt="The case list with reference, received date, days open, status, priority and category columns; one case shows 30 days open in red">
+<img src="images/user-guide/02-case-list.png" width="440" alt="The case list with reference, received date in BS with AD, days open, status, priority and category columns; one case shows 19 days open in red">
 
-*Picture 2: the case list. The red 30 marks a case open more than 15 working days.*
+*Picture 1: the case list. The red 19 is an open case past its target of 15 working days.*
 
-- **Find a case.** Type its reference number, for example `GHM-2026-0001`, in the **Search** box above the table.
-- **Filter the list.** Use the funnel button to filter by **Status**, **Category**, **Location**, a date range (**Received from**, **Received until**), or **Overdue only (over 15 working days)**.
-- **Days open** counts working days since the case was received, or since it was last reopened. Saturdays, and the holidays in **Settings → Holidays**, do not count; Sundays do. The number turns red when an open case passes 15 working days.
-- **When the count stops.** It stops when a case is **Referred / Out of scope**, **Resolved** or **Closed**. If you later set **Reopened**, it counts again from that day, and the case page shows **Reopened on** with the date. Setting **Reopened** on a case that is still open does not restart the count.
-- **Holidays.** At the start of each year, enter the government's public holidays: **Settings → Holidays**, **New holiday**, then the date and its name. You can correct one with **Edit**. Only the Administrator can delete a holiday, and the Administrator checks your entries in the activity log.
+- **Find a case:** type its reference number, such as `GHM-2026-0003`, in **Search**.
+- **Filter:** the funnel button filters by **Status**, **Category**, **Location**, **Received from**, **Received until** or **Overdue only (over 15 working days)**.
+- **Days open** counts working days since the case was received, or last reopened. Saturdays and the holidays in **Settings → Holidays** do not count; Sundays do. The number turns red when an open case passes 15.
+- **The count stops** at **Referred / Out of scope**, **Resolved** or **Closed**, and starts again from the day you set **Reopened**.
+- **Holidays.** At the start of each year, enter the public holidays: **Settings → Holidays**, **New holiday**, the date and its name. **Edit** corrects one. The counts change overnight. Only the Administrator can delete a holiday, and checks the ones you enter.
 
 ## 5. Working a case
 
-Click a reference to open the case (picture 3).
+Click a reference to open the case (picture 2). Opening a case is recorded in the activity log.
 
-<img src="images/user-guide/03-case-page.png" width="560" alt="The case page with Set status, Set priority, Assign and Mark restricted buttons above the Case section">
+<img src="images/user-guide/03-case-page.png" width="440" alt="The case page with Set status, Set priority, Assign and Mark restricted buttons above the Case section">
 
-*Picture 3: a case page. The actions are at the top right.*
+*Picture 2: a case page. The actions are at the top right.*
 
-Complainants who use the Nepali form give the incident date in Bikram Sambat. The case page shows it like every other date, Bikram Sambat with AD in brackets, or, when they did not remember the day, as the Bikram Sambat month, for example "Kartik 2083, exact day not remembered".
+Its sections are **Case**, **Grievance** (what happened, where and when), **Complainant** (name and contacts, or "Anonymous") and **About the complainant (optional answers)**. Status and category show their Nepali name next to the English, as the complainant reads them. An incident date from the Nepali form is in BS; when the complainant did not remember the day, it shows the month, such as "Kartik 2083, exact day not remembered".
 
-The status and the category show their Nepali name next to the English, as the complainant reads them, for example "Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)". The complainant's description and messages keep their own line breaks, in Nepali or English. You can reply in Nepali.
-
-**What the page shows.** Opening a case is recorded in the activity log. The page has four sections:
-
-- **Case:** reference, status, priority, who it is assigned to, dates and channel
-- **Grievance:** what happened, where and when
-- **Complainant:** name and contact details, or "Anonymous"
-- **About the complainant:** the optional answers
-
-**Set status.** The complainant sees the status on the status page, in the language they chose. The dialog lists each status with its Nepali name:
+**Set status.** The complainant sees the status on the status page, in their language.
 
 | Status | Nepali | Use it when |
 |---|---|---|
@@ -99,82 +83,68 @@ The status and the category show their Nepali name next to the English, as the c
 | Closed | बन्द गरिएको | Nothing more will be done; the closing date is recorded |
 | Reopened | पुनः खोलिएको | A resolved or closed case needs more work |
 
-A message from the complainant never changes the status. If a closed case needs more work, set **Reopened** yourself.
+A message from the complainant never changes the status: set **Reopened** yourself when a closed case needs more work.
 
-**Set priority** chooses **Low**, **Medium**, **High** or **Critical**.
+**Set priority:** **Low**, **Medium**, **High** or **Critical**. **Assign** gives the case to one person, or to **Nobody**; it offers only people allowed to see the case.
 
-**Assign** gives the case to one person. The list offers only people allowed to see the case.
+**Messages, Notes and Documents** are the tabs below the case. A note or reply cannot be edited or deleted once saved, so read it before you press **Create**. (**Create & create another** saves too, then opens an empty form.)
 
-**Notes and replies.** The tabs below the case are **Messages**, **Notes** and **Documents**. Notes and replies cannot be edited or deleted after you press **Create**, so read them before you do.
+- **Add note:** an internal note with the date and your name. The complainant never sees notes.
+- **Send reply:** the complainant reads it on the status page, signed "Grievance team", never with your name (picture 3). Colleagues see who sent it. You can write in Nepali.
+- **Upload document:** a JPG, PNG, WebP or PDF of up to 5 MB, such as a scanned letter. The complainant does not see it. A file the complainant attached shows as uploaded by **Complainant**.
 
-- **Notes:** **Add note** writes an internal note, with the date and your name. The complainant **never** sees notes.
-- **Messages:** **Send reply** writes to the complainant (picture 4). They read it on the status page, signed "Grievance team", never with your name. The tab also shows what the complainant has written.
+<img src="images/user-guide/04-reply-dialog.png" width="340" alt="The Reply to the complainant dialog, with the hint that the complainant reads it on the status page, and the Create button">
 
-<img src="images/user-guide/04-reply-dialog.png" width="460" alt="The Reply to the complainant dialog, with the hint that the complainant reads it on the status page, and the Create button">
+*Picture 3: a reply. Press **Create** to send it.*
 
-*Picture 4: a reply. Press **Create** to send it.*
-
-**Documents.** **Upload document** adds a photo or PDF of up to 5 MB, for example a scanned letter. Click a file's name to download it. The complainant does not see documents uploaded by staff. A photo the complainant attached to the form also appears here, as uploaded by **Complainant**.
-
-**Mark restricted.** Use it when a case should be seen only by restricted-case officers and the Administrator, for example when it turns out to involve harassment.
-
-- **You lose access at once.** As soon as you confirm, the case leaves your list.
-- **You cannot undo it.** Only the Administrator can remove the mark, and must give a reason. The reason is kept as an internal note on the case, in the **Notes** tab, so you can read why once the case is back in your list.
+**Mark restricted** when only restricted-case officers and the Administrator should see a case, for example when it turns out to involve harassment. As soon as you confirm, the case leaves your list, and you cannot undo it. Only the Administrator can remove the mark, with a reason that is kept in **Notes**.
 
 ## 6. Grievances received offline
 
-When a grievance arrives by phone, email, the drop box, in person, by letter, at a meeting or through another organisation, enter it so it is handled like any other. On **Cases**, press **Enter offline case**, then fill in:
+Enter every grievance that arrives another way (phone, email, drop box, in person, letter, meeting, another organisation) so it is handled like any other: **Cases**, **Enter offline case**, then fill in:
 
-- **Channel:** **Phone / hotline**, **Email**, **Drop box**, **In person**, **Letter**, **Meeting**, **Referred by another organisation** or **Other**.
-- **Received:** when it reached the company. It cannot be in the future.
-- **Category**, **Location**, **When it happened**, **How often** and **Description.**
-  - If the complainant knows only the month, tick "The complainant does not remember the day".
-- **Complainant's language:** Nepali or English. Any acknowledgement email is sent in this language.
-- **Anonymous:** switch it on when no name or contact is given. Otherwise a phone number or an email is needed, even when the complainant chooses **Do not contact me** as the preferred contact.
+- **Channel**, and **Received**: when it reached the company. It cannot be in the future.
+- **Category**, **Location**, **When it happened**, **How often** and **Description**. If the complainant knows only the month, tick "The complainant does not remember the day".
+- **Complainant's language:** Nepali or English. Any acknowledgement email goes in this language.
+- **Anonymous: no name or contact details:** switch it on when none are given. Otherwise give the **Name**, the **Preferred contact**, and a phone or an email: the phone if they prefer phone, the email if they prefer email.
 
-Press **Create**. The **Offline case recorded** page shows the reference number and a PIN (picture 5).
+Press **Create**. The **Offline case recorded** page shows the reference number and the PIN (picture 4). The PIN is shown only this once, so give both to the complainant straight away: in person, press **Print slip** and hand them the slip; on the phone, read both out (the system sends no text messages); by email, they also get an acknowledgement email.
 
-<img src="images/user-guide/05-offline-slip.png" width="560" alt="The Offline case recorded page with the reference number, a 6-digit PIN, the received date and a Print slip button">
+<img src="images/user-guide/05-offline-slip.png" width="400" alt="The Offline case recorded page with the reference number, a 6-digit PIN, the received date and a Print slip button">
 
-*Picture 5: the slip. The PIN is shown only once.*
-
-Give the reference and PIN to the complainant straight away:
-
-- **In person:** press **Print slip** and hand them the slip.
-- **On a phone call:** read both out. The system sends no text messages.
-- **By email:** the complainant also receives an acknowledgement email with the reference and PIN.
-
-The PIN cannot be shown again. With the reference and PIN, the complainant can follow the case and reply on the status page.
+*Picture 4: the slip. The PIN is shown only once.*
 
 ## 7. Summary and export
 
-**Summary** counts the cases received in a date range, by status and by category (picture 6). It counts only the cases you can see.
+**Summary** counts the cases you can see that were received in a date range, by status and by category (picture 5). A count from 1 to 4 shows as **<5**, so nobody in a small group can be picked out. A 0 shows as 0, the line above the tables gives the exact total, and the category table lists only categories that have cases.
 
-- **Small groups show as <5.** A count from 1 to 4 shows as **<5**, so that nobody can be picked out of a small group. A 0 shows as 0, and the line above the tables gives the exact total.
+<img src="images/user-guide/06-summary.png" width="360" alt="The Summary page: 7 cases received, a table by status with <5 and 0 counts, and a table by category with 5 for one category and <5 for two others">
 
-<img src="images/user-guide/06-summary.png" width="460" alt="The Summary page with date fields and two tables: cases by status and cases by category">
+*Picture 5: the summary. Wages and benefits had 5 cases; the others had fewer.*
 
-*Picture 6: the summary for a chosen date range.*
-
-**Export**, on **Cases**, downloads the cases received in a date range as **CSV** or **Excel (XLSX)**.
-
-- **What the file holds:** the reference, the received and closed dates, channel, category, location, priority, status and the optional answers.
-- **Dates in both calendars:** each date has two columns. The AD one has the date and time, such as 2026-11-08 10:05; the Bikram Sambat (BS) one has the date, such as 2083-07-22.
-- **No personal details:** your exports never include names or contact details.
-- **Logged:** every export is recorded in the activity log.
+**Export**, on **Cases**, downloads cases as a file: choose **Received from** and **Received until** (this month, unless you change them), **CSV** or **Excel (XLSX)**, then **Download**. Both open in Excel. The file has the reference, the received and closed dates (in AD with the time, and in BS), channel, category, location, priority, status and the optional answers. It never has names or contact details. Every export is recorded in the activity log.
 
 ## 8. QR poster
 
-**QR poster** shows a QR code that opens the grievance form on a phone. Press **Print poster** for an A4 poster in Nepali and English, or **Download QR code (PNG)** to use the code elsewhere.
+**QR poster** shows a QR code that opens the grievance form on a phone. **Print poster** gives an A4 poster in Nepali and English; **Download QR code (PNG)** gives the code alone.
 
 ## 9. Keeping grievances confidential
 
-- **Do not share your account.** Every case you open and every change you make is recorded under your name.
-- **Keep details inside the panel.** Do not copy them into email, chat or documents.
-- **Store files with care.** Keep downloaded files and exports only as long as you need them, never on a shared computer.
-- **Sign out** when you finish, using the menu under your initials.
-- **Report anything unusual:** an alert you did not expect, or a case you should not see. Tell the Administrator straight away.
+- **Do not share your account.** Everything you open or change is recorded under your name.
+- **Keep details inside the panel,** not in email, chat or documents.
+- **Keep downloads and exports** only as long as you need them, never on a shared computer.
+- **Sign out** when you finish, from the menu under your initials.
+- **Tell the Administrator at once** about anything unusual: an alert you did not expect, or a case you should not see.
 
-## 10. Help
+## 10. If something goes wrong
 
-For a forgotten password, a lost phone, a new category or location, or a case that needs its restricted mark removed, contact the Administrator.
+| What happens | What to do |
+|---|---|
+| "Too many login attempts" | Wait 15 minutes, then try again |
+| You forgot your password | Ask the Administrator for a new one, then change it on **Profile** |
+| Your phone is lost or replaced | Sign in with **Use a recovery code instead**. On **Profile**, press **Turn off** (it takes your password and a second recovery code), then set up the app on the new phone. No codes left: ask the Administrator |
+| You were signed out while working | 30 minutes passed without activity. Sign in again; anything not saved is lost |
+| No alert emails arrive | Check the spam folder, then tell the Administrator |
+| A case is missing from the list | Clear the filters (funnel button). If it was marked restricted, you no longer see it |
+| A complainant lost the PIN | It cannot be shown again, by anyone. Tell the Administrator |
+| You need a new category or location, or a restricted mark removed | Ask the Administrator |

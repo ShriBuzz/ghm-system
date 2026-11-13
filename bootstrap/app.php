@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,8 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Mail servers quote the recipient's address when they refuse an email; it never reaches the log.
+        // Mail servers, and the mailer itself, quote the recipient's address when they refuse an email; it never reaches the log.
         $exceptions->map(TransportExceptionInterface::class, fn (TransportExceptionInterface $e) => FailedJobStore::withoutAddress($e));
+        $exceptions->map(RfcComplianceException::class, fn (RfcComplianceException $e) => FailedJobStore::withoutAddress($e));
 
         // A public form sent after the session ended (30 idle minutes) fails its CSRF check, which Laravel
         // turns into a 419 before this runs. Send the visitor back to the form by name, with what they typed,
@@ -29,6 +31,14 @@ return Application::configure(basePath: dirname(__DIR__))
             $form = ['grievance.store' => 'home', 'status.check' => 'status.lookup', 'status.reply' => 'status.lookup'][$request->route()?->getName()] ?? null;
 
             if ($e->getStatusCode() !== 419 || $form === null) {
+                return null;
+            }
+
+            // Only a browser's own post is refilled. A current browser's own post never gets here (its Sec-Fetch-Site
+            // passes the check), so one with the header came from another site; an older browser may name it in Origin.
+            // Refilling that would let another site plant a named form with its own email, where the PIN is sent (P7).
+            $origin = $request->headers->get('Origin');
+            if ($request->headers->has('Sec-Fetch-Site') || ($origin !== null && $origin !== $request->getSchemeAndHttpHost())) {
                 return null;
             }
 

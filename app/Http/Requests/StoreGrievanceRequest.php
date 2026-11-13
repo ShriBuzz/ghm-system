@@ -148,7 +148,7 @@ class StoreGrievanceRequest extends FormRequest
             'name' => ['exclude_if:is_anonymous,true', 'required', 'string', 'max:255'],
             // A named complainant gives a phone or an email, also one who asks not to be contacted.
             'phone' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,phone', 'required_without:email', 'string', 'max:30'],
-            'email' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,email', 'email', 'max:255'],
+            'email' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,email', 'email:strict', 'max:255'],
             'preferred_contact' => ['exclude_if:is_anonymous,true', 'required', Rule::enum(ContactMethod::class)],
             'category_id' => ['required', Rule::exists('categories', 'id')->where('is_active', true)],
             'location_id' => ['required', Rule::exists('locations', 'id')->where('is_active', true)],
