@@ -25,7 +25,7 @@ return [
                 /*
                  * The list of directories and files that will be included in the backup.
                  */
-                // Attachments only: the code is in Git, and .env (with APP_KEY) is kept apart from backups (S3, S7).
+                // Attachments only: the code is in Git, and .env (with APP_KEY) is kept apart from backups.
                 'include' => [
                     storage_path('app/private'),
                 ],
@@ -332,7 +332,7 @@ return [
             /*
              * The number of days for which backups must be kept.
              */
-            // RFQ S7: at least 14 days. 15, so the backup made 14 days ago survives the night's cleanup.
+            // The company keeps backups at least 14 days. 15, so the backup made 14 days ago survives the night's cleanup.
             'keep_all_backups_for_days' => 15,
 
             /*

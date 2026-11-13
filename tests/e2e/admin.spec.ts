@@ -90,7 +90,7 @@ for (const role of roles) {
     });
 }
 
-// Focal persons enter each year's holidays (the company's answer); every other setting is the Administrator's.
+// Focal persons enter each year's holidays; every other setting is the Administrator's.
 const refused = { focal_person: ['categories', 'locations', 'users'], restricted_officer: ['categories', 'holidays', 'locations', 'users'] };
 
 for (const role of ['focal_person', 'restricted_officer'] as const) {

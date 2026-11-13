@@ -150,7 +150,7 @@ test.describe('focal person', () => {
         expect(after.restricted).toBeNull();
     });
 
-    test('exports a CSV of the N4 columns, dates in AD and BS, without names or contacts, and is not offered them', { tag: ['@N4', '@A5', '@U9'] }, async ({ page }) => {
+    test('exports a CSV of the agreed columns, dates in AD and BS, without names or contacts, and is not offered them', { tag: ['@N4', '@A5', '@U9'] }, async ({ page }) => {
         const day = `2022-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
         const { reference } = await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
 

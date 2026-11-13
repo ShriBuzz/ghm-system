@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { devices, expect, type Page } from '@playwright/test';
 import { findCase, openTab, test, writeOnCase } from './support';
 
-// The status page (P8) on a 360 px phone (mobile project), with a focal person replying from the panel.
+// The status page on a 360 px phone (mobile project), with a focal person replying from the panel.
 const wcag = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 /** Sends an anonymous grievance from the public form and returns its reference and PIN. */

@@ -10,7 +10,7 @@ class Holiday extends Model
 {
     /**
      * Every change to the list is logged, so the Administrator can check what the focal
-     * person entered (A2, S6). A holiday's date and name are not personal data.
+     * person entered. A holiday's date and name are not personal data.
      */
     protected static function booted(): void
     {

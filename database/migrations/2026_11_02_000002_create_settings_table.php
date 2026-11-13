@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Text the Administrator edits without a developer, such as the notice above the form (P3, A7).
+     * Text the Administrator edits without a developer, such as the notice above the form.
      */
     public function up(): void
     {

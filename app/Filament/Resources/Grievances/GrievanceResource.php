@@ -34,7 +34,7 @@ class GrievanceResource extends Resource
     protected static ?string $recordTitleAttribute = 'reference';
 
     /**
-     * Every list, count, search and record address starts from the one visibility rule (A1, A5).
+     * Every list, count, search and record address starts from the one visibility rule.
      *
      * @return Builder<Grievance>
      */

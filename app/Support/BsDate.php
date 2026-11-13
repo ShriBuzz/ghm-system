@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 
 /**
- * Bikram Sambat (BS) to AD and back, by Nepal date (P5, U9). BS months follow no formula, so
+ * Bikram Sambat (BS) to AD and back, by Nepal date. BS months follow no formula, so
  * their lengths come from a table. It was taken from two open calendars that agree on every
  * month, nepali-date-converter 3.4.2 (MIT) and bikram-sambat 1.8.1 (Apache-2.0), and checked
  * against the company's own example, 2083-07-22 = 2026-11-08.
@@ -109,7 +109,7 @@ final class BsDate
     }
 
     /**
-     * A date as staff read it (U9): BS first, AD in brackets, such as "2083-07-22 (2026-11-08)",
+     * A date as staff read it: BS first, AD in brackets, such as "2083-07-22 (2026-11-08)",
      * then the Nepal time when asked. A date outside the table shows in AD only.
      */
     public static function forStaff(CarbonInterface $date, bool $time = false): string

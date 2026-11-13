@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 /**
  * Tells a complainant who gave an email that their case was received, with its
- * reference, PIN and where to check them (N2, P7). Never anything they wrote.
+ * reference, PIN and where to check them. Never anything they wrote.
  * Encrypted on the queue, because the job carries the PIN.
  */
 class Acknowledgement extends Notification implements ShouldBeEncrypted, ShouldQueue
@@ -30,7 +30,7 @@ class Acknowledgement extends Notification implements ShouldBeEncrypted, ShouldQ
 
     public function toMail(Grievance $notifiable): MailMessage
     {
-        // The status page, where the reference and PIN show the case and its replies (P8).
+        // The status page, where the reference and PIN show the case and its replies.
         $site = route('status.lookup', ['locale' => $notifiable->locale]);
 
         return (new MailMessage)

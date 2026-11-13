@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * How a named complainant prefers to be contacted (P4), as the company lists it (U8).
+ * How a named complainant prefers to be contacted.
  */
 enum ContactMethod: string implements HasLabel
 {

@@ -62,7 +62,7 @@ it('lets a named complainant ask not to be contacted, yet still needs a phone or
 
     $case = Grievance::sole();
     expect($case->preferred_contact)->toBe(ContactMethod::DoNotContact);
-    // P7: the reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
+    // The reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
     Notification::assertSentTo($case, Acknowledgement::class);
 })->group('P4', 'P7', 'U8');
 

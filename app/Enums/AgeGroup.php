@@ -5,9 +5,9 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * The complainant's age group (P6), as the company lists it (U8). "Under 18" stays its own
- * group: it points to possible child labour. Codes are stored encrypted, so never change one
- * once real answers exist; labels can change any time.
+ * The complainant's age group. "Under 18" stays its own group: it points to possible child
+ * labour. Codes are stored encrypted, so never change one once real answers exist; labels can
+ * change any time.
  */
 enum AgeGroup: string implements HasLabel
 {

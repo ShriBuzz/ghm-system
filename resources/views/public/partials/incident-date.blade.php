@@ -1,4 +1,4 @@
-{{-- The incident date as three selects (P5): Bikram Sambat on the Nepali form, AD on the English one (U9).
+{{-- The incident date as three selects: Bikram Sambat on the Nepali form, AD on the English one.
      The BS fields have their own names, so a language switch never carries a BS month into the AD selects;
      StoreGrievanceRequest::prepareForValidation() turns either into an AD date. --}}
 @php

@@ -1,4 +1,4 @@
-{{-- The offline slip (A6) prints alone: no menu, no buttons, no staff name. --}}
+{{-- The offline slip prints alone: no menu, no buttons, no staff name. --}}
 <style>
     @media print {
         .fi-topbar-ctn, .fi-sidebar, .fi-sidebar-close-overlay, .fi-breadcrumbs, .fi-header-actions-ctn { display: none !important; }

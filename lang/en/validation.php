@@ -1,6 +1,6 @@
 <?php
 
-// Messages for the public form (P1, S9) that name the problem and the fix. Laravel's own English
+// Messages for the public form that name the problem and the fix. Laravel's own English
 // messages cover every other rule; this file only overrides these.
 return [
     'uploaded' => 'The file could not be used. Choose another photo or PDF, up to 5 MB.',

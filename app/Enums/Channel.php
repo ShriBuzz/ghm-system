@@ -5,8 +5,8 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * How a grievance reached the company (A6), as the company lists it (U8). Web is set by the
- * public form; staff choose one of the others for an offline case.
+ * How a grievance reached the company. Web is set by the public form; staff choose one of the
+ * others for an offline case.
  */
 enum Channel: string implements HasLabel
 {

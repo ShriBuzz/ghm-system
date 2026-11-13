@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * When a stopped case was last reopened: its working days count from then (A2, U3).
+     * When a stopped case was last reopened: its working days count from then.
      */
     public function up(): void
     {

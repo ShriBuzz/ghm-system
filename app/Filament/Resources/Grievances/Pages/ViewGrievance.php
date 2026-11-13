@@ -16,7 +16,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\DB;
 
 /**
- * The case page and the actions staff take on it (A3, A4, A5).
+ * The case page and the actions staff take on it.
  */
 class ViewGrievance extends ViewRecord
 {
@@ -77,7 +77,7 @@ class ViewGrievance extends ViewRecord
                     }
                 }),
 
-            // The reason is kept as an internal note, encrypted; the activity log holds the note's ID (U5).
+            // The reason is kept as an internal note, encrypted; the activity log holds the note's ID.
             Action::make('unrestrict')
                 ->label('Remove restricted mark')
                 ->authorize('removeRestriction')

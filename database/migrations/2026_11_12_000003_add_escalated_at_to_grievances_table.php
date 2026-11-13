@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * When the Administrators were told an open case had passed its target, so they are told
-     * once per crossing; a reopening clears it (U6).
+     * once per crossing; a reopening clears it.
      */
     public function up(): void
     {

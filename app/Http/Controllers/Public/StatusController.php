@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * The status page (P8): look a grievance up by reference and PIN, read the status and the company's
+ * The status page: look a grievance up by reference and PIN, read the status and the company's
  * replies, and add information. Staff visibility rules do not apply: the PIN is the complainant's key.
  */
 class StatusController
@@ -29,7 +29,7 @@ class StatusController
 
     private const IDLE_SECONDS = 10 * 60;
 
-    /** Each complainant message alerts staff by email (N1), so one case cannot flood the mail server. */
+    /** Each complainant message alerts staff by email, so one case cannot flood the mail server. */
     private const MESSAGES_PER_HOUR = 10;
 
     public function lookup(): View
@@ -118,7 +118,7 @@ class StatusController
             return redirect()->route('status.show')->withInput()->withErrors(['body' => __('track.errors.too_many_messages')]);
         }
 
-        // Its created hook alerts the staff who can see the case (N1).
+        // Its created hook alerts the staff who can see the case.
         $case->messages()->create(['direction' => MessageDirection::Complainant, 'body' => $request->validated('body')]);
         RateLimiter::hit($limit, 3600);
 
@@ -127,7 +127,7 @@ class StatusController
 
     public function close(Request $request): RedirectResponse
     {
-        // The page with the reference and PIN too, so "Hidden on this phone" holds for both (P7, P8).
+        // The page with the reference and PIN too, so "Hidden on this phone" holds for both.
         $request->session()->forget(['status', 'status_draft', 'received']);
 
         return redirect()->route('status.lookup')->with('status_notice', __('track.closed'));

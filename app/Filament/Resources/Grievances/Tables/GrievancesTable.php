@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Config;
 
 /**
- * The case list (A2). Only the reference is searchable: the other text is encrypted (S3).
+ * The case list. Only the reference is searchable: the other text is encrypted.
  */
 class GrievancesTable
 {

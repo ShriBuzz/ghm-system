@@ -11,8 +11,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * Tells staff a case needs them, and why, with no grievance details: only a link to sign in
- * (N1, U6). The queued job holds the case ID and the kind of alert, nothing else.
+ * Tells staff a case needs them, and why, with no grievance details: only a link to sign in.
+ * The queued job holds the case ID and the kind of alert, nothing else.
  */
 class CaseAlert extends Notification implements ShouldQueue
 {

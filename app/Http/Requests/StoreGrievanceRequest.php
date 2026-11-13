@@ -19,8 +19,8 @@ use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 
 /**
- * A new grievance from the public form (WP1). Offline entry (A6) uses the
- * same caseRules(), so a field change is made once for both.
+ * A new grievance from the public form. Offline entry uses the same
+ * caseRules(), so a field change is made once for both.
  */
 class StoreGrievanceRequest extends FormRequest
 {
@@ -40,7 +40,7 @@ class StoreGrievanceRequest extends FormRequest
     }
 
     /**
-     * Spam protection (P9): a trap field people never see, a minimum time to fill the form, and a
+     * Spam protection: a trap field people never see, a minimum time to fill the form, and a
      * limit per visitor per hour. A refusal keeps what was typed and says so in plain words.
      *
      * @return list<callable(Validator): void>
@@ -92,8 +92,8 @@ class StoreGrievanceRequest extends FormRequest
 
     /**
      * The form sends strings: "1" or "0" for the anonymous choice, which the shared rules compare
-     * as a boolean, and the incident date as day, month and year, the day possibly "unknown" (P5).
-     * The Nepali form sends a Bikram Sambat date (U9), the English form an AD one; both are stored in AD.
+     * as a boolean, and the incident date as day, month and year, the day possibly "unknown".
+     * The Nepali form sends a Bikram Sambat date, the English form an AD one; both are stored in AD.
      */
     protected function prepareForValidation(): void
     {
@@ -136,7 +136,7 @@ class StoreGrievanceRequest extends FormRequest
     }
 
     /**
-     * The fields every new case has (P4, P5). An anonymous case drops the
+     * The fields every new case has. An anonymous case drops the
      * contact fields here, so they are never stored even if typed.
      *
      * @return array<string, mixed>
@@ -146,7 +146,7 @@ class StoreGrievanceRequest extends FormRequest
         return [
             'is_anonymous' => ['required', 'boolean'],
             'name' => ['exclude_if:is_anonymous,true', 'required', 'string', 'max:255'],
-            // P4: a named complainant gives a phone or an email, also one who asks not to be contacted.
+            // A named complainant gives a phone or an email, also one who asks not to be contacted.
             'phone' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,phone', 'required_without:email', 'string', 'max:30'],
             'email' => ['exclude_if:is_anonymous,true', 'nullable', 'required_if:preferred_contact,email', 'email', 'max:255'],
             'preferred_contact' => ['exclude_if:is_anonymous,true', 'required', Rule::enum(ContactMethod::class)],
@@ -159,7 +159,7 @@ class StoreGrievanceRequest extends FormRequest
             'incident_date_calendar' => ['sometimes', Rule::in(['ad', 'bs'])],
             'recurrence' => ['required', Rule::enum(Recurrence::class)],
             'description' => ['required', 'string', 'max:5000'],
-            // Optional (P6): blank or one of the question's codes, "prefer not to say" among them.
+            // Optional: blank or one of the question's codes, "prefer not to say" among them.
             ...array_map(fn (string $enum): array => ['nullable', Rule::enum($enum)], Grievance::OPTIONAL_ANSWERS),
         ];
     }

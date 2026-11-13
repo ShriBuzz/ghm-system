@@ -41,13 +41,13 @@ class Grievance extends Model
     use HasFactory, RoutesNotifications;
 
     /**
-     * The internal note giving the reason a restriction was removed (U5), for the activity log
+     * The internal note giving the reason a restriction was removed, for the activity log
      * entry of that save. Never a column: the log holds this ID, the note holds the text.
      */
     public ?int $reasonNoteId = null;
 
     /**
-     * The optional questions about the complainant (P6) and their options. Each column holds
+     * The optional questions about the complainant and their options. Each column holds
      * the chosen code, encrypted; the form, the rules, the case page and the export read this list.
      *
      * @var array<string, class-string<AgeGroup|ComplainantType|Disability|Ethnicity|Sex>>
@@ -61,7 +61,7 @@ class Grievance extends Model
     ];
 
     /**
-     * The one rule for which cases a staff member may see (A1, A5). Every
+     * The one rule for which cases a staff member may see. Every
      * list, page, file, summary, export and alert goes through it.
      *
      * @param  Builder<self>  $query
@@ -81,9 +81,9 @@ class Grievance extends Model
     }
 
     /**
-     * Active staff who may see this case, the only people it can be assigned to (A3, A5).
+     * Active staff who may see this case, the only people it can be assigned to.
      *
-     * shortcut: one visibility query per active user, fine for the RFQ's 3 to 5 staff.
+     * shortcut: one visibility query per active user, fine for the company's 3 to 5 staff.
      *
      * @return Collection<int, User>
      */
@@ -95,7 +95,7 @@ class Grievance extends Model
     }
 
     /**
-     * Clear the assignee once they can no longer see the case, after it became restricted (A5).
+     * Clear the assignee once they can no longer see the case, after it became restricted.
      */
     public function dropUnseeingAssignee(): void
     {
@@ -112,7 +112,7 @@ class Grievance extends Model
     }
 
     /**
-     * Alert staff to this case, as the company set out (N1, U6):
+     * Alert staff to this case, as the company set out:
      * - a new case, a case just marked restricted, or a message on a case with no active assignee:
      *   the active staff who can see it, but not the Administrators;
      * - a message on a case whose assignee is active and can see it: the assignee alone, even
@@ -145,7 +145,7 @@ class Grievance extends Model
 
     /**
      * Working days open until now, counted from the last reopening if there was one, else
-     * from receipt (A2, U3). The observer and the nightly recount both use it.
+     * from receipt. The observer and the nightly recount both use it.
      *
      * @return int<0, max>
      */
@@ -155,7 +155,7 @@ class Grievance extends Model
     }
 
     /**
-     * Email the reference and PIN to a complainant who gave an email (N2, P7).
+     * Email the reference and PIN to a complainant who gave an email.
      * Called where the PIN is made: the only moment it exists in clear.
      */
     public function acknowledge(string $pin): void
@@ -166,7 +166,7 @@ class Grievance extends Model
     }
 
     /**
-     * An optional answer (P6) by its label, or null when the complainant gave none.
+     * An optional answer by its label, or null when the complainant gave none.
      */
     public function answerLabel(string $field): ?string
     {
@@ -176,7 +176,7 @@ class Grievance extends Model
     }
 
     /**
-     * The complainant's email, for the acknowledgement (N2).
+     * The complainant's email, for the acknowledgement.
      */
     public function routeNotificationForMail(): ?string
     {
@@ -242,7 +242,7 @@ class Grievance extends Model
     /**
      * Get the attributes that should be cast.
      *
-     * Personal fields are encrypted (S3), the demographic fields too.
+     * Personal fields are encrypted, the demographic fields too.
      *
      * @return array<string, string>
      */

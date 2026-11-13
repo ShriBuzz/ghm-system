@@ -74,7 +74,7 @@ it('logs the removal of a restriction with the ID of its reason note, and shows 
     $note = $case->notes()->sole();
     expect($entry->causer_id)->toBe($admin->id)
         ->and($entry->properties->toArray())->toEqual(['old' => true, 'new' => false, 'note_id' => $note->id])
-        // The log is not encrypted, so the reason itself stays in the encrypted note (S3).
+        // The log is not encrypted, so the reason itself stays in the encrypted note.
         ->and(json_encode($entry->properties))->not->toContain('Reviewed');
 
     Livewire::test(ManageActivityLogs::class)

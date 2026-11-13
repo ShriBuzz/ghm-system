@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
 /**
- * A reference number and PIN typed on the status page (P8).
+ * A reference number and PIN typed on the status page.
  */
 class StatusLookupRequest extends FormRequest
 {

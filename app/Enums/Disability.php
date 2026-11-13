@@ -5,8 +5,8 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Whether the complainant has a disability (P6), as the company lists it (U8). Codes are stored
- * encrypted, so never change one once real answers exist; labels can change any time.
+ * Whether the complainant has a disability. Codes are stored encrypted, so never change one
+ * once real answers exist; labels can change any time.
  */
 enum Disability: string implements HasLabel
 {

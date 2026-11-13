@@ -3,7 +3,7 @@
 use App\Enums\Priority;
 use App\Enums\Status;
 
-it('lists the statuses exactly as RFQ A4 does', function () {
+it('lists the statuses the company uses', function () {
     app()->setLocale('en');
 
     expect(array_map(fn (Status $status) => $status->getLabel(), Status::cases()))->toBe([
@@ -11,7 +11,7 @@ it('lists the statuses exactly as RFQ A4 does', function () {
     ]);
 })->group('A4');
 
-it('lists the priorities exactly as RFQ A4 does', function () {
+it('lists the priorities the company uses', function () {
     app()->setLocale('en');
 
     expect(array_map(fn (Priority $priority) => $priority->getLabel(), Priority::cases()))->toBe([

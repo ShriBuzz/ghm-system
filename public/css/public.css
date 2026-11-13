@@ -1,5 +1,5 @@
-/* Public pages: the only stylesheet. No web fonts, no build step (P1, P2, S9).
-   Colours are variables so the company's colour can replace the accent at kick-off. */
+/* Public pages: the only stylesheet. No web fonts, no build step.
+   Colours are variables so the company's colour can replace the accent. */
 
 :root {
     color-scheme: light;
@@ -75,7 +75,7 @@ main {
     border-bottom: 1px solid var(--line);
 }
 
-/* The emergency line (U10): its own strip at the top of every public page, ruled off from the site name,
+/* The emergency line: its own strip at the top of every public page, ruled off from the site name,
    the whole sentence one phone link at least a target tall. */
 .emergency {
     flex-basis: 100%;
@@ -176,7 +176,7 @@ h2 {
     white-space: nowrap;
 }
 
-/* The notice (P3): the company's own words, set apart by a quiet band, not a coloured edge. */
+/* The notice: the company's own words, set apart by a quiet band, not a coloured edge. */
 .notice {
     margin: 0 0 2.5rem;
     padding: 1.25rem;
@@ -207,7 +207,7 @@ h2 {
     margin-bottom: 0;
 }
 
-/* Other ways to raise a grievance (U10): one last section below the form, set apart like the form's own. */
+/* Other ways to raise a grievance: one last section below the form, set apart like the form's own. */
 .other-ways {
     margin-top: 2.5rem;
 }
@@ -298,7 +298,7 @@ textarea {
     font: inherit;
 }
 
-/* An error-summary link jumps to its field (S9). form.js brings the question into view first, a little below the
+/* An error-summary link jumps to its field. form.js brings the question into view first, a little below the
    top; without JavaScript the field keeps room above it for the question, hint and error. Measured at 360 px:
    up to 136 px above a field, 222 px above the date's day box, more with wider fonts. */
 legend,
@@ -370,7 +370,7 @@ input[type="file"]::file-selector-button {
     background: var(--accent-wash);
 }
 
-/* The spam trap (P9): no one sees it or reaches it, so only scripts fill it. */
+/* The spam trap: no one sees it or reaches it, so only scripts fill it. */
 .trap {
     display: none;
 }
@@ -492,7 +492,7 @@ main > .error-summary {
     font-weight: 600;
 }
 
-/* The received page: the two things to keep, large, spaced and easy to copy (P7). */
+/* The received page: the two things to keep, large, spaced and easy to copy. */
 .keep {
     margin: 0 0 2rem;
     padding: 1.25rem;
@@ -535,7 +535,7 @@ main > .error-summary {
     margin-top: 2rem;
 }
 
-/* The status pages (P8). */
+/* The status pages. */
 .stack {
     display: grid;
     gap: 1.5rem;

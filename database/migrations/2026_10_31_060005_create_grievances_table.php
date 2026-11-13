@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // No IP address or user-agent column, for any case (S5).
+        // No IP address or user-agent column, for any case.
         Schema::create('grievances', function (Blueprint $table) {
             $table->id();
             $table->string('reference')->unique();
