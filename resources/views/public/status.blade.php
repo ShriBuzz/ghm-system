@@ -3,7 +3,6 @@
 @section('title', __('track.title'))
 
 @push('head')
-    <meta name="robots" content="noindex">
     <script src="{{ asset('js/form.js') }}" defer></script>
 @endpush
 

@@ -109,7 +109,7 @@ class StatusController
             // Messages only: internal notes are never loaded on a public page.
             'messages' => $case->messages()->oldest()->oldest('id')->get(),
             'draft' => $this->draftFor($request, $case),
-        ])->header('Cache-Control', 'no-store, private')->header('X-Robots-Tag', 'noindex');
+        ])->header('Cache-Control', 'no-store, private');
     }
 
     public function reply(ComplainantReplyRequest $request): RedirectResponse

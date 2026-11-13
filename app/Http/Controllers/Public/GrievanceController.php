@@ -89,10 +89,10 @@ class GrievanceController
             return redirect()->route('home');
         }
 
-        // The PIN is on this page: no browser or proxy keeps a copy, and no search engine lists it.
+        // The PIN is on this page: no browser or proxy keeps a copy. A search engine never gets it: without the
+        // session it sends to the form, and robots.txt disallows it.
         return response()->view('public.received', $received)
-            ->header('Cache-Control', 'no-store, private')
-            ->header('X-Robots-Tag', 'noindex');
+            ->header('Cache-Control', 'no-store, private');
     }
 
     public function done(): RedirectResponse
