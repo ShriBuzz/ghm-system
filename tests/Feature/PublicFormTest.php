@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function () {
     $this->travelTo('2026-11-02 10:00');
@@ -233,6 +234,26 @@ it('sends a form posted after the session ended back to it, with what was typed'
         ->and(session()->getOldInput('website'))->toBeNull()
         ->and(session('errors')->getBag('default')->first('form'))->toStartWith('This page was open too long to send');
 })->group('S2', 'P1');
+
+it('never refills the form from a post another site sent, so it cannot plant where the PIN is emailed', function () {
+    $refused = function (array $headers): Response {
+        $request = Request::create('/en', 'POST', formInput(['is_anonymous' => '0', 'email' => 'planted@example.com']), server: $headers);
+        $route = app('router')->getRoutes()->match($request);
+        $route->bind($request);
+        $request->setRouteResolver(fn () => $route);
+
+        return app(ExceptionHandler::class)->render($request, new TokenMismatchException);
+    };
+
+    // A current browser's post from another site, and an older browser's that names another origin.
+    expect($refused(['HTTP_SEC_FETCH_SITE' => 'cross-site'])->getStatusCode())->toBe(419)
+        ->and($refused(['HTTP_ORIGIN' => 'https://elsewhere.example'])->getStatusCode())->toBe(419)
+        ->and(session()->getOldInput('email'))->toBeNull();
+
+    // An older browser's own post, after the session ended, is still sent back with what was typed.
+    expect($refused(['HTTP_ORIGIN' => 'http://localhost'])->getStatusCode())->toBe(302)
+        ->and(session()->getOldInput('email'))->toBe('planted@example.com');
+})->group('S2', 'P7');
 
 it('refuses crafted list values in place of text, without an error page', function () {
     $this->post('/en', formInput(['incident_day' => ['1']]))->assertRedirect()->assertSessionHasErrors('incident_date');

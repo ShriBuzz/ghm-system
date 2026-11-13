@@ -32,6 +32,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            // Only a browser's own post is refilled. A current browser's own post never gets here (its Sec-Fetch-Site
+            // passes the check), so one with the header came from another site; an older browser may name it in Origin.
+            // Refilling that would let another site plant a named form with its own email, where the PIN is sent (P7).
+            $origin = $request->headers->get('Origin');
+            if ($request->headers->has('Sec-Fetch-Site') || ($origin !== null && $origin !== $request->getSchemeAndHttpHost())) {
+                return null;
+            }
+
             // The CSRF check runs before SetLocale, so take the language from the address.
             app()->setLocale((string) $request->route('locale'));
 
