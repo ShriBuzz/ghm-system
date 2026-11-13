@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Backup\Config\Config;
+use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
 
 function scheduled(string $command): ?Event
 {
@@ -99,7 +100,17 @@ it('says in php artisan about, the first check after a deploy, whether backups a
 
     config(['backup.backup.password' => 'an-archive-password']);
     $this->artisan('about', ['--only' => 'backups'])->expectsOutputToContain('Archive password')
-        ->doesntExpectOutputToContain('NOT SET')->assertSuccessful();
+        ->doesntExpectOutputToContain('archives are not encrypted')->assertSuccessful();
+})->group('S7');
+
+it('says in php artisan about whether anyone is told when a backup fails', function () {
+    // BACKUP_MAIL_TO left out of .env: failures and missing backups would go unseen.
+    config(['backup.notifications.notifications.'.BackupHasFailedNotification::class => []]);
+    $this->artisan('about', ['--only' => 'backups'])->expectsOutputToContain('nobody is told')->assertSuccessful();
+
+    config(['backup.notifications.notifications.'.BackupHasFailedNotification::class => ['mail']]);
+    $this->artisan('about', ['--only' => 'backups'])->expectsOutputToContain('Failure emails')
+        ->doesntExpectOutputToContain('nobody is told')->assertSuccessful();
 })->group('S7');
 
 it('keeps backups for 14 days', function () {

@@ -12,6 +12,7 @@ use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,9 +34,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // `php artisan about` is the first check after a deploy (docs/deploy.md). Without the password
-        // the nightly archive is made unencrypted, and nothing else would say so (S7).
+        // the nightly archive is made unencrypted; without BACKUP_MAIL_TO a failing or missing backup tells
+        // nobody. Nothing else would say either (S7).
         AboutCommand::add('Backups', fn (): array => [
             'Archive password' => filled(config('backup.backup.password')) ? 'set' : '<fg=red;options=bold>NOT SET: archives are not encrypted</>',
+            'Failure emails' => filled(config('backup.notifications.notifications.'.BackupHasFailedNotification::class))
+                ? 'set' : '<fg=red;options=bold>NOT SET: nobody is told when a backup fails</>',
         ]);
 
         Event::listen(Login::class, fn (Login $event) => activity()->causedBy($event->user instanceof Model ? $event->user : null)
