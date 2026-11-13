@@ -9,13 +9,14 @@ Last tried end to end: locally on 2026-11-02 with fake data (steps 1 to 6 took 1
 - One encrypted zip per night, made at 01:00 Nepal time, in `storage/app/backups/ghm/` (named `YYYY-MM-DD-HH-MM-SS.zip`), plus any off-server copy listed in `BACKUP_DISKS`.
 - Inside: `db-dumps/mysql-<database>.sql` (the whole database) and `attachments/` (the uploaded files).
 - Kept 15 days; older ones are deleted at 01:30.
-- Not inside: the code (it is in Git) and `.env`, which holds the keys and is kept apart.
+- Not inside: the code (keep the release zip of each version you deploy) and `.env`, which holds the keys and is kept apart.
 
 ## What you need
 
 1. The archive password (`BACKUP_ARCHIVE_PASSWORD`), from the company's password manager.
-2. The `APP_KEY` the site used when the backup was made, also from the password manager. Without it, names, contacts, descriptions, messages and notes in the database cannot be read.
+2. The `APP_KEY` the site used when the backup was made, also from the password manager. Without it, the encrypted fields cannot be read: names, contacts, descriptions, the optional answers, messages, notes, file names and staff two-factor secrets.
 3. SSH access to the server and the database credentials from `.env`.
+4. Only if the server itself is lost: the release zip of the version the site ran.
 
 ## Steps
 
@@ -58,9 +59,10 @@ Run these from the application folder on the server.
    cp -R ~/restore/attachments/. storage/app/private/attachments/
    ```
 
-6. Check that `.env` has the `APP_KEY` from step 2 of "What you need". If the key was changed after the backup, put the backup's key in `APP_KEY` or `APP_PREVIOUS_KEYS`. Then:
+6. Check that `.env` has the `APP_KEY` from step 2 of "What you need". If the key was changed after the backup, put the backup's key in `APP_KEY` or `APP_PREVIOUS_KEYS`. Then bring the tables up to the installed version (a backup made before an update lacks its new columns; otherwise it prints "Nothing to migrate"), and open the site:
 
    ```sh
+   php artisan migrate --force
    php artisan config:cache
    php artisan up
    ```
@@ -77,8 +79,11 @@ Cases and messages received after the backup was made are lost. Tell NBI and the
 
 ## If the server itself is lost
 
-The steps above use the copy on the server. When the server is gone, its copy is gone too:
+The steps above use the copy on the server. When the server is gone, its copy is gone too, so this needs the off-server copy. **None exists yet** (`docs/technical-reference.md`, Backups): until one is built, a lost server means the data since the last copy kept elsewhere is lost.
 
-1. Set up the application on the new server from Git, with the `.env` values and the same `APP_KEY` from the password manager (`docs/deploy.md`, sections 3 to 5).
-2. Copy the newest archive from the off-server copy (a disk in `BACKUP_DISKS`) into `storage/app/backups/ghm/`.
-3. Follow the steps above from step 1.
+With an off-server copy:
+
+1. Set up the new server with `docs/deploy.md` sections 1 to 4, from the release zip of the version the site ran.
+2. Follow section 5 with three differences: put the old `APP_KEY` from the password manager in `.env` instead of running `php artisan key:generate`; leave the `GHM_ADMIN_*` lines out; and skip `php artisan migrate` and `php artisan db:seed`, because the backup brings the tables, the users, the categories and the locations.
+3. Copy the newest archive from the off-server copy into `storage/app/backups/ghm/`.
+4. Follow the steps above from step 1. Step 4 creates the tables in the empty database.
