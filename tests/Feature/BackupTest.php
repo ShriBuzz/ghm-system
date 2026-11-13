@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Backup\Config\Config;
+use Spatie\Backup\Tasks\Backup\DbDumperFactory;
 
 function scheduled(string $command): ?Event
 {
@@ -58,6 +59,13 @@ it('writes a password-protected archive of the database and private files, witho
         ->and($entries->reject(fn (array $entry) => str_ends_with($entry['name'], '/'))
             ->every(fn (array $entry) => $entry['encryption_method'] === ZipArchive::EM_AES_256))->toBeTrue();
 })->group('S7', 'S4');
+
+it('dumps the database without tablespaces, which a shared-hosting MySQL user may not read', function () {
+    // MySQL 8.0.21+ refuses a plain mysqldump to a user without the PROCESS privilege, as on most cPanel hosts.
+    $command = DbDumperFactory::createFromConnection('mysql')->getDumpCommand('dump.sql', 'credentials.cnf');
+
+    expect($command)->toContain('--no-tablespaces');
+})->group('S7');
 
 it('holds case details in the backup only as ciphertext, which the app key alone decrypts', function () {
     Storage::fake('backups');

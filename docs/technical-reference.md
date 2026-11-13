@@ -102,7 +102,7 @@ Server install, updates and the checks after each deploy: `docs/deploy.md`. Rest
 
 ## Backups (S7)
 
-- Every night at 01:00 `backup:run` dumps the database (`mysqldump`, which the host must provide) and copies `storage/app/private` without `livewire-tmp` into one zip, encrypted with AES-256 and `BACKUP_ARCHIVE_PASSWORD`. The code is in Git; `.env` is left out, so `APP_KEY` never sits next to the data it unlocks.
+- Every night at 01:00 `backup:run` dumps the database (`mysqldump --no-tablespaces`, which the host must provide; without the flag MySQL 8.0.21+ refuses a database user who lacks the PROCESS privilege, as on most shared hosting) and copies `storage/app/private` without `livewire-tmp` into one zip, encrypted with AES-256 and `BACKUP_ARCHIVE_PASSWORD`. The code is in Git; `.env` is left out, so `APP_KEY` never sits next to the data it unlocks.
 - Archives go to every disk in `BACKUP_DISKS`: `backups` (`storage/app/backups`, outside the web root) by default. The second copy off the web server is a disk added to that list once the host is known.
 - `backup:clean` at 01:30 deletes archives older than 15 days, so the one from 14 days ago is always there (RFQ: at least 14). `backup:monitor` at 02:00 reports when the newest backup is older than a day.
 - Failure emails go to `BACKUP_MAIL_TO`; without it nothing is sent. Success sends nothing.
