@@ -36,12 +36,16 @@ class CreateGrievance extends CreateRecord
     {
         $valid = $this->validateCase($data);
 
-        return DB::transaction(function () use ($valid): Grievance {
-            $pin = Pin::generate();
+        // The PIN's slow hash before the transaction: the reference counter's row stays locked until the commit,
+        // and every other submission waits for it (P7).
+        $pin = Pin::generate();
+        $pinHash = Hash::make($pin);
+
+        return DB::transaction(function () use ($valid, $pin, $pinHash): Grievance {
             $case = new Grievance;
             $case->forceFill($valid + [
                 'reference' => ReferenceNumber::next(),
-                'pin_hash' => Hash::make($pin),
+                'pin_hash' => $pinHash,
                 'status' => Status::Received,
                 'created_by' => auth()->id(),
             ])->save();

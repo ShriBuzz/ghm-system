@@ -49,12 +49,16 @@ class GrievanceController
         $data = $request->validated();
         $file = $request->file('attachment');
 
-        [$case, $pin] = DB::transaction(function () use ($data, $file): array {
-            $pin = Pin::generate();
+        // The PIN's slow hash before the transaction: the reference counter's row stays locked until the commit,
+        // and every other submission waits for it (P7).
+        $pin = Pin::generate();
+        $pinHash = Hash::make($pin);
+
+        $case = DB::transaction(function () use ($data, $file, $pinHash): Grievance {
             $case = new Grievance;
             $case->forceFill(Arr::except($data, ['attachment']) + [
                 'reference' => ReferenceNumber::next(),
-                'pin_hash' => Hash::make($pin),
+                'pin_hash' => $pinHash,
                 'channel' => Channel::Web,
                 'status' => Status::Received,
                 'locale' => app()->getLocale(),
@@ -65,7 +69,7 @@ class GrievanceController
                 AttachmentStore::store($file, $case, field: 'attachment');
             }
 
-            return [$case, $pin];
+            return $case;
         });
 
         $case->acknowledge($pin);
