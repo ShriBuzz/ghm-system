@@ -5,8 +5,8 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * The complainant's sex (P6), as the company lists it (U8). Codes are stored encrypted, so
- * never change one once real answers exist; labels can change any time.
+ * The complainant's sex. Codes are stored encrypted, so never change one once real answers
+ * exist; labels can change any time.
  */
 enum Sex: string implements HasLabel
 {

@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;
 
 /**
- * The activity log (S6), read only and for the Administrator alone: who
+ * The activity log, read only and for the Administrator alone: who
  * changed, viewed or added what on each case, and sign-ins. Entries hold codes
  * and IDs, never case text, and cannot be edited or deleted here.
  */
@@ -102,7 +102,7 @@ class ActivityLogResource extends Resource
 
         if ($properties->has('old') || $properties->has('new')) {
             return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '')
-                // A removed restriction's reason is an encrypted note; the log holds only its ID (U5).
+                // A removed restriction's reason is an encrypted note; the log holds only its ID.
                 .($properties->has('note_id') ? '. Reason: '.GrievanceNote::whereKey($properties->get('note_id'))->first()?->body : '');
         }
 

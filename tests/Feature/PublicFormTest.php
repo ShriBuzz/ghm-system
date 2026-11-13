@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function () {
     $this->travelTo('2026-11-02 10:00');
@@ -62,7 +63,7 @@ it('lets a named complainant ask not to be contacted, yet still needs a phone or
 
     $case = Grievance::sole();
     expect($case->preferred_contact)->toBe(ContactMethod::DoNotContact);
-    // P7: the reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
+    // The reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
     Notification::assertSentTo($case, Acknowledgement::class);
 })->group('P4', 'P7', 'U8');
 
@@ -233,6 +234,35 @@ it('sends a form posted after the session ended back to it, with what was typed'
         ->and(session()->getOldInput('website'))->toBeNull()
         ->and(session('errors')->getBag('default')->first('form'))->toStartWith('This page was open too long to send');
 })->group('S2', 'P1');
+
+it('never refills the form from a post another site sent, so it cannot plant where the PIN is emailed', function () {
+    $refused = function (array $headers): Response {
+        $request = Request::create('/en', 'POST', formInput(['is_anonymous' => '0', 'email' => 'planted@example.com']), server: $headers);
+        $route = app('router')->getRoutes()->match($request);
+        $route->bind($request);
+        $request->setRouteResolver(fn () => $route);
+
+        return app(ExceptionHandler::class)->render($request, new TokenMismatchException);
+    };
+
+    // A current browser's post from another site, and an older browser's that names another origin.
+    expect($refused(['HTTP_SEC_FETCH_SITE' => 'cross-site'])->getStatusCode())->toBe(419)
+        ->and($refused(['HTTP_ORIGIN' => 'https://elsewhere.example'])->getStatusCode())->toBe(419)
+        ->and(session()->getOldInput('email'))->toBeNull();
+
+    // An older browser's own post, after the session ended, is still sent back with what was typed.
+    expect($refused(['HTTP_ORIGIN' => 'http://localhost'])->getStatusCode())->toBe(302)
+        ->and(session()->getOldInput('email'))->toBe('planted@example.com');
+})->group('S2', 'P7');
+
+it('refuses an email address the mailer would refuse, so the complainant can correct it and gets the acknowledgement', function () {
+    $named = ['is_anonymous' => '0', 'name' => 'Sita', 'preferred_contact' => 'email'];
+
+    $this->post('/en', formInput([...$named, 'email' => 'ram(home)@gmail.com']))->assertRedirect()->assertSessionHasErrors('email');
+    expect(Grievance::count())->toBe(0);
+
+    $this->post('/en', formInput([...$named, 'email' => 'rām.k+gunaso@उदाहरण.नेपाल']))->assertRedirect(route('grievance.received', ['locale' => 'en']));
+})->group('P4', 'N2');
 
 it('refuses crafted list values in place of text, without an error page', function () {
     $this->post('/en', formInput(['incident_day' => ['1']]))->assertRedirect()->assertSessionHasErrors('incident_date');

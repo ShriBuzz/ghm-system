@@ -35,7 +35,7 @@ it('shows the submission, with no contact details for an anonymous case', functi
     viewCase($anonymous)->assertSee('Anonymous')->assertDontSee('Preferred contact');
 })->group('A3');
 
-it('sets status and priority from the A4 lists only', function () {
+it('sets status and priority from the fixed lists only', function () {
     $case = Grievance::factory()->create();
     signedInAs(Role::FocalPerson);
 

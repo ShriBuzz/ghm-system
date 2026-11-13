@@ -66,6 +66,8 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            // The nightly backup (S7): without it, MySQL 8.0.21+ refuses a user lacking PROCESS, as on shared hosting.
+            'dump' => ['add_extra_option' => '--no-tablespaces'],
         ],
 
         'mariadb' => [

@@ -18,7 +18,7 @@ class Category extends Model
     use HasFactory;
 
     /**
-     * Turning a category's restricted flag on or off re-flags its existing cases (A5, A7).
+     * Turning a category's restricted flag on or off re-flags its existing cases.
      */
     protected static function booted(): void
     {

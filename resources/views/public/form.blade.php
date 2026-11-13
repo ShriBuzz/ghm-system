@@ -17,7 +17,7 @@
     <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>
     <p><a href="{{ route('status.lookup') }}">{{ __('form.check_link') }}</a></p>
 
-    {{-- The notice's first paragraph is its heading; a paragraph of lines starting "- " is a list (U10). --}}
+    {{-- The notice's first paragraph is its heading; a paragraph of lines starting "- " is a list. --}}
     <section class="notice" aria-labelledby="notice-heading">
         <h2 id="notice-heading">{{ $notice[0] }}</h2>
         @foreach (array_slice($notice, 1) as $paragraph)
@@ -36,7 +36,7 @@
     <form method="post" action="{{ route('grievance.store') }}" enctype="multipart/form-data" novalidate data-grievance>
         @csrf
         <input type="hidden" name="form_started" value="{{ $started }}">
-        {{-- A trap for scripts that fill every field (P9); people never see it. --}}
+        {{-- A trap for scripts that fill every field; people never see it. --}}
         <div class="trap" aria-hidden="true">
             <label for="website">{{ __('form.trap') }}</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">

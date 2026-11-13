@@ -33,13 +33,13 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            // Off: private files are reached only through the case-checked download route (S4).
+            // Off: private files are reached only through the case-checked download route.
             'serve' => false,
             'throw' => false,
             'report' => false,
         ],
 
-        // Backups (S7): outside the web root, never served.
+        // Backups: outside the web root, never served.
         'backups' => [
             'driver' => 'local',
             'root' => storage_path('app/backups'),

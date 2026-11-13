@@ -11,8 +11,8 @@ use OpenSpout\Writer\XLSX\Writer as XlsxWriter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * CSV or Excel export of the cases a user may see, received in a date range (N4), with each date in AD and BS (U9).
- * Names and contact details only when the Administrator asks for them; every export is logged (S6).
+ * CSV or Excel export of the cases a user may see, received in a date range, with each date in AD and BS.
+ * Names and contact details only when the Administrator asks for them; every export is logged.
  */
 class CaseExport
 {
@@ -26,7 +26,7 @@ class CaseExport
             'from' => $from->toDateString(), 'until' => $until->toDateString(), 'format' => $format,
             'personal_data' => $personal, 'cases' => $cases->count(),
         ])->log('Cases exported');
-        // Also on each case, so the log's reference filter answers who exported it (S6).
+        // Also on each case, so the log's reference filter answers who exported it.
         $cases->lazyById()->each(fn (Grievance $case) => activity()->performedOn($case)->causedBy($user)->event('exported')
             ->withProperties(['personal_data' => $personal])->log('Case exported'));
 
@@ -44,7 +44,7 @@ class CaseExport
     }
 
     /**
-     * The RFQ N4 column list in its order, with names and contacts after the reference when included,
+     * The export's columns in their order, with names and contacts after the reference when included,
      * and each date twice: AD with the time, then the BS date.
      *
      * @return list<string>

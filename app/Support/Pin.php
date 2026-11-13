@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 class Pin
 {
     /**
-     * A random numeric PIN (P7). Show it once; store only Hash::make() of it.
+     * A random numeric PIN. Show it once; store only Hash::make() of it.
      */
     public static function generate(): string
     {

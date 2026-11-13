@@ -5,8 +5,8 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Who the complainant is (P6), as the company lists it (U8). Codes are stored encrypted,
- * so never change one once real answers exist; labels can change any time.
+ * Who the complainant is. Codes are stored encrypted, so never change one once real answers
+ * exist; labels can change any time.
  */
 enum ComplainantType: string implements HasLabel
 {

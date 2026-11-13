@@ -7,9 +7,9 @@ use App\Models\Location;
 use Illuminate\Database\Seeder;
 
 /**
- * The company's grievance categories and locations (A7, U8), two categories restricted by
- * default (A5, U5). They fill empty lists only, so seeding again never undoes what the
- * Administrator has since changed in Settings. Target days per category wait with U1.
+ * The company's grievance categories and locations, two categories restricted by default.
+ * They fill empty lists only, so seeding again never undoes what the Administrator has
+ * since changed in Settings. Per-category target days are not set yet.
  */
 class CompanyListsSeeder extends Seeder
 {

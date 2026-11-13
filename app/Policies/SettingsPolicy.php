@@ -6,9 +6,9 @@ use App\Enums\Role;
 use App\Models\User;
 
 /**
- * Settings (users, categories, locations, holidays) belong to the Administrator
- * (A7). Nothing is deleted: a user, category or location is deactivated
- * instead, so past cases keep their names.
+ * Settings (users, categories, locations, holidays) belong to the Administrator.
+ * Nothing is deleted: a user, category or location is deactivated instead, so
+ * past cases keep their names.
  */
 class SettingsPolicy
 {

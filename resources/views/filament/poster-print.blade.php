@@ -1,4 +1,4 @@
-{{-- The QR poster (P10): its own layout on screen, and alone on an A4 page when printed. --}}
+{{-- The QR poster: its own layout on screen, and alone on an A4 page when printed. --}}
 <style>
     .ghm-poster { display: grid; justify-items: center; gap: 0.5rem; padding: 2rem 1rem; text-align: center; background: #fff; border-radius: 0.75rem; }
     .ghm-poster p { margin: 0; font-size: 1.125rem; }

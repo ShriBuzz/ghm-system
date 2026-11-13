@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Case statuses exactly as RFQ A4 lists them. Labels live in lang/*.json.
+ * Case statuses the company uses. Labels live in lang/*.json.
  */
 enum Status: string implements HasLabel
 {
@@ -18,7 +18,7 @@ enum Status: string implements HasLabel
     case Reopened = 'reopened';
 
     /**
-     * Whether the 15-working-day clock runs in this status (A2). Kick-off default.
+     * Whether the 15-working-day clock runs in this status.
      */
     public function isOpen(): bool
     {
@@ -39,7 +39,7 @@ enum Status: string implements HasLabel
     }
 
     /**
-     * The label with the Nepali the complainant reads, for staff: "Closed (बन्द गरिएको)" (U16).
+     * The label with the Nepali the complainant reads, for staff: "Closed (बन्द गरिएको)".
      */
     public function withNepali(): string
     {

@@ -1,4 +1,4 @@
-// Progressive enhancement for the public form (P1, P5, S9). Everything works without it.
+// Progressive enhancement for the public form. Everything works without it.
 (() => {
     // After a refused submission, take screen readers and keyboards straight to what needs fixing; after an
     // action, to what it did. A message already on the page when it opens is rarely read out otherwise.
@@ -41,7 +41,7 @@
         });
     }
 
-    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7). Only for
+    // A second tap while a slow upload is still on its way would send the grievance twice. Only for
     // 10 seconds: the browser's Stop button cancels a send without an event, and must not leave Send dead.
     for (const each of document.querySelectorAll('form[method="post"]')) {
         each.addEventListener('submit', (event) => {
@@ -70,7 +70,7 @@
         }
     });
 
-    // Switching language loads the same form in the other language (P2). Carry what was typed across,
+    // Switching language loads the same form in the other language. Carry what was typed across,
     // in this tab only, and forget it the moment it is put back. A chosen file cannot be carried.
     const form = document.querySelector('form[data-grievance]');
     if (form) {

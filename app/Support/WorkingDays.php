@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 class WorkingDays
 {
     /**
-     * Working days after $from, up to and including $to, by Nepal date (A2).
+     * Working days after $from, up to and including $to, by Nepal date.
      * The weekly day off comes from config, public holidays from the holidays table.
      *
      * @return int<0, max>

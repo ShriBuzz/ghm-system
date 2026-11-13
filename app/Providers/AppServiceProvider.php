@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Failed jobs keep their error without a refused email's address (S3, S5). Laravel's own
+        // Failed jobs keep their error without a refused email's address. Laravel's own
         // store for the configured driver is swapped for the same store with that one change.
         $this->app->extend('queue.failer', fn (FailedJobProviderInterface $failer, Application $app) => $failer instanceof DatabaseUuidFailedJobProvider
             ? new FailedJobStore($app->make('db'), config('queue.failed.database'), config('queue.failed.table'))
@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // `php artisan about` is the first check after a deploy (docs/deploy.md). Without the password
         // the nightly archive is made unencrypted; without BACKUP_MAIL_TO a failing or missing backup tells
-        // nobody. Nothing else would say either (S7).
+        // nobody. Nothing else would say either.
         AboutCommand::add('Backups', fn (): array => [
             'Archive password' => filled(config('backup.backup.password')) ? 'set' : '<fg=red;options=bold>NOT SET: archives are not encrypted</>',
             'Failure emails' => filled(config('backup.notifications.notifications.'.BackupHasFailedNotification::class))
@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, fn (Login $event) => activity()->causedBy($event->user instanceof Model ? $event->user : null)
             ->event('login')->log('Signed in'));
 
-        // Only for an existing account, and only the account: no email, IP or device (S5, S6). An unknown
+        // Only for an existing account, and only the account: no email, IP or device. An unknown
         // email has no one to record, and the per-email throttle would not stop endless random ones.
         Event::listen(Failed::class, function (Failed $event): void {
             if ($event->user instanceof Model) {

@@ -75,7 +75,7 @@ function exportRows(Role|User $user, string $format = 'csv', bool $personal = fa
     return $rows;
 }
 
-it('exports the N4 columns for the cases received in the range, dates in AD and BS, without names or contacts', function (string $format) {
+it('exports the agreed columns for the cases received in the range, dates in AD and BS, without names or contacts', function (string $format) {
     $rows = exportRows(Role::Administrator, $format);
 
     expect($rows[0])->toBe(N4_COLUMNS)

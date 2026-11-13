@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-12. The company's answers and the brief of its Policy and SOP updates arrived; they are planned as WP4 in `docs/answers-change-plan.md`. Steps 1 (the company's lists and labels, pull request #19), 2 (the count restarting on reopening and holidays entered by focal persons, pull request #20) 3 (Bikram Sambat dates on the Nepali form) and 10 (Bikram Sambat dates and Nepali names on the staff screens) are built; the rest of WP4 is not. Decided the same day: the answers go first, and the new requirements wait until scope and price are agreed with NBI. Before that, on 2026-11-11: the handover package docs, branch `handover/docs`, and before them the `main` and `main-backup` split, under Decisions. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions were answered in part on 2026-11-12. Until WP4 applies the answers, the code follows the assumptions in `docs/clarification-questions.md`.
+Last updated: 2026-11-13: a whole-repo audit and its must-fix fixes, under "Audit of 2026-11-13". Before that, 2026-11-12. The company's answers and the brief of its Policy and SOP updates arrived; they are planned as WP4 in `docs/answers-change-plan.md`. Steps 1 (the company's lists and labels, pull request #19), 2 (the count restarting on reopening and holidays entered by focal persons, pull request #20) 3 (Bikram Sambat dates on the Nepali form) and 10 (Bikram Sambat dates and Nepali names on the staff screens) are built; the rest of WP4 is not. Decided the same day: the answers go first, and the new requirements wait until scope and price are agreed with NBI. Before that, on 2026-11-11: the handover package docs, branch `handover/docs`, and before them the `main` and `main-backup` split, under Decisions. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions were answered in part on 2026-11-12. Until WP4 applies the answers, the code follows the assumptions in `docs/clarification-questions.md`.
 
 Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
@@ -90,13 +90,19 @@ The RFQ's handover deliverables, branch `handover/docs` (plan approved in chat o
 | 3 | User guide for focal persons (A1 to A7, N1, N3, N4, P10) | Done | `d93f9ca`. English, five A4 pages, six screenshots taken on fake data in `ghm_testing` with the Playwright CLI session `focal`, wiped afterwards |
 | 4 | Credentials handover sheet (S8) | Done | `be58d3d`. `docs/credentials-handover.md`, blank fields only, vendor-side (in `DEV_ONLY`) |
 | 5 | `README.md` as the package index | Done | This commit |
+| 6 | Review and finish for non-technical and technical readers, branch `handover/finalize` (2026-11-13) | Done | Every claim in the guides checked against the code by two review agents, then spot-checked. Technical docs (`9ca8f1a`): install, update and lost-server rebuild start from the release zip, since the client gets no Git; the off-server copy is said to need a package and a release; restore runs `migrate --force`; zip AES-256 host check; a first `backup:run` on deploy day; port 465; VPS file ownership; references to work packages and the plan removed (the sync's leak check does not catch "WP2 step 7"). New `docs/troubleshooting.md` for the IT contact. The technical note fits one A4 page again (it was 1.06). User guide (`024133c`): the menu (Settings, Holidays), two-factor set-up buttons, offline-entry labels and required fields, file types, a "how a grievance moves" opener, BS and AD explained, a what-to-do table; pictures 2, 3, 5 and 6 re-taken on fake data in `ghm_testing` with the Playwright CLI session `focal`, cropped, the sign-in picture dropped, data wiped afterwards; 5 A4 pages (it had grown to 6). The walk confirmed a user with recovery codes left can move two-factor login to a new phone without the Administrator (Profile, Turn off, set up again). New `docs/admin-guide.md` (2 pages, agreed in chat). Nepali draft `docs/user-guide.ne.md` (5 pages). The 5,000 MB backup limit worded to hold before and after the clean-up change on `fix/S2-S7-S5-audit-must-fix` |
+| 7 | The backup's `mysqldump` without tablespaces (S7), branch `fix/S7-mysqldump-tablespaces` | Done | `c6c63b7`, failing test first. MySQL 8.0.21+ refuses a plain `mysqldump` to a user without the PROCESS privilege, as on most shared hosting; local runs passed only because the local user has every privilege. `handover/finalize` is stacked on it; both target `main-backup` |
+
+Page counts are checked on an A4 print: 10.5 pt text, 16 mm margins, GitHub-flavoured Markdown rendered with `league/commonmark` and printed by Chromium. The README promises PDF copies of the guides, so make them at handover with the same settings.
 
 Still to do:
 
-- The Nepali user guide (`docs/user-guide.ne.md`), once the English one is approved, read by a Nepali speaker before training on 25 Nov.
-- The guide's "Use it when" column for each status is suggested wording; confirm it with NBI at UAT.
-- Re-take the screenshots if UAT changes the screens; regenerate `docs/database-schema.sql` if a migration is added. Since WP4 step 1, pictures 2 (case list) and 6 (summary) show the old placeholder category "Working conditions and safety". WP4 step 10 is built, so all six are now due for a re-take (step 16): the case list and case page show Nepali names and Bikram Sambat dates, and since step 11 the summary shows small counts as "<5".
-- Fill in the credentials sheet at go-live, once the host is known (NBI question 1).
+- NEEK's Nepali reviewer reads `docs/user-guide.ne.md` before training on 25 Nov, with the rest of the Nepali text (open question 3).
+- The guide's "Use it when" column for each status is suggested wording; confirm it with NEEK at UAT (call brief, UAT question 6).
+- Re-take the pictures if UAT changes the screens (the reply dialog's "Create" wording, open question 6; the status badge, open question 15); regenerate `docs/database-schema.sql` if a migration is added.
+- Re-run the deploy rehearsal and the restore drill before staging: both date from 2026-11-02, and three migrations, a Symfony update and a package removal came after.
+- Make the PDF copies of the user guide (English and Nepali), the Administrator's guide and the technical note at handover, and check the page counts again.
+- Fill in the credentials sheet at go-live, once the host is known (NEEK question 1).
 
 ## WP4 The company's answers and Policy updates
 
@@ -142,6 +148,18 @@ Nepali text, checked 2026-11-12 against the company's Word files of the brief an
 - Every one of the company's Nepali strings in `docs/rfq-requirements.md` matches them, so steps 1 and 4 can use the strings as they are (C11 settled).
 - The WhatsApp Word file says the same as its PDF and adds no requirement the plan lacks.
 
+## Audit of 2026-11-13
+
+A whole-repo `/ponytail-audit` (public side, staff side, operations, each read by its own reviewer and every finding checked against the code) and an `/impeccable audit` of the public pages, emails and print views, before the 18 Nov test version. Impeccable: 17/20, no P0 and no P1 on public pages, so the release gate passes; two P1s in the print views (the QR poster's text and the slip's reference and PIN fade in Filament's dark mode). Ponytail: 3 must-fix, 8 should-fix, 5 nice-to-have; no path for a focal person to a restricted case or the reverse.
+
+| # | Finding | IDs | Status | Commit or note |
+|---|---|---|---|---|
+| 1 | Another site's post refilled the expired-form handler, so it could plant a named form whose PIN went to its email | S2, P7 | Done | `bb2a96c`, branch `fix/S2-S7-S5-audit-must-fix`. Checked in a real browser: a page on another origin that auto-posts the form lands on the plain 419; Playwright spec in `form.spec.ts`, failing before the fix |
+| 2 | `backup:clean` deleted the oldest archives above 5,000 MB, below 14 days, and the monitor then stayed quiet | S7 | Done | `caecef2`. Never deleted for size; the monitor's 5,000 MB check now warns; set it to the host's quota once known. The Backups docs are left to `handover/finalize`, which edits the same lines |
+| 3 | An address the mailer refuses (`ram(home)@gmail.com`) passed the form, and the mailer's error quoted it in the log and `failed_jobs` | S3, S5, N2 | Done | `a155bc5`. `email:strict` in the shared case rules; the mailer's refusal is stored and logged without the address |
+| 4 to 11 | Should-fix: parallel PIN guesses pass the lock; a language switch after a refusal empties the form; no MySQL time zone; no alert without an active focal person (decision); none when a category becomes restricted (decision); the case tabs' access check untested; `BACKUP_MAIL_TO` not required; cPanel's PHP files and `rsync --delete` (check on staging) | | Next | In the order the project lead picks |
+| 12 to 16 | Nice-to-have: the reference lock held through bcrypt and the photo redraw; dead `noindex` lines; unused relations; the activity-log migration's `down()`; four unused starter tables | | Not started | |
+
 ## Open questions for the project lead
 
 Questions for NBI, with what to change once they answer, are in `docs/clarification-questions.md` (email due 2 Nov). Until then the code follows the assumptions listed there. The ones below are internal.
@@ -160,6 +178,10 @@ Questions for NBI, with what to change once they answer, are in `docs/clarificat
 12. Send the follow-up questions C1 to C26 (change plan, section 4) to the company. C27 (build the retention delete now, or only document it) is ours to decide.
     - C11 is settled: the Word files of the brief and of the WhatsApp answers arrived, and every Nepali string matches them. C11 no longer needs sending.
     - Tell the company that while U1 is held, every open case is flagged after 15 working days, including cases in the 30- and 45-day categories, and the Administrator's past-target alert uses the same 15 days.
+13. Two-factor reset (S10, A1), found 2026-11-13: nothing in the panel resets a staff member's two-factor login. A user with recovery codes left can move it to a new phone on Profile; one with none left, including the only Administrator, needs the IT contact to clear it on the server (`docs/troubleshooting.md`). Add a "Reset two-factor login" action on Settings, Users for the Administrator? Not an RFQ line item.
+14. A complainant who lost the PIN (P7, P8): it cannot be shown again or reset, and the guides say only "tell the Administrator". What should the company do: tell them to send a new grievance quoting the old reference, or should staff be able to issue a new PIN? A question for NEEK.
+15. The case page cuts the Nepali status name off (U16), found in the 2026-11-13 walk: at 1280 px and 1440 px the badge shows "Under assessment (प्रारम्भिक मूल्याङ्क…"; only 1920 px shows it in full. Most staff laptops are 1280 to 1440 px wide. Fix before UAT (let the badge wrap), then re-take user-guide picture 2?
+16. The off-server backup copy (S7) needs a storage place from the host, a Flysystem package and a release, not only a `BACKUP_DISKS` line, as the docs said before 2026-11-13. Until it exists, a lost server loses every backup.
 
 ## Decisions
 

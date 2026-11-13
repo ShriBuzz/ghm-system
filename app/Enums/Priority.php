@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Case priorities exactly as RFQ A4 lists them. Labels live in lang/*.json.
+ * Case priorities the company uses. Labels live in lang/*.json.
  */
 enum Priority: string implements HasLabel
 {

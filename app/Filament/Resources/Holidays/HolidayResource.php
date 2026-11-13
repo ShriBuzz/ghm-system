@@ -19,7 +19,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 
 /**
- * Public holidays, left out of the working-day count (A2).
+ * Public holidays, left out of the working-day count.
  */
 class HolidayResource extends Resource
 {
