@@ -28,7 +28,7 @@ it('changes day at midnight in Kathmandu, not UTC', function () {
     expect(WorkingDays::between($lateThursday, $earlyFridayUtc))->toBe(1);
 })->group('A2');
 
-it('stops the clock at Resolved, Referred or Closed and sets the closed date', function () {
+it('stops the clock at Resolved, keeps it stopped at Closed and sets the closed date', function () {
     $this->travelTo('2026-11-20 10:00');
     $case = Grievance::factory()->create();
 

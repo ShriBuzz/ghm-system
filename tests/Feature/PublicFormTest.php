@@ -78,6 +78,15 @@ it('words the identity, contact and frequency choices as the company does, in bo
         ->assertSee('तपाईं को हुनुहुन्छ?')->assertSee('जाति/जातीयता')->assertSee('भन्न चाहँदिन');
 })->group('P4', 'P5', 'P6', 'U8');
 
+it('requires a named complainant to choose how to be contacted, and never asks an anonymous one', function () {
+    $this->post('/en', formInput(['preferred_contact' => '']))->assertSessionHasNoErrors();
+    expect(Grievance::count())->toBe(1);
+
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'phone' => '9800000000', 'preferred_contact' => '']))
+        ->assertSessionHasErrors('preferred_contact');
+    expect(Grievance::count())->toBe(1);
+})->group('P4');
+
 it('lists categories and locations by their names in the page\'s language', function () {
     Category::factory()->create(['name_en' => 'Wages in English', 'name_ne' => 'तलब नेपालीमा']);
     Location::factory()->create(['name_en' => 'Factory in English', 'name_ne' => 'कारखाना नेपालीमा']);

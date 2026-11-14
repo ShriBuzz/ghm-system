@@ -61,24 +61,27 @@ it('adds dated internal notes with their author, which cannot be edited or delet
         ->assertActionDoesNotExist(TestAction::make('delete')->table($note));
 })->group('A3');
 
-it('sends a staff reply into the complainant thread, next to their messages', function () {
+it('sends a staff reply into the complainant thread, next to their messages, as typed', function (string $body) {
     $case = Grievance::factory()->create();
     $fromComplainant = GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant]);
     $staff = signedInAs(Role::FocalPerson);
 
     onCasePage(MessagesRelationManager::class, $case)
         ->assertCanSeeTableRecords([$fromComplainant])
-        ->callAction(TestAction::make('create')->table(), data: ['body' => 'We have spoken to the payroll office.'])
+        ->callAction(TestAction::make('create')->table(), data: ['body' => $body])
         ->assertHasNoActionErrors();
 
     $reply = GrievanceMessage::where('direction', MessageDirection::Staff)->sole();
     expect($reply->author_id)->toBe($staff->id)
-        ->and($reply->body)->toBe('We have spoken to the payroll office.');
+        ->and($reply->body)->toBe($body);
 
     onCasePage(MessagesRelationManager::class, $case)
         ->assertActionDoesNotExist(TestAction::make('edit')->table($reply))
         ->assertActionDoesNotExist(TestAction::make('delete')->table($reply));
-})->group('A3');
+})->with([
+    'English' => 'We have spoken to the payroll office.',
+    'Nepali, two lines' => "तलब शाखासँग कुरा भयो।\nसोमबारसम्म जवाफ दिनेछौं।",
+])->group('A3', 'U16');
 
 it('uploads a staff document to the private store', function () {
     Storage::fake('local');
