@@ -39,4 +39,4 @@ All free and open source. Dev tools (Pest, Larastan, Pint, Playwright) stay off 
 
 ## Database structure
 
-`database/migrations/` creates the 18 tables, shown in one file in `docs/database-schema.sql`. Encrypted: name, contacts, description and the optional answers in `grievances`; `body` in `grievance_messages` and `grievance_notes`; `original_name` in `attachments`; the two-factor secret and recovery codes in `users`.
+`database/migrations/` creates the 14 tables, shown in one file in `docs/database-schema.sql`. Encrypted: name, contacts, description and the optional answers in `grievances`; `body` in `grievance_messages` and `grievance_notes`; `original_name` in `attachments`; the two-factor secret and recovery codes in `users`.

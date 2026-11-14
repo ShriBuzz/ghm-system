@@ -4,11 +4,11 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-12, after WP4 steps 1 to 5, 7, 10 to 12 and the WP4 review fixes (error links that keep the question in view, the day box on its own row on phones, Finish and hide clearing the PIN page, an alert when a case is marked restricted; "<5" for small groups in the summary; a reason for removing a restricted mark; the company's alert rules; the company's text on the public pages; both calendars in the export; Bikram Sambat dates and Nepali names on the staff screens; the company's lists and wording; the count restarting on reopening, and holidays entered by focal persons; Bikram Sambat dates on the Nepali form). What each requirement covers so far is in `docs/requirements-traceability.md`.
+What each requirement covers is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
-A `.env` made before WP3 still has `APP_NAME=Laravel` and `MAIL_MAILER=log`. Change them to `.env.example`'s values, `APP_NAME="Grievance handling"` and `MAIL_MAILER=array`: with `log`, every email the app makes, PINs and addresses included, is written into `storage/logs/laravel.log`.
+An older `.env` may still have `APP_NAME=Laravel` and `MAIL_MAILER=log`. Change them to `.env.example`'s values, `APP_NAME="Grievance handling"` and `MAIL_MAILER=array`: with `log`, every email the app makes, PINs and addresses included, is written into `storage/logs/laravel.log`.
 
 Give yourself an Administrator in `.env`, with fake details and a password you will remember:
 
@@ -279,7 +279,6 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 - The acknowledgement email's Nepali wording needs a native speaker's check.
 - Backups stay on the same machine until the off-server copy is set up, once the host is known.
 - The staff panel is in English; `APP_LOCALE=ne` stays the public pages' default.
-- Categories, locations and the optional questions' answers are the company's lists, received 2026-11-12. Where its two documents differ, the WhatsApp answers' wording is used until the company decides.
+- Categories, locations and the optional questions' answers are the company's lists.
 - The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are still to be agreed.
 - Notes, replies and documents are on the case page as tabs below the submission. The Administrator's menu has "Activity log": every case change, view, note, reply, document and sign-in, with who and when.
-- The public home page is a placeholder until the WP1 grievance form.
