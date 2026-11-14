@@ -10,7 +10,7 @@ it('has every text in both languages', function () {
 
 it('sends a first visit to the Nepali pages', function () {
     $this->get('/')->assertRedirect(url('ne'));
-})->group('P2');
+})->group('P2', 'U9');
 
 it('sends a returning visitor to the language they used last', function () {
     $this->withCookie('locale', 'en')->get('/')->assertRedirect(url('en'));

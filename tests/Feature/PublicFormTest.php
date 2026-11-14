@@ -4,7 +4,9 @@ use App\Enums\ContactMethod;
 use App\Enums\Role;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Models\Attachment;
+use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\Location;
 use App\Models\Setting;
 use App\Notifications\Acknowledgement;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -69,12 +71,38 @@ it('lets a named complainant ask not to be contacted, yet still needs a phone or
 
 it('words the identity, contact and frequency choices as the company does, in both languages', function () {
     $this->get('/en')->assertOk()->assertSeeInOrder(['Without my name (anonymous)', 'With my name'])
-        ->assertSee('Do not contact me')->assertSee('Repeatedly')->assertSee('Caste/ethnicity');
+        ->assertSee('Do not contact me')->assertSeeInOrder(['Once', 'Repeatedly', 'Still happening'])->assertSee('Caste/ethnicity');
 
     $this->get('/ne')->assertOk()->assertSeeInOrder(['नाम नखुलाई (बेनामी)', 'नाम सहित'])
-        ->assertSee('मलाई सम्पर्क नगर्नुहोस्')->assertSee('घटना कतिपटक भएको हो?')->assertSee('पटक-पटक')
+        ->assertSee('मलाई सम्पर्क नगर्नुहोस्')->assertSee('घटना कतिपटक भएको हो?')->assertSeeInOrder(['एक पटक', 'पटक-पटक', 'अझै भइरहेको'])
         ->assertSee('तपाईं को हुनुहुन्छ?')->assertSee('जाति/जातीयता')->assertSee('भन्न चाहँदिन');
 })->group('P4', 'P5', 'P6', 'U8');
+
+it('requires a named complainant to choose how to be contacted, and never asks an anonymous one', function () {
+    $this->post('/en', formInput(['preferred_contact' => '']))->assertSessionHasNoErrors();
+    expect(Grievance::count())->toBe(1);
+
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'phone' => '9800000000', 'preferred_contact' => '']))
+        ->assertSessionHasErrors('preferred_contact');
+    expect(Grievance::count())->toBe(1);
+})->group('P4');
+
+it('lists categories and locations by their names in the page\'s language', function () {
+    Category::factory()->create(['name_en' => 'Wages in English', 'name_ne' => 'तलब नेपालीमा']);
+    Location::factory()->create(['name_en' => 'Factory in English', 'name_ne' => 'कारखाना नेपालीमा']);
+
+    $this->get('/ne')->assertSee('तलब नेपालीमा')->assertSee('कारखाना नेपालीमा')
+        ->assertDontSee('Wages in English')->assertDontSee('Factory in English');
+    $this->get('/en')->assertSee('Wages in English')->assertSee('Factory in English')
+        ->assertDontSee('तलब नेपालीमा')->assertDontSee('कारखाना नेपालीमा');
+})->group('P5', 'U8');
+
+it('requires how often it happened, and stores each answer', function (string $recurrence) {
+    $this->post('/en', formInput(['recurrence' => '']))->assertSessionHasErrors('recurrence');
+
+    $this->post('/en', formInput(['recurrence' => $recurrence]))->assertSessionHasNoErrors();
+    expect(Grievance::sole()->recurrence->value)->toBe($recurrence);
+})->with(['once', 'repeated', 'ongoing'])->group('P5');
 
 /**
  * The form as the Nepali page sends it: the incident date as a Bikram Sambat day, month and year.
@@ -148,7 +176,11 @@ it('emails the reference and PIN only when an email was given', function () {
     Notification::assertNothingSent();
 
     $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'email' => 'sita@example.com', 'preferred_contact' => 'email']));
-    Notification::assertSentTo(Grievance::latest('id')->first(), Acknowledgement::class);
+    preg_match('/data-pin>(\d{6})</', $this->get('/en/received')->getContent(), $pin);
+    $case = Grievance::latest('id')->first();
+    // The email's PIN is the one on the screen, not another one made for the email.
+    Notification::assertSentTo($case, Acknowledgement::class,
+        fn (Acknowledgement $mail) => str_contains(implode(' ', $mail->toMail($case)->introLines), "**{$pin[1]}**"));
 })->group('P7', 'N2');
 
 it('takes a remembered month as the month only, and refuses an impossible or future date', function () {
@@ -208,12 +240,12 @@ it('labels every field and puts every set of choices in a fieldset with a legend
     }
 })->group('S9');
 
-it('stores no IP address anywhere the submission writes', function () {
-    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])->post('/en', formInput());
+it('stores no IP address or user agent anywhere the submission writes', function () {
+    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7', 'HTTP_USER_AGENT' => 'ProbeBrowser/9.9 (TestPhone)'])->post('/en', formInput());
 
     $everything = collect(['grievances', 'activity_log', 'jobs', 'attachments'])
         ->flatMap(fn (string $table) => DB::table($table)->get()->map(fn ($row) => json_encode($row)))->implode(' ');
-    expect(Grievance::count())->toBe(1)->and($everything)->not->toContain('203.0.113.7');
+    expect(Grievance::count())->toBe(1)->and($everything)->not->toContain('203.0.113.7')->not->toContain('ProbeBrowser');
 })->group('S5');
 
 it('sends a form posted after the session ended back to it, with what was typed', function () {

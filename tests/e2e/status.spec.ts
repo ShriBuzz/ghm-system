@@ -32,7 +32,7 @@ async function lookUp(page: Page, reference: string, pin: string, locale = 'en')
     await page.getByRole('button', { name: locale === 'en' ? 'Check' : 'हेर्नुहोस्' }).click();
 }
 
-test('a complainant reads a staff reply and adds information, with the reference and PIN in no address', { tag: ['@P8', '@A3', '@N1'] }, async ({ page, browser, baseURL, staff }) => {
+test('a complainant reads a staff reply and adds information, with the reference and PIN in no address', { tag: ['@P8', '@A3'] }, async ({ page, browser, baseURL, staff }) => {
     const addresses: string[] = [];
     page.on('request', (request) => addresses.push(request.url()));
 

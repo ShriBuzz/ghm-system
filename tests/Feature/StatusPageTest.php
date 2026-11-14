@@ -3,6 +3,7 @@
 use App\Enums\AlertKind;
 use App\Enums\MessageDirection;
 use App\Enums\Role;
+use App\Enums\Status;
 use App\Models\Category;
 use App\Models\Grievance;
 use App\Models\GrievanceMessage;
@@ -31,12 +32,14 @@ it('shows the status and the company\'s replies, never internal notes or staff n
     GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Staff, 'author_id' => $staff->id, 'body' => 'We are looking into it.']);
     GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant, 'body' => 'It happened again today.']);
     GrievanceNote::factory()->for($case)->create(['user_id' => $staff->id, 'body' => 'Internal: speak to the supervisor']);
+    $case->forceFill(['status' => Status::UnderAssessment])->save();
 
     lookUp($case)->assertRedirect(route('status.show', ['locale' => 'en']));
     $page = $this->get('/en/status/case')->assertOk();
 
     expect($page->headers->get('Cache-Control'))->toContain('no-store');
-    $page->assertSee($case->reference)->assertSee('Received')->assertSee('We are looking into it.')->assertSee('Grievance team')
+    $page->assertSee($case->reference)->assertSee('<dd class="status-value">Under assessment</dd>', escape: false)
+        ->assertSee('We are looking into it.')->assertSee('Grievance team')
         ->assertSee('It happened again today.')
         ->assertDontSee('Internal: speak to the supervisor')->assertDontSee('Hari Staffname');
 })->group('P8', 'A3');
@@ -55,6 +58,17 @@ it('lets the complainant add information, which alerts the staff who can see the
     Notification::assertSentTo($focal, CaseAlert::class, fn (CaseAlert $alert) => $alert->kind === AlertKind::Message);
     $this->get('/en/status/case')->assertSee('The supervisor has done it again.')->assertSee('Your message was sent.');
 })->group('P8', 'N1');
+
+it('takes a message on a closed case too, so an appeal reaches staff', function () {
+    $case = Grievance::factory()->create();
+    $case->forceFill(['status' => Status::Closed])->save();
+
+    lookUp($case);
+    $this->post('/en/status/case', ['body' => 'I do not agree with the outcome.'])
+        ->assertRedirect(route('status.show', ['locale' => 'en']));
+
+    expect(GrievanceMessage::sole()->body)->toBe('I do not agree with the outcome.');
+})->group('P8', 'U12');
 
 it('works for a restricted case too: the restriction is about staff, not the complainant', function () {
     $case = Grievance::factory()->create(['category_id' => Category::factory()->create(['is_restricted' => true])]);

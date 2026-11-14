@@ -84,7 +84,7 @@ it('exports the agreed columns for the cases received in the range, dates in AD 
             'Permanent employee', 'Female', '18–24', 'Prefer not to say', 'No'])
         ->and(array_slice($rows[2], 1, 4))->toBe(['2026-11-05 10:00', '2083-07-19', '', '']) // Still open.
         ->and(implode(' ', array_merge(...$rows)))->not->toContain('complainant@example.com')->not->toContain('9800000000');
-})->with(['csv', 'xlsx'])->group('N4', 'U9');
+})->with(['csv', 'xlsx'])->group('N4', 'U9', 'U14');
 
 it('adds names and contacts only when the Administrator asks, with formulas made harmless', function () {
     $rows = exportRows(Role::Administrator, personal: true);
@@ -99,7 +99,7 @@ it('never gives names or contacts to other roles, and only the cases they may se
 
         expect($rows[0])->toBe(N4_COLUMNS)->and($rows)->toHaveCount(2);
     }
-})->group('N4', 'A5');
+})->group('N4', 'A5', 'U7');
 
 it('logs each export with its range, format and whether personal data was included', function () {
     $admin = User::factory()->create(['role' => Role::Administrator]);
@@ -108,7 +108,7 @@ it('logs each export with its range, format and whether personal data was includ
     $entry = Activity::where('event', 'exported')->whereNull('subject_id')->sole();
     expect($entry->causer_id)->toBe($admin->id)
         ->and($entry->properties->all())->toEqual(['from' => '2026-11-01', 'until' => '2026-11-15', 'format' => 'xlsx', 'personal_data' => true, 'cases' => 2]);
-})->group('N4', 'S6');
+})->group('N4', 'S6', 'U7');
 
 it('also logs the export on each exported case, so filtering the log by reference finds it', function () {
     $admin = signedInAs(Role::Administrator);
@@ -123,7 +123,7 @@ it('also logs the export on each exported case, so filtering the log by referenc
         ->filterTable('reference', ['reference' => 'GHM-2026-0001'])
         ->assertCanSeeTableRecords([$onCase])
         ->assertSee('personal_data: yes');
-})->group('N4', 'S6');
+})->group('N4', 'S6', 'U7');
 
 it('offers the personal-data choice to the Administrator only', function () {
     signedInAs(Role::FocalPerson);

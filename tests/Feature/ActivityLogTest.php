@@ -81,10 +81,11 @@ it('logs the removal of a restriction with the ID of its reason note, and shows 
         ->assertSee('yes → no. Reason: Reviewed with &lt;b&gt;HR&lt;/b&gt;: not sensitive.', false);
 })->group('S6', 'U5');
 
-it('logs notes, replies, uploads and document views', function () {
+it('logs notes, replies, uploads and document views, with who and when', function () {
     Storage::fake('local');
+    $this->travelTo('2026-11-20 10:00');
     $case = Grievance::factory()->create();
-    signedInAs(Role::FocalPerson);
+    $staff = signedInAs(Role::FocalPerson);
 
     $page = ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class];
     Livewire::test(NotesRelationManager::class, $page)->callAction(TestAction::make('create')->table(), data: ['body' => 'Private note text']);
@@ -93,7 +94,8 @@ it('logs notes, replies, uploads and document views', function () {
     $this->get(route('filament.admin.attachments.download', $attachment))->assertOk();
 
     foreach (['note_added', 'reply_sent', 'attachment_uploaded', 'attachment_viewed'] as $event) {
-        expect(logged($event)->subject_id)->toBe($case->id, $event);
+        expect(logged($event))->subject_id->toBe($case->id, $event)->causer_id->toBe($staff->id, $event)
+            ->created_at->toDateTimeString()->toBe('2026-11-20 10:00:00', $event);
     }
 })->group('S6');
 
