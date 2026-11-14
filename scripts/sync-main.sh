@@ -1,17 +1,15 @@
 #!/bin/sh
 # Brings main-backup's work into main without the dev-only files, on a new sync/<date-time>
-# branch for a pull request into main (docs/handoff.md, "Branches and sync").
+# branch for a pull request into main (dev-docs/handoff.md, "Branches and sync").
 # Never merge main into main-backup: the dev-only files are deleted on main.
 set -eu
 
-# Kept on main-backup, never on main. A new dev-only file goes here in the same commit.
-DEV_ONLY='.claude .impeccable CLAUDE.md PRODUCT.md DESIGN.md WP0-kickoff.md WP2-kickoff.md
-docs/implementation-plan.md docs/progress.md docs/handoff.md docs/clarification-questions.md
-docs/client-discussion.md docs/breach-report-template.md docs/production-access-log.md
-docs/credentials-handover.md docs/answers-change-plan.md docs/neek-call-2026-11-13.md scripts/sync-main.sh'
+# Kept on main-backup, never on main. A new dev-only doc goes in dev-docs/, which needs no entry here;
+# any other new dev-only file goes here in the same commit.
+DEV_ONLY='.claude .impeccable CLAUDE.md PRODUCT.md DESIGN.md dev-docs scripts/sync-main.sh'
 
 # Mentions of dev tooling or internal docs that must not reach a file main keeps.
-LEAKS='CLAUDE\.md|\.claude|[Ii]mpeccable|[Pp]onytail|Claude Code|progress\.md|handoff\.md|implementation-plan|clarification[- ]question|\(question [0-9]+\)|client-discussion|kickoff\.md|breach-report-template|production-access-log|answers-change-plan|neek-call|PRODUCT\.md|DESIGN\.md|main-backup|plan section'
+LEAKS='dev-docs|CLAUDE\.md|\.claude|[Ii]mpeccable|[Pp]onytail|Claude Code|progress\.md|handoff\.md|implementation-plan|clarification[- ]question|\(question [0-9]+\)|client-discussion|kickoff\.md|breach-report-template|production-access-log|answers-change-plan|neek-call|PRODUCT\.md|DESIGN\.md|main-backup|plan section'
 
 # A function, so the shell has read the whole file before git switch deletes it.
 sync_main() {

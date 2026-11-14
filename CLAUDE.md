@@ -1,8 +1,8 @@
 # GHM System: rules for coding agents
 
 This repo builds the online grievance handling system for RFQ NBI/GHM/RFQ/01.
-The full plan is in `docs/implementation-plan.md`. These rules win over any skill when they disagree.
-Status, decisions and open questions are in `docs/progress.md`. In a new session or on a new machine, read `docs/handoff.md` first.
+The full plan is in `dev-docs/implementation-plan.md`. These rules win over any skill when they disagree.
+Status, decisions and open questions are in `dev-docs/progress.md`. In a new session or on a new machine, read `dev-docs/handoff.md` first.
 
 ## Order of authority
 
@@ -17,7 +17,7 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 ## Scope
 
-- Build exactly what RFQ section 3 and the company's updates U1 to U16 ask for. Build an update only once the project lead has accepted it (WP4 in `docs/progress.md`; plan in `docs/answers-change-plan.md`). Nothing speculative.
+- Build exactly what RFQ section 3 and the company's updates U1 to U16 ask for. Build an update only once the project lead has accepted it (WP4 in `dev-docs/progress.md`; plan in `dev-docs/answers-change-plan.md`). Nothing speculative.
 - Every commit message names its requirement IDs, for example `feat(P7): reference number and PIN` or `feat(U1): target time per category`.
 - Code comments never cite requirement IDs, the RFQ or internal documents: the client's developers get the code, not those documents. A comment says the why in plain words. Commit messages, Pest groups and Playwright tags keep the IDs.
 - Open questions go to the person, not into guesses in code.
@@ -59,11 +59,11 @@ No other skills or plugins are used in this repo: not frontend-design, not Larav
 
 ## Branching
 
-- `main-backup`: our development branch, with everything, the dev-only files included (this file, `.claude/`, `.impeccable/`, the internal docs). Work and fix branches start from it, and pull requests go into it with `gh pr create --base main-backup`: the GitHub default branch stays `main`.
+- `main-backup`: our development branch, with everything, the dev-only files included (this file, `.claude/`, `.impeccable/`, `PRODUCT.md`, `DESIGN.md` and the internal docs in `dev-docs/`). Work and fix branches start from it, and pull requests go into it with `gh pr create --base main-backup`: the GitHub default branch stays `main`.
 - `main`: what the client gets, release-ready. It is `main-backup` without the dev-only files. Change it only with `scripts/sync-main.sh` and a pull request from the sync branch it makes, merged with "Create a merge commit", never squash or rebase. Tag `v1.0.0` at go-live.
 - Never merge `main` into `main-backup`, and never open a pull request from `main-backup` itself. The dev-only files are deleted on `main`, so such a merge deletes them on `main-backup` too.
 - Files both branches share stay identical: edit them on `main-backup` only, and keep dev-only notes out of them. `scripts/sync-main.sh` stops when a shared file mentions dev tooling or the internal docs.
-- A new dev-only file goes into the `DEV_ONLY` list in `scripts/sync-main.sh` in the same commit.
+- Docs: `docs/` holds only what the client gets (the handover); `dev-docs/` holds the internal docs and never ships. A new internal doc goes in `dev-docs/`; any other new dev-only file goes into the `DEV_ONLY` list in `scripts/sync-main.sh` in the same commit.
 - Branch names: `wp<N>/<slug>` for work packages, `fix/<ID>-<short-slug>` for UAT and support fixes.
 - Handover zip for the client: `git archive --format=zip -o ghm-system.zip main`.
 

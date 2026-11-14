@@ -42,7 +42,7 @@ A commissioned build against a fixed RFQ, not a market product. What sets it apa
 
 ### Open, not to be guessed
 
-- Requirement wording is in `docs/rfq-requirements.md`; the plan is in `docs/implementation-plan.md`. Questions for NBI are in `docs/clarification-questions.md`.
+- Requirement wording is in `docs/rfq-requirements.md`; the plan is in `dev-docs/implementation-plan.md`. Questions for NBI are in `dev-docs/clarification-questions.md`.
 - The company's name on public pages and emails. The RFQ says only "a private company", and names NBI separately (S8).
 - The Nepali labels for A4 statuses and priorities are drafts, to be confirmed with NBI at kick-off.
 
