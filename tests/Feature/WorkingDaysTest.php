@@ -72,6 +72,26 @@ it('restarts the count from the reopening date, each time a stopped case is reop
     expect($case->reopened_at->toDateString())->toBe('2026-12-14')->and($case->working_days_open)->toBe(0);
 })->group('A2', 'U3');
 
+it('freezes the count in every stopped status and restarts it on any move back to an open one', function (Status $stopped, Status $open) {
+    $this->travelTo('2026-11-20 10:00');
+    $case = Grievance::factory()->create();
+
+    $this->travelTo('2026-11-23 10:00');
+    $case->forceFill(['status' => $stopped, 'escalated_at' => now()])->save();
+
+    $this->travelTo('2026-12-04 10:00');
+    $this->artisan('ghm:recount-working-days')->assertSuccessful();
+    expect($case->refresh()->working_days_open)->toBe(2);
+
+    $case->forceFill(['status' => $open])->save();
+
+    expect($case->reopened_at->toDateString())->toBe('2026-12-04')
+        ->and($case->working_days_open)->toBe(0)
+        ->and($case->escalated_at)->toBeNull();
+})->with([Status::Resolved, Status::Closed, Status::ReferredOutOfScope])
+    ->with([Status::UnderAssessment, Status::UnderInvestigation, Status::Reopened])
+    ->group('A2', 'U3', 'U6');
+
 it('keeps counting from receipt when an open case is set to Reopened, so an overdue case stays overdue', function () {
     $this->travelTo('2026-11-20 10:00');
     $case = Grievance::factory()->create();

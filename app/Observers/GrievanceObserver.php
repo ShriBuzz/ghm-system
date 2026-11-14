@@ -89,9 +89,9 @@ class GrievanceObserver
         // Any status can follow Closed, so the date goes whenever the case leaves it.
         $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
 
-        // Only a stopped case restarts: an open, overdue case set to Reopened keeps its count.
-        // Its new count can pass the target again, so the past-target alert is due again.
-        if ($grievance->status === Status::Reopened && $was instanceof Status && ! $was->isOpen()) {
+        // A stopped case set to any open status restarts, not only at Reopened, so the stopped days never
+        // count; an open, overdue case set to Reopened keeps its count. The past-target alert is due again.
+        if ($grievance->status->isOpen() && $was instanceof Status && ! $was->isOpen()) {
             $grievance->reopened_at = now();
             $grievance->escalated_at = null;
         }
