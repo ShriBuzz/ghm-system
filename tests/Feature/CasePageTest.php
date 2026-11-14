@@ -1,12 +1,22 @@
 <?php
 
+use App\Enums\MessageDirection;
 use App\Enums\Priority;
 use App\Enums\Role;
 use App\Enums\Status;
+use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Filament\Resources\Grievances\Pages\ListGrievances;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
+use App\Filament\Resources\Grievances\RelationManagers\AttachmentsRelationManager;
+use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
+use App\Filament\Resources\Grievances\RelationManagers\NotesRelationManager;
+use App\Filament\Resources\Holidays\Pages\ManageHolidays;
+use App\Models\Attachment;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\GrievanceMessage;
+use App\Models\GrievanceNote;
+use App\Models\Holiday;
 use App\Models\Location;
 use App\Models\User;
 use Livewire\Features\SupportTesting\Testable;
@@ -27,7 +37,7 @@ it('shows the submission, with no contact details for an anonymous case', functi
     viewCase($anonymous)->assertSee('Anonymous')->assertDontSee('Preferred contact');
 })->group('A3');
 
-it('sets status and priority from the A4 lists only', function () {
+it('sets status and priority from the fixed lists only', function () {
     $case = Grievance::factory()->create();
     signedInAs(Role::FocalPerson);
 
@@ -82,17 +92,24 @@ it('lets a focal person mark a case restricted, then sends them back to the list
     expect($case->fresh()->is_restricted)->toBeTrue();
 })->group('A5');
 
-it('lets only the Administrator remove a restriction', function () {
+it('lets only the Administrator remove a restriction, with a reason kept as an internal note', function () {
     $case = Grievance::factory()->create(['manually_restricted' => true]);
 
     signedInAs(Role::RestrictedOfficer);
     viewCase($case)->assertActionHidden('unrestrict')->assertActionHidden('restrict');
 
-    signedInAs(Role::Administrator);
-    viewCase($case)->callAction('unrestrict');
+    $admin = signedInAs(Role::Administrator);
+    viewCase($case)->callAction('unrestrict', data: ['reason' => ''])->assertHasActionErrors(['reason' => 'required']);
+    expect($case->fresh()->is_restricted)->toBeTrue()
+        ->and($case->notes()->count())->toBe(0);
 
-    expect($case->fresh()->is_restricted)->toBeFalse();
-})->group('A5');
+    viewCase($case)->callAction('unrestrict', data: ['reason' => 'Reviewed: about wages, not harassment.'])->assertHasNoActionErrors();
+
+    $note = $case->notes()->sole();
+    expect($case->fresh()->is_restricted)->toBeFalse()
+        ->and($note->body)->toBe('Reviewed: about wages, not harassment.')
+        ->and($note->user_id)->toBe($admin->id);
+})->group('A5', 'U5');
 
 it('keeps a new assignment when the old assignee was loaded and can no longer see the case', function () {
     $old = User::factory()->create(['role' => Role::FocalPerson]);
@@ -145,3 +162,52 @@ it('clears every assignment of a user who is deactivated', function () {
     expect($case->fresh()->assigned_to)->toBeNull()
         ->and($untouched->fresh()->assigned_to)->not->toBeNull();
 })->group('A3', 'A7');
+
+it('shows status and category with their Nepali names, as the complainant sees them', function () {
+    $case = Grievance::factory()->create([
+        'status' => Status::UnderAssessment,
+        'category_id' => Category::factory()->create(['name_en' => 'Wages and benefits', 'name_ne' => 'तलब तथा सुविधा']),
+    ]);
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    signedInAs(Role::FocalPerson);
+
+    viewCase($case)->assertSee('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)')->assertSee('Wages and benefits (तलब तथा सुविधा)');
+})->group('A3', 'A4', 'U16');
+
+it('shows the complainant\'s Nepali text and its line breaks as written, in the submission and the messages', function () {
+    $case = Grievance::factory()->create(['description' => "पहिलो लाइन: तीन महिनादेखि तलब आएको छैन।\nदोस्रो लाइन: <b>सुपरभाइजर</b>लाई भनें।"]);
+    GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant, 'body' => "थप जानकारी।\nआज फेरि भयो।"]);
+    signedInAs(Role::FocalPerson);
+
+    // Each line break becomes <br />; anything typed as HTML stays visible text.
+    viewCase($case)->assertSeeHtml('पहिलो लाइन: तीन महिनादेखि तलब आएको छैन।<br />')->assertSee('दोस्रो लाइन:')
+        ->assertSeeHtml('&lt;b&gt;सुपरभाइजर&lt;/b&gt;')->assertDontSeeHtml('<b>सुपरभाइजर</b>');
+    Livewire::test(MessagesRelationManager::class, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class])
+        ->assertSeeHtml('थप जानकारी।<br />')->assertSee('आज फेरि भयो।');
+})->group('A3', 'U16');
+
+it('shows every date staff read in Bikram Sambat with AD alongside', function () {
+    $this->travelTo('2026-11-08 10:00');
+    $case = Grievance::factory()->create(['incident_date' => '2026-10-28', 'incident_date_exact' => true]);
+    GrievanceNote::factory()->for($case)->create(['body' => 'A note']);
+    Holiday::forceCreate(['date' => '2026-11-08', 'name' => 'A holiday']);
+    Holiday::forceCreate(['date' => '2207-05-13', 'name' => 'Beyond the BS table']);
+    // Each later date has its own time, so each assertion can only match its own field.
+    $this->travelTo('2026-11-08 11:30');
+    $case->forceFill(['status' => Status::Closed])->save();
+    $this->travelTo('2026-11-08 12:15');
+    GrievanceMessage::factory()->for($case)->create();
+    $this->travelTo('2026-11-08 13:45');
+    Attachment::factory()->for($case)->create();
+    signedInAs(Role::Administrator);
+
+    viewCase($case)->assertSee('2083-07-22 (2026-11-08) 10:00')->assertSee('2083-07-11 (2026-10-28)')
+        ->assertSee('2083-07-22 (2026-11-08) 11:30');
+    $page = ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class];
+    Livewire::test(MessagesRelationManager::class, $page)->assertSee('2083-07-22 (2026-11-08) 12:15');
+    Livewire::test(AttachmentsRelationManager::class, $page)->assertSee('2083-07-22 (2026-11-08) 13:45');
+    Livewire::test(ListGrievances::class)->assertSee('2083-07-22 (2026-11-08)');
+    Livewire::test(NotesRelationManager::class, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class])->assertSee('2083-07-22 (2026-11-08) 10:00');
+    Livewire::test(ManageActivityLogs::class)->assertSee('2083-07-22 (2026-11-08) 10:00');
+    Livewire::test(ManageHolidays::class)->assertSee('2083-07-22 (2026-11-08)')->assertSee('2207-05-13');
+})->group('A2', 'A3', 'U9');

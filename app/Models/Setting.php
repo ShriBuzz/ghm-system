@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * One piece of text the Administrator edits without a developer (P3, A7), by key.
+ * One piece of text the Administrator edits without a developer, by key.
  */
 #[Fillable(['key', 'value'])]
 class Setting extends Model

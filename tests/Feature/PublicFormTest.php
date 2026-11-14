@@ -1,7 +1,12 @@
 <?php
 
+use App\Enums\ContactMethod;
+use App\Enums\Role;
+use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Models\Attachment;
+use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\Location;
 use App\Models\Setting;
 use App\Notifications\Acknowledgement;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -11,6 +16,8 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
+use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function () {
     $this->travelTo('2026-11-02 10:00');
@@ -18,7 +25,7 @@ beforeEach(function () {
 });
 
 it('opens the form to anyone, with the notice above the first question, escaped', function () {
-    $this->get('/en')->assertOk()->assertSee('[Draft:', false)->assertSee('name="is_anonymous"', false);
+    $this->get('/en')->assertOk()->assertSee('Your grievance is safe with us.')->assertSee('name="is_anonymous"', false);
 
     Setting::put('notice.en', "Kept <b>confidential</b>.\n\nNo retaliation.");
     $html = $this->get('/en')->assertOk()->getContent();
@@ -26,7 +33,7 @@ it('opens the form to anyone, with the notice above the first question, escaped'
     expect($html)->toContain('Kept &lt;b&gt;confidential&lt;/b&gt;.')->toContain('<p>No retaliation.</p>')
         ->and(strpos($html, 'No retaliation.'))->toBeLessThan(strpos($html, 'name="is_anonymous"'));
 
-    $this->get('/ne')->assertOk()->assertSee('[मस्यौदा:', false);
+    $this->get('/ne')->assertOk()->assertSee('तपाईंको गुनासो हामीसँग सुरक्षित छ');
 })->group('P1', 'P3');
 
 it('keeps an anonymous case free of contact details, even when some were typed', function () {
@@ -48,6 +55,101 @@ it('needs a name, and the contact its preferred method names, from a named compl
     expect(Grievance::count())->toBe(0);
 })->group('P4');
 
+it('lets a named complainant ask not to be contacted, yet still needs a phone or an email', function () {
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'preferred_contact' => 'do_not_contact']))
+        ->assertSessionHasErrors(['phone' => 'Give a phone number or an email.']);
+    expect(Grievance::count())->toBe(0);
+
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'email' => 'sita@example.com', 'preferred_contact' => 'do_not_contact']))
+        ->assertSessionHasNoErrors();
+
+    $case = Grievance::sole();
+    expect($case->preferred_contact)->toBe(ContactMethod::DoNotContact);
+    // The reference and PIN still go to the email given; they are the complainant's only copy besides the screen.
+    Notification::assertSentTo($case, Acknowledgement::class);
+})->group('P4', 'P7', 'U8');
+
+it('words the identity, contact and frequency choices as the company does, in both languages', function () {
+    $this->get('/en')->assertOk()->assertSeeInOrder(['Without my name (anonymous)', 'With my name'])
+        ->assertSee('Do not contact me')->assertSeeInOrder(['Once', 'Repeatedly', 'Still happening'])->assertSee('Caste/ethnicity');
+
+    $this->get('/ne')->assertOk()->assertSeeInOrder(['नाम नखुलाई (बेनामी)', 'नाम सहित'])
+        ->assertSee('मलाई सम्पर्क नगर्नुहोस्')->assertSee('घटना कतिपटक भएको हो?')->assertSeeInOrder(['एक पटक', 'पटक-पटक', 'अझै भइरहेको'])
+        ->assertSee('तपाईं को हुनुहुन्छ?')->assertSee('जाति/जातीयता')->assertSee('भन्न चाहँदिन');
+})->group('P4', 'P5', 'P6', 'U8');
+
+it('requires a named complainant to choose how to be contacted, and never asks an anonymous one', function () {
+    $this->post('/en', formInput(['preferred_contact' => '']))->assertSessionHasNoErrors();
+    expect(Grievance::count())->toBe(1);
+
+    $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'phone' => '9800000000', 'preferred_contact' => '']))
+        ->assertSessionHasErrors('preferred_contact');
+    expect(Grievance::count())->toBe(1);
+})->group('P4');
+
+it('lists categories and locations by their names in the page\'s language', function () {
+    Category::factory()->create(['name_en' => 'Wages in English', 'name_ne' => 'तलब नेपालीमा']);
+    Location::factory()->create(['name_en' => 'Factory in English', 'name_ne' => 'कारखाना नेपालीमा']);
+
+    $this->get('/ne')->assertSee('तलब नेपालीमा')->assertSee('कारखाना नेपालीमा')
+        ->assertDontSee('Wages in English')->assertDontSee('Factory in English');
+    $this->get('/en')->assertSee('Wages in English')->assertSee('Factory in English')
+        ->assertDontSee('तलब नेपालीमा')->assertDontSee('कारखाना नेपालीमा');
+})->group('P5', 'U8');
+
+it('requires how often it happened, and stores each answer', function (string $recurrence) {
+    $this->post('/en', formInput(['recurrence' => '']))->assertSessionHasErrors('recurrence');
+
+    $this->post('/en', formInput(['recurrence' => $recurrence]))->assertSessionHasNoErrors();
+    expect(Grievance::sole()->recurrence->value)->toBe($recurrence);
+})->with(['once', 'repeated', 'ongoing'])->group('P5');
+
+/**
+ * The form as the Nepali page sends it: the incident date as a Bikram Sambat day, month and year.
+ *
+ * @return array<string, mixed>
+ */
+function nepaliFormInput(string $day, string $month, string $year): array
+{
+    return array_diff_key(formInput(), array_flip(['incident_day', 'incident_month', 'incident_year']))
+        + ['incident_bs_day' => $day, 'incident_bs_month' => $month, 'incident_bs_year' => $year];
+}
+
+it('asks for the incident date in Bikram Sambat on the Nepali form and in AD on the English one', function () {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->get('/ne')->assertOk()->assertSee('name="incident_bs_month"', false)->assertDontSee('name="incident_month"', false)
+        ->assertSeeInOrder(['बैशाख', 'कार्तिक', 'चैत'])->assertSee('<option value="2083" selected>', false);
+    $this->get('/en')->assertOk()->assertSee('name="incident_month"', false)->assertDontSee('name="incident_bs_month"', false);
+})->group('P5', 'U9');
+
+it('stores a Bikram Sambat incident date in AD, and a remembered month as its first day', function () {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->post('/ne', nepaliFormInput('22', '7', '2083'))->assertSessionHasNoErrors();
+    $this->post('/ne', nepaliFormInput('unknown', '7', '2083'))->assertSessionHasNoErrors();
+    $this->post('/en', formInput())->assertSessionHasNoErrors();
+
+    expect(Grievance::orderBy('id')->get()->map->only('incident_date_exact', 'incident_date_calendar')->all())->toBe([
+        ['incident_date_exact' => true, 'incident_date_calendar' => 'bs'],
+        ['incident_date_exact' => false, 'incident_date_calendar' => 'bs'],
+        ['incident_date_exact' => true, 'incident_date_calendar' => 'ad'],
+    ])->and(Grievance::orderBy('id')->get()->map(fn (Grievance $case) => $case->incident_date->toDateString())->all())
+        ->toBe(['2026-11-08', '2026-10-18', '2026-10-28']);
+})->group('P5', 'U9');
+
+it('refuses a Bikram Sambat date that does not exist, is still to come, or is outside the calendar', function (array $date, string $message) {
+    $this->travelTo('2026-11-12 10:00');
+
+    $this->post('/ne', nepaliFormInput(...$date))->assertSessionHasErrors(['incident_date' => $message]);
+
+    expect(Grievance::count())->toBe(0);
+})->with([
+    'Kartik 2083 has 30 days' => [['31', '7', '2083'], 'यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।'],
+    '15 Mangsir 2083 is 1 December 2026' => [['15', '8', '2083'], 'यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।'],
+    'a year the calendar does not have' => [['1', '1', '2091'], 'यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।'],
+])->group('P5', 'U9');
+
 it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both until Done', function () {
     $this->post('/ne', formInput())->assertRedirect(route('grievance.received', ['locale' => 'ne']));
     $case = Grievance::sole();
@@ -58,7 +160,7 @@ it('gives a reference and a PIN, stores only the PIN\'s hash, and shows both unt
     preg_match('/data-pin>(\d{6})</', $page, $pin);
 
     expect($case->reference)->toMatch('/^GHM-2026-\d{4}$/')
-        ->and($page)->toContain($case->reference)->toContain('noindex')
+        ->and($page)->toContain($case->reference)
         ->and($pin)->toHaveCount(2)
         ->and(Hash::check($pin[1], $case->pin_hash))->toBeTrue()
         ->and($case->pin_hash)->not->toContain($pin[1]);
@@ -74,7 +176,11 @@ it('emails the reference and PIN only when an email was given', function () {
     Notification::assertNothingSent();
 
     $this->post('/en', formInput(['is_anonymous' => '0', 'name' => 'Sita', 'email' => 'sita@example.com', 'preferred_contact' => 'email']));
-    Notification::assertSentTo(Grievance::latest('id')->first(), Acknowledgement::class);
+    preg_match('/data-pin>(\d{6})</', $this->get('/en/received')->getContent(), $pin);
+    $case = Grievance::latest('id')->first();
+    // The email's PIN is the one on the screen, not another one made for the email.
+    Notification::assertSentTo($case, Acknowledgement::class,
+        fn (Acknowledgement $mail) => str_contains(implode(' ', $mail->toMail($case)->introLines), "**{$pin[1]}**"));
 })->group('P7', 'N2');
 
 it('takes a remembered month as the month only, and refuses an impossible or future date', function () {
@@ -102,10 +208,10 @@ it('stores one photo or PDF up to 5 MB, and refuses a larger file or a renamed p
 it('accepts every optional question left blank, and stores the answers given', function () {
     $blank = array_fill_keys(array_keys(Grievance::OPTIONAL_ANSWERS), '');
     $this->post('/en', formInput($blank))->assertSessionHasNoErrors();
-    $this->post('/en', formInput(['sex' => 'prefer_not_to_say', 'age_group' => '30_44']))->assertSessionHasNoErrors();
+    $this->post('/en', formInput(['sex' => 'prefer_not_to_say', 'age_group' => '35_44']))->assertSessionHasNoErrors();
 
     [$first, $second] = Grievance::orderBy('id')->get()->all();
-    expect($first->sex)->toBeNull()->and($second->sex)->toBe('prefer_not_to_say')->and($second->age_group)->toBe('30_44');
+    expect($first->sex)->toBeNull()->and($second->sex)->toBe('prefer_not_to_say')->and($second->age_group)->toBe('35_44');
 })->group('P6');
 
 it('keeps what was typed when something needs fixing, with a summary that links to the field', function () {
@@ -115,7 +221,7 @@ it('keeps what was typed when something needs fixing, with a summary that links 
     $html = $this->get('/en')->getContent();
     expect($html)->toContain('Wages unpaid since June')->toContain('href="#category_id"')
         // In view without JavaScript too: under the heading, above the notice, and named in the title.
-        ->toContain('<title>Error: Send a grievance')
+        ->toContain('<title>Error: Raise a grievance')
         ->and(strpos($html, 'data-error-summary'))->toBeLessThan(strpos($html, 'notice-heading'));
 })->group('P1', 'S9');
 
@@ -134,12 +240,12 @@ it('labels every field and puts every set of choices in a fieldset with a legend
     }
 })->group('S9');
 
-it('stores no IP address anywhere the submission writes', function () {
-    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])->post('/en', formInput());
+it('stores no IP address or user agent anywhere the submission writes', function () {
+    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7', 'HTTP_USER_AGENT' => 'ProbeBrowser/9.9 (TestPhone)'])->post('/en', formInput());
 
     $everything = collect(['grievances', 'activity_log', 'jobs', 'attachments'])
         ->flatMap(fn (string $table) => DB::table($table)->get()->map(fn ($row) => json_encode($row)))->implode(' ');
-    expect(Grievance::count())->toBe(1)->and($everything)->not->toContain('203.0.113.7');
+    expect(Grievance::count())->toBe(1)->and($everything)->not->toContain('203.0.113.7')->not->toContain('ProbeBrowser');
 })->group('S5');
 
 it('sends a form posted after the session ended back to it, with what was typed', function () {
@@ -161,9 +267,63 @@ it('sends a form posted after the session ended back to it, with what was typed'
         ->and(session('errors')->getBag('default')->first('form'))->toStartWith('This page was open too long to send');
 })->group('S2', 'P1');
 
+it('never refills the form from a post another site sent, so it cannot plant where the PIN is emailed', function () {
+    $refused = function (array $headers): Response {
+        $request = Request::create('/en', 'POST', formInput(['is_anonymous' => '0', 'email' => 'planted@example.com']), server: $headers);
+        $route = app('router')->getRoutes()->match($request);
+        $route->bind($request);
+        $request->setRouteResolver(fn () => $route);
+
+        return app(ExceptionHandler::class)->render($request, new TokenMismatchException);
+    };
+
+    // A current browser's post from another site, and an older browser's that names another origin.
+    expect($refused(['HTTP_SEC_FETCH_SITE' => 'cross-site'])->getStatusCode())->toBe(419)
+        ->and($refused(['HTTP_ORIGIN' => 'https://elsewhere.example'])->getStatusCode())->toBe(419)
+        ->and(session()->getOldInput('email'))->toBeNull();
+
+    // An older browser's own post, after the session ended, is still sent back with what was typed.
+    expect($refused(['HTTP_ORIGIN' => 'http://localhost'])->getStatusCode())->toBe(302)
+        ->and(session()->getOldInput('email'))->toBe('planted@example.com');
+})->group('S2', 'P7');
+
+it('refuses an email address the mailer would refuse, so the complainant can correct it and gets the acknowledgement', function () {
+    $named = ['is_anonymous' => '0', 'name' => 'Sita', 'preferred_contact' => 'email'];
+
+    $this->post('/en', formInput([...$named, 'email' => 'ram(home)@gmail.com']))->assertRedirect()->assertSessionHasErrors('email');
+    expect(Grievance::count())->toBe(0);
+
+    $this->post('/en', formInput([...$named, 'email' => 'rām.k+gunaso@उदाहरण.नेपाल']))->assertRedirect(route('grievance.received', ['locale' => 'en']));
+})->group('P4', 'N2');
+
 it('refuses crafted list values in place of text, without an error page', function () {
     $this->post('/en', formInput(['incident_day' => ['1']]))->assertRedirect()->assertSessionHasErrors('incident_date');
     $this->post('/en', formInput(['form_started' => ['x']]))->assertRedirect()->assertSessionHasErrors('form');
 
     expect(Grievance::count())->toBe(0);
 })->group('P9', 'P5');
+
+it('decides the calendar itself, so a hand-made post cannot store a case its staff page cannot show', function () {
+    // No date selects, a typed date before the Bikram Sambat table starts, and a claim that it is BS.
+    $input = formInput(['incident_date' => '2000-01-01', 'incident_date_exact' => '0', 'incident_date_calendar' => 'bs']);
+    unset($input['incident_day'], $input['incident_month'], $input['incident_year']);
+    $this->post('/en', $input)->assertRedirect(route('grievance.received', ['locale' => 'en']));
+
+    $case = Grievance::sole();
+    expect($case->incident_date_calendar)->toBe('ad');
+
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    signedInAs(Role::Administrator);
+    Livewire::test(ViewGrievance::class, ['record' => $case->id])->assertOk()->assertSee('January 2000, exact day not remembered');
+})->group('P5', 'U9');
+
+it('links each date box to the date\'s hint and error, as every other field is linked to its own', function (string $locale, string $day) {
+    $this->from("/{$locale}")->post("/{$locale}", formInput(['incident_day' => '', 'incident_bs_day' => '']));
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8"?>'.$this->get("/{$locale}")->getContent());
+    $select = (new DOMXPath($dom))->query("//select[@id='{$day}']")->item(0);
+
+    expect($select->getAttribute('aria-describedby'))->toBe('incident_date-hint incident_date-error')
+        ->and($select->getAttribute('aria-invalid'))->toBe('true');
+})->with([['en', 'incident_day'], ['ne', 'incident_bs_day']])->group('S9', 'P5');

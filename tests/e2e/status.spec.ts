@@ -2,16 +2,18 @@ import AxeBuilder from '@axe-core/playwright';
 import { devices, expect, type Page } from '@playwright/test';
 import { findCase, openTab, test, writeOnCase } from './support';
 
-// The status page (P8) on a 360 px phone (mobile project), with a focal person replying from the panel.
+// The status page on a 360 px phone (mobile project), with a focal person replying from the panel.
 const wcag = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 /** Sends an anonymous grievance from the public form and returns its reference and PIN. */
 async function sendGrievance(page: Page): Promise<{ reference: string; pin: string }> {
     await page.goto('/en');
     await page.getByLabel('What is it about?').selectOption('Wages and benefits');
-    await page.getByLabel('Where did it happen?').selectOption('Head office');
+    await page.getByLabel('Where did it happen?').selectOption('Head office, Thapathali');
     await page.getByLabel('Day', { exact: true }).selectOption('3');
     await page.getByLabel('Month', { exact: true }).selectOption('10');
+    // Last year, so the date is in the past whenever the suite runs.
+    await page.getByLabel('Year', { exact: true }).selectOption({ index: 1 });
     await page.getByText('Once', { exact: true }).click();
     await page.getByLabel('Describe what happened').fill('Test grievance for the status page');
     await page.getByRole('button', { name: 'Send grievance' }).click();
@@ -30,7 +32,7 @@ async function lookUp(page: Page, reference: string, pin: string, locale = 'en')
     await page.getByRole('button', { name: locale === 'en' ? 'Check' : 'हेर्नुहोस्' }).click();
 }
 
-test('a complainant reads a staff reply and adds information, with the reference and PIN in no address', { tag: ['@P8', '@A3', '@N1'] }, async ({ page, browser, baseURL, staff }) => {
+test('a complainant reads a staff reply and adds information, with the reference and PIN in no address', { tag: ['@P8', '@A3'] }, async ({ page, browser, baseURL, staff }) => {
     const addresses: string[] = [];
     page.on('request', (request) => addresses.push(request.url()));
 

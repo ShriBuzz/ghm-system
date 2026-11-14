@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 /**
- * The public grievance form and the page that hands out the reference and PIN (P1, P3–P7).
+ * The public grievance form and the page that hands out the reference and PIN.
  */
 class GrievanceController
 {
@@ -34,10 +34,12 @@ class GrievanceController
         $notice = Setting::value("notice.{$locale}") ?: __('notice.default');
 
         return view('public.form', [
-            'notice' => preg_split('/\R{2,}/', trim($notice)),
+            // By character (u): without it, \R also matches a byte inside some Nepali letters, such as अ.
+            'notice' => preg_split('/\R{2,}/u', trim($notice)),
             'categories' => Category::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
             'locations' => Location::where('is_active', true)->orderBy('sort')->orderBy($name)->pluck($name, 'id'),
-            // When the form was shown (P9). After a refusal or an expired session, the first showing still counts.
+            // When the form was shown, for the spam check. After a refusal or an expired session, the
+            // first showing still counts.
             'started' => old('form_started') ?: Crypt::encryptString((string) now()->getTimestamp()),
         ]);
     }
@@ -47,12 +49,16 @@ class GrievanceController
         $data = $request->validated();
         $file = $request->file('attachment');
 
-        [$case, $pin] = DB::transaction(function () use ($data, $file): array {
-            $pin = Pin::generate();
+        // The PIN's slow hash before the transaction: the reference counter's row stays locked until the commit,
+        // and every other submission waits for it.
+        $pin = Pin::generate();
+        $pinHash = Hash::make($pin);
+
+        $case = DB::transaction(function () use ($data, $file, $pinHash): Grievance {
             $case = new Grievance;
             $case->forceFill(Arr::except($data, ['attachment']) + [
                 'reference' => ReferenceNumber::next(),
-                'pin_hash' => Hash::make($pin),
+                'pin_hash' => $pinHash,
                 'channel' => Channel::Web,
                 'status' => Status::Received,
                 'locale' => app()->getLocale(),
@@ -63,7 +69,7 @@ class GrievanceController
                 AttachmentStore::store($file, $case, field: 'attachment');
             }
 
-            return [$case, $pin];
+            return $case;
         });
 
         $case->acknowledge($pin);
@@ -83,10 +89,10 @@ class GrievanceController
             return redirect()->route('home');
         }
 
-        // The PIN is on this page: no browser or proxy keeps a copy, and no search engine lists it.
+        // The PIN is on this page: no browser or proxy keeps a copy. A search engine never gets it: without the
+        // session it sends to the form, and robots.txt disallows it.
         return response()->view('public.received', $received)
-            ->header('Cache-Control', 'no-store, private')
-            ->header('X-Robots-Tag', 'noindex');
+            ->header('Cache-Control', 'no-store, private');
     }
 
     public function done(): RedirectResponse

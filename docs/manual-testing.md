@@ -4,11 +4,11 @@ How to run the GHM system on your machine and try what it does so far, by hand a
 
 Use fake data only. Never point the app, a test or a browser session at production.
 
-Last updated 2026-11-02, after WP3 (alerts, summary, export, backups). What each requirement covers so far is in `docs/requirements-traceability.md`.
+What each requirement covers is in `docs/requirements-traceability.md`.
 
 ## 1. Start fresh
 
-A `.env` made before WP3 still has `APP_NAME=Laravel` and `MAIL_MAILER=log`. Change them to `.env.example`'s values, `APP_NAME="Grievance handling"` and `MAIL_MAILER=array`: with `log`, every email the app makes, PINs and addresses included, is written into `storage/logs/laravel.log`.
+An older `.env` may still have `APP_NAME=Laravel` and `MAIL_MAILER=log`. Change them to `.env.example`'s values, `APP_NAME="Grievance handling"` and `MAIL_MAILER=array`: with `log`, every email the app makes, PINs and addresses included, is written into `storage/logs/laravel.log`.
 
 Give yourself an Administrator in `.env`, with fake details and a password you will remember:
 
@@ -45,16 +45,26 @@ Open http://127.0.0.1:8000. It sends you to `/ne`, the Nepali page.
 | Chrome DevTools (Cmd+Opt+I), device toolbar (Cmd+Shift+M), width 360 | Everything fits, nothing scrolls sideways |
 | DevTools, Cmd+Shift+P, "Disable JavaScript", reload | The page and the language switch still work |
 | DevTools, Network tab, the page request | `Content-Security-Policy`, `Referrer-Policy: no-referrer` and `X-Content-Type-Options: nosniff` headers |
+| The top of every public page, in both languages | First, "In immediate danger? Call the police on 100." (तत्काल खतरामा हुनुहुन्छ भने प्रहरीलाई १०० मा फोन गर्नुहोस्।). On a phone, tapping the line offers to call 100. It sits on its own row, ruled off from the site name |
 
 The page is the grievance form (P1 to P9). Fill it with fake details only.
 
 | Try | Expect |
 |---|---|
-| Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling |
+| Read the form page in both languages | Titled "Raise a grievance" (गुनासो दर्ता गर्नुहोस्). The notice "Your grievance is safe with us." with four points, then what happens next and that the service is free; the police line is only at the top. Below the Send button, "Other ways to raise a grievance" (गुनासो दर्ता गर्ने अन्य तरिका) |
+| Press "Send grievance" with nothing filled in | A box under the heading lists what needs fixing, each line a link to its field, and the tab's title starts with "Error:". With JavaScript off too, the box is in view without scrolling Each link lands on its field with the question, hint and red message still in view |
 | DevTools device toolbar, width 320, on `/ne` and `/en` | Nothing scrolls sideways; the photo field stays inside the page |
 | Tap "Send grievance" twice quickly (DevTools, Network, "Slow 4G", with a photo) | The button says "Sending…" and only one grievance arrives |
-| Choose "Yes, give my name and contact", then "No, stay anonymous" | The contact fields appear, then go away; with JavaScript off too |
-| Day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
+| Choose "With my name", then "Without my name (anonymous)" | The contact fields appear, then go away; with JavaScript off too |
+| Choose "With my name", write a name, choose "Do not contact me", leave phone and email empty, fill in the rest and send | "Give a phone number or an email." in the box under the heading and at the phone field; with a phone number added, the grievance goes through |
+| On `/ne`, open the "About you" questions | तपाईं को हुनुहुन्छ? lists 11 answers and भन्न चाहँदिन; the age groups start with १८ वर्षभन्दा कम; जाति/जातीयता includes थारु |
+| On `/en`: day "I don't remember the day", a month and year, the rest filled in, send | The reference number and a 6-digit PIN in a framed box. On the case page in the staff panel the date reads "June 2026, exact day not remembered" (or the month you chose) |
+| On `/ne`, open the date boxes | गते 1 to 32 and गते याद छैन; महिना बैशाख to चैत (the Bikram Sambat months); साल this BS year first, then the ten before. At 360 px the day box has its own row and shows "गते याद छैन" in full; from 40rem the three share one row |
+| On `/ne`: a past BS date, for example 22 कार्तिक 2083, the rest filled in, send | Sent. On the case page, "When it happened" shows "2083-07-22 (2026-11-08)" |
+| On `/ne`: गते याद छैन, कार्तिक 2083, send | On the case page: "Kartik 2083, exact day not remembered", not an AD month |
+| On `/ne`: 31 कार्तिक 2083 (Kartik 2083 has 30 days), or a date still to come | Refused: "यो मिति हुँदैन। गते र महिना जाँच्नुहोस्।" or "यो मिति अझै आएको छैन। घटना भएको दिन छान्नुहोस्।" |
+| On `/ne`, choose a date, then switch to English | The English form keeps what you typed but not the date: pick it again in AD |
+| Read the page with the reference and PIN | "Thank you. Your grievance has been received."; in the framed box, the advice to keep the reference and PIN safe, then, in bold, to write them down or photograph them; what happens next; that the service is free and leaves the police, the Labour Office, a national commission and the courts open |
 | Reload the page with the reference and PIN, then press Done | The reload keeps them; Done goes back to the form, and the page is gone |
 | Attach a photo over 5 MB | With JavaScript on, it is refused at once; with JavaScript off, the form comes back with the message and what you typed |
 | Type something, then switch language in the header | The form in the other language with what you typed (JavaScript on); a file must be chosen again |
@@ -64,12 +74,13 @@ The status page (P8), at http://127.0.0.1:8000/en/status or from the link on the
 
 | Try | Expect |
 |---|---|
+| Open the status lookup in both languages | Titled "Check your grievance" (आफ्नो गुनासोको अवस्था हेर्नुहोस्) |
 | Enter the reference in small letters without hyphens (`ghm20260001`) and the PIN in Nepali digits (`१२३४५६`) | Accepted like the usual form; a wrong PIN typed either way counts toward the same lock |
 | Enter a reference and PIN you noted when sending | The status, the received date and the messages. A staff reply from the case page in the panel shows as "Grievance team", never a staff name; internal notes never show |
 | Write in "Add information or reply" and send | "Your message was sent." and the message in the thread as "You". The case page's Messages tab in the panel shows it, and the staff who can see the case get an alert (in the queue) |
 | A wrong PIN five times | The fifth says the reference is locked for 15 minutes; the right PIN is refused until then. An unknown reference gets the same message as a wrong PIN |
 | Leave the status page untouched for 10 minutes, then reload | Back on the lookup, asked for the reference and PIN again |
-| Finish and hide | Back on the lookup with "Hidden on this phone. Your grievance is still open with the team."; the status page needs the PIN again |
+| Finish and hide | Back on the lookup with "Hidden on this phone. Your grievance is still open with the team."; the status page needs the PIN again, and the page with the reference and PIN (`/en/received`) is gone too |
 
 ## 4. Staff panel
 
@@ -88,7 +99,7 @@ Open http://127.0.0.1:8000/admin and sign in with the email and password from `.
 
 ## 5. Admin side: demo of the proof of concept
 
-The staff panel is in English. Start from a clean local database, so the demo shows only what you create. This deletes everything in `ghm`, which is only ever fake data, and loads your Administrator plus placeholder categories and locations:
+The staff panel is in English. Start from a clean local database, so the demo shows only what you create. This deletes everything in `ghm`, which is only ever fake data, and loads your Administrator plus the company's categories and locations:
 
 ```sh
 php artisan migrate:fresh --seed
@@ -101,21 +112,26 @@ Use three browser windows that keep their sessions apart, for example a normal w
 
 | Try | Expect |
 |---|---|
-| Sign in, open Settings → Categories | Five placeholder categories; "Sexual harassment or abuse" is restricted |
+| Sign in, open Settings → Categories | The company's 19 categories; "Sexual harassment, exploitation and abuse" and "Reporting wrongdoing (fraud, corruption, breach of law)" are restricted |
 | Settings → Users → New user: a focal person and a restricted-case officer, with fake names, `@example.com` emails and a password of at least 8 characters | Both appear in the list with their role |
 | Edit your own user | Role and Active cannot be changed: you cannot lock yourself out |
 | Settings → Holidays → add a date | It appears; holidays can be deleted, other settings cannot (deactivate them instead) |
+| Settings → Public notice: the boxes are empty with the company's notice greyed in. Save a short English notice: a first line, an empty line, two lines starting "- ", an empty line and a sentence | `/en` shows the first line as the notice's heading, the two lines as a list and the sentence as a paragraph. Until something is saved, the form shows the company's notice |
+| Activity log, after a holiday is added, changed or deleted | "Holiday Added", "Holiday Changed" or "Holiday Deleted", with who did it, the date and the name |
 
 **Focal person: offline entry (A6)**
 
 | Try | Expect |
 |---|---|
-| Sign in as the focal person | Menu shows Dashboard, Cases, Summary and QR poster, no Settings. Opening `/admin/categories` shows "Forbidden" |
-| Cases → Enter offline case: channel Phone, category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
+| Sign in as the focal person | Menu shows Dashboard, Cases, Summary, QR poster and, under Settings, only Holidays. Opening `/admin/categories` shows "Forbidden" |
+| Settings → Holidays → New holiday: a date and a name | The holiday is saved; its row offers Edit but no Delete |
+| Open Channel and Preferred contact on the offline form | Channel: Phone / hotline, Email, Drop box, In person, Letter, Meeting, Referred by another organisation, Other (never "Online form"). Preferred contact: Phone, Email, Do not contact me |
+| Cases → Enter offline case: channel "Phone / hotline", category "Wages and benefits", a named complainant with a phone number | A slip with the reference (`GHM-2026-0001`) and a 6-digit PIN, and a Print slip button |
 | Print slip, or the browser's print preview | Only the heading and the slip: no menu, no buttons, no staff name |
 | Reload the slip page | Back on the case list: the PIN is shown only once |
 | Enter another case: received date four weeks ago | In the list its days open is red (over 15 working days); the filter "Overdue only" shows just that case |
-| Enter a case in "Sexual harassment or abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
+| Open that case, Set status Resolved, then Reopened | Working days open is 0 and the case page shows "Reopened on" with today's date; in the list its days open is no longer red |
+| Enter a case in "Sexual harassment, exploitation and abuse", switch Anonymous on | The contact fields disappear. The slip still shows, but the case is not in the focal person's list afterwards |
 | Open one of your cases, Set status, Set priority | Only the RFQ's statuses and priorities are offered |
 | Open QR poster (P10) | The QR code with the site address under it. A phone camera pointed at the screen opens the form |
 | Print poster, or the browser's print preview | One A4 page: the heading in Nepali and English, the code and the address, no panel menu or buttons |
@@ -123,7 +139,7 @@ Use three browser windows that keep their sessions apart, for example a normal w
 
 **Offline cases from start to finish (A6)**
 
-A grievance that came by phone, email, drop box or in person, entered by staff and then followed by the complainant online. Keep the focal person signed in, and use a private window as the complainant. Fake details only; for an email address use one at `example.com`.
+A grievance that came by phone, email, drop box, in person, letter, a meeting or another organisation, entered by staff and then followed by the complainant online. Keep the focal person signed in, and use a private window as the complainant. Fake details only; for an email address use one at `example.com`.
 
 | Try | Expect |
 |---|---|
@@ -132,6 +148,9 @@ A grievance that came by phone, email, drop box or in person, entered by staff a
 | Run the queue, then render the acknowledgement (section 7 commands) | The acknowledgement is in English, the language chosen. Enter another case with Nepali (the default) and it is in Nepali |
 | In the private window, http://127.0.0.1:8000/en/status with the slip's reference and PIN | The status page: Received, the received date, no messages yet |
 | Back on the case page, Messages → Send reply; then reload the status page | The reply shows as "Grievance team". "Add information or reply" there puts the message on the case page, and queues an alert |
+| Send a grievance from `/ne` with a description on two lines, then open it in the panel | Status "Received (प्राप्त)", the category with its Nepali name in brackets, the description on its two lines with no blank line above it, every date like "2083-07-26 (2026-11-12)" |
+| On that case, Messages → Send reply in Nepali on two lines; read it on the status page | The reply in Nepali, on its two lines, in the panel and on the status page |
+| Set status | Each status shows its Nepali name in brackets, for example "Closed (बन्द गरिएको)" |
 | On the case page, Documents → add a PDF, as for a scanned letter | It is listed and downloads; the complainant does not see it |
 | Enter a case with channel Drop box, Anonymous on | The slip still shows, but there is nobody to give it to |
 | Enter a case with channel Phone | The slip shows; staff read the reference and PIN out on the call, since the system sends no text messages |
@@ -145,7 +164,8 @@ A grievance that came by phone, email, drop box or in person, entered by staff a
 | Open it, Assign | Only the Administrator and the officer are offered, never a focal person |
 | As the Administrator, open Cases | Every case. Search a reference number; filter by status, category, location or date |
 | Assign a named case to the focal person, then Mark restricted | The assignment is cleared, and the case leaves the focal person's list |
-| Remove restricted mark (Administrator only) | The focal person sees the case again |
+| Remove restricted mark (Administrator only) and press Submit with the Reason box empty | The dialog stays open: the reason is required |
+| Remove restricted mark again, write a reason, Submit | The focal person sees the case again. The reason is in its Notes tab, by the Administrator, and the activity log's "Restriction Changed" entry reads "yes → no. Reason: …" |
 | Settings → Categories → make "Wages and benefits" restricted | Its cases leave the focal person's list at once, past ones included |
 
 ## 6. Encryption in the database
@@ -166,12 +186,13 @@ Carry on with the users and cases from section 5.
 | Try | Expect |
 |---|---|
 | Summary in the menu, as each role | Cases received this month, counted by status and by category. The focal person's counts leave out restricted cases, the officer's count only those, the Administrator's count all |
+| Look at the counts on Summary | A count from 1 to 4 shows as "<5"; 0 shows as 0, 5 or more as the number. The line above the tables ("N cases received in this period.") is exact |
 | On Summary, set the end date before the start date | An error, and no counts |
-| Cases → Export as the focal person: this month, CSV | A file of the cases they can see: reference, received and closed dates, channel, category, location, priority, status and the five demographic columns. No names or contacts, and no option to add them |
+| Cases → Export as the focal person: this month, CSV | A file of the cases they can see: reference, received and closed dates, channel, category, location, priority, status and the five demographic columns. Each date has an AD column with the time and a BS column with the date; the BS date matches the one on the case page, and an open case's closed columns are empty. No names or contacts, and no option to add them |
 | The same as the Administrator, with "Include names and contact details" on | Name, phone and email columns after the reference. Opened in Excel or Numbers, Nepali text shows correctly |
 | Activity log, as the Administrator | "Cases exported", with the dates, the format and whether personal data was included |
 
-Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, never the Administrator) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
+Emails are made but never sent locally (`MAIL_MAILER=array`). Entering an offline case queues an alert for the staff who can see it (not the one who entered it, nor the Administrator, unless nobody else can see it: no active restricted-case officer for a restricted case, no active focal person for another) and, when the complainant gave an email, an acknowledgement. Work the queue the way the server's cron does:
 
 ```sh
 php artisan queue:work --stop-when-empty
@@ -180,7 +201,7 @@ php artisan queue:work --stop-when-empty
 Each email shows a `RUNNING` line, then one ending in `DONE`; the worker stops once the queue is empty. To see what the two emails look like, render them for the newest case and open them in a browser (`open` is macOS; elsewhere open the files by hand):
 
 ```sh
-php artisan tinker --execute '$case = App\Models\Grievance::latest("id")->firstOrFail(); app()->setLocale($case->locale); file_put_contents(storage_path("app/email-acknowledgement.html"), (new App\Notifications\Acknowledgement("123456"))->toMail($case)->render()); app()->setLocale("en"); file_put_contents(storage_path("app/email-alert.html"), (new App\Notifications\CaseAlert($case->id, message: false))->toMail(App\Models\User::firstOrFail())->render());'
+php artisan tinker --execute '$case = App\Models\Grievance::latest("id")->firstOrFail(); app()->setLocale($case->locale); file_put_contents(storage_path("app/email-acknowledgement.html"), (new App\Notifications\Acknowledgement("123456"))->toMail($case)->render()); app()->setLocale("en"); file_put_contents(storage_path("app/email-alert.html"), (new App\Notifications\CaseAlert($case->id, App\Enums\AlertKind::NewCase))->toMail(App\Models\User::firstOrFail())->render());'
 open storage/app/email-acknowledgement.html storage/app/email-alert.html
 ```
 
@@ -189,6 +210,16 @@ open storage/app/email-acknowledgement.html storage/app/email-alert.html
 | The acknowledgement | In the case's language (the form's language for an online case, the one staff chose for an offline case): the reference, the PIN (here a made-up `123456`) and the public site's address. Nothing the complainant wrote |
 | The alert | In English: "A new grievance has been received" and a "Log in to view" button. No reference, category, name or description |
 | Both | The app's name as plain text at the top; no image or anything else from another site |
+
+Who gets which alert (U6). Count the queued alerts with `php artisan tinker --execute 'echo DB::table("jobs")->count();'` before and after each step, then work the queue as above.
+
+| Try | Expect |
+|---|---|
+| Assign a case to the focal person, then send a message on it from the status page | One alert, to the focal person only. On an unassigned case, every focal person gets one |
+| As the focal person, Set priority → Critical | One alert to each active Administrator: "Grievance set to Critical". Setting another priority, or Critical again, sends none |
+| Deactivate every restricted-case officer, then send a grievance in a restricted category | The Administrator gets "New grievance received". Reactivate the officer afterwards |
+| As the focal person, Mark restricted on a case | One alert to each active restricted-case officer: "Grievance marked restricted" (with none active, to the Administrator); none to the focal person who marked it |
+| Enter an offline case received 30 days ago, then run `php artisan ghm:recount-working-days` twice | One "Grievance past its target" alert per active Administrator, and one "Escalated" entry for the case in the activity log, by "System or complainant". Closing and reopening the case starts its count again |
 
 Delete the two files afterwards: `rm storage/app/email-*.html`.
 
@@ -248,7 +279,6 @@ Open `http://<that address>:8000` on the phone. This makes the development serve
 - The acknowledgement email's Nepali wording needs a native speaker's check.
 - Backups stay on the same machine until the off-server copy is set up, once the host is known.
 - The staff panel is in English; `APP_LOCALE=ne` stays the public pages' default.
-- Categories and locations are placeholders until NBI sends the real lists; their Nepali names need a native speaker's check.
+- Categories, locations and the optional questions' answers are the company's lists.
 - The printed slip is in English and includes the staff instruction line. Its wording and language for the complainant are still to be agreed.
 - Notes, replies and documents are on the case page as tabs below the submission. The Administrator's menu has "Activity log": every case change, view, note, reply, document and sign-in, with who and when.
-- The public home page is a placeholder until the WP1 grievance form.

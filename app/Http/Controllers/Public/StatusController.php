@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * The status page (P8): look a grievance up by reference and PIN, read the status and the company's
+ * The status page: look a grievance up by reference and PIN, read the status and the company's
  * replies, and add information. Staff visibility rules do not apply: the PIN is the complainant's key.
  */
 class StatusController
@@ -29,7 +29,7 @@ class StatusController
 
     private const IDLE_SECONDS = 10 * 60;
 
-    /** Each complainant message alerts staff by email (N1), so one case cannot flood the mail server. */
+    /** Each complainant message alerts staff by email, so one case cannot flood the mail server. */
     private const MESSAGES_PER_HOUR = 10;
 
     public function lookup(): View
@@ -50,12 +50,25 @@ class StatusController
 
         // Per visitor, so a bot cannot spread guesses over every reference; per reference, 5 wrong PINs
         // lock it for 15 minutes from the fifth. An unknown reference counts and answers the same.
-        if (RateLimiter::tooManyAttempts($visitor, Config::integer('ghm.public.failed_lookups_per_hour'))) {
+        // Counted before the slow PIN check, so lookups sent all at once are counted as they arrive, not after
+        // every one has been checked. One at a time: the file cache's own increment is not atomic. A locked
+        // reference is refused uncounted, so tries during the lock do not extend it.
+        $maxVisits = Config::integer('ghm.public.failed_lookups_per_hour');
+        [$locked, $visits, $tries] = Cache::lock('status-lookup-count', 10)->block(5, function () use ($lock, $visitor, $wrongPins, $maxVisits): array {
+            if (RateLimiter::tooManyAttempts($lock, 1)) {
+                return [true, 0, 0];
+            }
+            $visits = RateLimiter::hit($visitor, 3600);
+
+            return [false, $visits, $visits > $maxVisits ? 0 : RateLimiter::hit($wrongPins, self::LOCK_SECONDS)];
+        });
+
+        if ($visits > $maxVisits) {
             $minutes = max(1, (int) ceil(RateLimiter::availableIn($visitor) / 60));
 
             return $this->refuse($reference, trans_choice('track.errors.too_many', $minutes, ['minutes' => $minutes]));
         }
-        if (RateLimiter::tooManyAttempts($lock, 1)) {
+        if ($locked || $tries > self::MAX_WRONG_PINS) {
             return $this->refuse($reference, __('track.errors.locked'));
         }
 
@@ -63,11 +76,9 @@ class StatusController
         $valid = Hash::check($request->string('pin')->toString(), $case->pin_hash ?? self::dummyHash());
 
         if (! $case || ! $valid) {
-            RateLimiter::hit($visitor, 3600);
-            RateLimiter::hit($wrongPins, self::LOCK_SECONDS);
-
-            if (RateLimiter::attempts($wrongPins) >= self::MAX_WRONG_PINS) {
-                RateLimiter::clear($wrongPins);
+            if ($tries >= self::MAX_WRONG_PINS) {
+                // The count is not reset: it runs out 15 minutes after the first wrong PIN, before this lock does,
+                // and a lookup counted after this one, still waiting for its check, finds more than five.
                 RateLimiter::hit($lock, self::LOCK_SECONDS);
 
                 return $this->refuse($reference, __('track.errors.locked'));
@@ -76,6 +87,8 @@ class StatusController
             return $this->refuse($reference, __('track.errors.wrong'));
         }
 
+        // Only failed lookups count against the visitor.
+        RateLimiter::decrement($visitor, 3600);
         RateLimiter::clear($wrongPins);
         $request->session()->regenerate();
         $request->session()->put('status', ['case' => $case->id, 'seen' => now()->getTimestamp()]);
@@ -96,7 +109,7 @@ class StatusController
             // Messages only: internal notes are never loaded on a public page.
             'messages' => $case->messages()->oldest()->oldest('id')->get(),
             'draft' => $this->draftFor($request, $case),
-        ])->header('Cache-Control', 'no-store, private')->header('X-Robots-Tag', 'noindex');
+        ])->header('Cache-Control', 'no-store, private');
     }
 
     public function reply(ComplainantReplyRequest $request): RedirectResponse
@@ -118,7 +131,7 @@ class StatusController
             return redirect()->route('status.show')->withInput()->withErrors(['body' => __('track.errors.too_many_messages')]);
         }
 
-        // Its created hook alerts the staff who can see the case (N1).
+        // Its created hook alerts the staff who can see the case.
         $case->messages()->create(['direction' => MessageDirection::Complainant, 'body' => $request->validated('body')]);
         RateLimiter::hit($limit, 3600);
 
@@ -127,7 +140,8 @@ class StatusController
 
     public function close(Request $request): RedirectResponse
     {
-        $request->session()->forget(['status', 'status_draft']);
+        // The page with the reference and PIN too, so "Hidden on this phone" holds for both.
+        $request->session()->forget(['status', 'status_draft', 'received']);
 
         return redirect()->route('status.lookup')->with('status_notice', __('track.closed'));
     }

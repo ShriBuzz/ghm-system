@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Who is sending, for the public rate limits only (P8, P9): an HMAC of the IP address with a
+ * Who is sending, for the public rate limits only: an HMAC of the IP address with a
  * random salt that is thrown away at midnight. The address itself is never stored, and once the
- * salt is gone no key can be turned back into it, not even with APP_KEY (S5).
+ * salt is gone no key can be turned back into it, not even with APP_KEY.
  */
 class VisitorKey
 {

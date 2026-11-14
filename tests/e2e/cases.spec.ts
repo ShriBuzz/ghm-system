@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOnCase } from './support';
 
@@ -7,10 +8,10 @@ import { fillInDialog, findCase, headingOf, open, openTab, search, test, writeOn
  */
 async function enterOfflineCase(
     page: Page,
-    { category = 'Wages and benefits', location = 'Head office', receivedAt = '', anonymous = false, dayUnknown = false, language = '' } = {},
+    { category = 'Wages and benefits', location = 'Head office, Thapathali', receivedAt = '', anonymous = false, dayUnknown = false, language = '' } = {},
 ) {
     await page.goto('/admin/grievances/create');
-    await page.getByLabel('Channel').selectOption('Phone');
+    await page.getByLabel('Channel').selectOption('Phone / hotline');
 
     if (receivedAt) {
         await page.getByRole('textbox', { name: 'Received' }).fill(receivedAt);
@@ -47,7 +48,8 @@ async function enterOfflineCase(
 }
 
 /**
- * Picks a value in one of the case page's dialogs, such as Set status, and saves it.
+ * Picks a value in one of the case page's dialogs, such as Set status, and saves it. Statuses are picked
+ * by their value, such as 'resolved': their labels carry the Nepali too.
  */
 async function setOnCase(page: Page, action: string, field: string, value: string) {
     const dialog = page.getByRole('dialog', { name: action });
@@ -115,8 +117,19 @@ test.describe('focal person', () => {
         await expect(page.getByRole('definition').filter({ hasText: pin })).toBeVisible();
     });
 
+    test('prints the reference and PIN in dark ink on white, also from a dark staff panel', { tag: ['@A6'] }, async ({ page }) => {
+        // In print the dark panel's background is dropped, so its white text would come out pale on paper.
+        await page.emulateMedia({ colorScheme: 'dark' });
+        const { reference, pin } = await enterOfflineCase(page);
+        await page.emulateMedia({ colorScheme: 'dark', media: 'print' });
+
+        await expect(page.getByText(reference, { exact: true })).toHaveCSS('color', 'rgb(27, 36, 40)');
+        await expect(page.getByText(pin, { exact: true })).toHaveCSS('color', 'rgb(27, 36, 40)');
+        await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    });
+
     test('gets the slip for a restricted case, then cannot open it', { tag: ['@A5', '@A6'] }, async ({ page, browser, baseURL, staff }) => {
-        const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment or abuse', anonymous: true });
+        const { reference, pin } = await enterOfflineCase(page, { category: 'Sexual harassment, exploitation and abuse', anonymous: true });
         expect(pin).toMatch(/^\d{6}$/);
 
         const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
@@ -131,21 +144,24 @@ test.describe('focal person', () => {
         expect([403, 404]).toContain((await page.goto(address))!.status());
     });
 
-    test('counts the cases received on a day by status and category, leaving out restricted ones', { tag: ['@N3', '@A5'] }, async ({ page }) => {
+    test('counts the cases received on a day, small groups as "<5", leaving out restricted ones', { tag: ['@N3', '@A5', '@U11'] }, async ({ page }) => {
         // A day of its own in the past, so cases from other specs and workers do not land in it.
-        const day = `2021-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
+        const day = `${2015 + Math.floor(Math.random() * 6)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
         const before = await summaryOf(page, day);
 
         await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
-        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment or abuse', anonymous: true });
+        await enterOfflineCase(page, { receivedAt: `${day}T10:00`, category: 'Sexual harassment, exploitation and abuse', anonymous: true });
 
+        // The total is exact; a group of 1 to 4 shows as "<5", and an empty one as 0.
         const after = await summaryOf(page, day);
-        expect(after.received).toBe(before.received + 1);
-        expect(after.wages).toBe(before.wages + 1);
-        expect(after.restricted).toBe(0);
+        expect(after.total).toBe(before.total + 1);
+        expect(after.received).toBe('<5');
+        expect(after.wages).toBe('<5');
+        expect(after.closed).toBe('0');
+        expect(after.restricted).toBeNull();
     });
 
-    test('exports a CSV of the N4 columns without names or contacts, and is not offered them', { tag: ['@N4', '@A5'] }, async ({ page }) => {
+    test('exports a CSV of the agreed columns, dates in AD and BS, without names or contacts, and is not offered them', { tag: ['@N4', '@A5', '@U7', '@U9', '@U14'] }, async ({ page }) => {
         const day = `2022-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
         const { reference } = await enterOfflineCase(page, { receivedAt: `${day}T09:00` });
 
@@ -153,13 +169,14 @@ test.describe('focal person', () => {
 
         expect(csv.startsWith('\uFEFF')).toBe(true);
         expect(csv).toContain(N4_HEADER);
-        expect(csv).toContain(`${reference},"${day} 09:00",,Phone,"Wages and benefits","Head office",,Received`);
+        // The BS date is checked exactly in Pest; here, that the column holds one.
+        expect(csv).toMatch(new RegExp(`${reference},"${day} 09:00",\\d{4}-\\d{2}-\\d{2},,,"Phone / hotline","Wages and benefits","Head office, Thapathali",,Received`));
         expect(csv).not.toContain('Test Worker');
         expect(csv).not.toContain('9800000000');
     });
 });
 
-const N4_HEADER = 'Reference,Received,Closed,Channel,Category,Location,Priority,Status,"Complainant type",Sex,"Age group",Ethnicity,Disability';
+const N4_HEADER = 'Reference,"Received (AD)","Received (BS)","Closed (AD)","Closed (BS)",Channel,Category,Location,Priority,Status,"Complainant type",Sex,"Age group",Ethnicity,Disability';
 
 /**
  * Exports the cases received on one day as CSV, with names and contacts if asked and offered,
@@ -186,28 +203,69 @@ async function exportCsv(page: Page, day: string, { personal = false } = {}) {
 }
 
 /**
+ * Opens the activity log filtered to one case.
+ */
+async function activityLogOf(page: Page, reference: string) {
+    await page.goto('/admin/activity-log');
+    await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
+    await page.getByLabel('Case reference').fill(reference);
+    await Promise.all([
+        page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
+        page.getByRole('button', { name: 'Apply filters' }).click(),
+    ]);
+}
+
+/**
  * Opens the summary for one day and reads the counts this spec checks.
  */
 async function summaryOf(page: Page, day: string) {
     await page.goto('/admin/summary');
-    // Each date goes to the server on change; read the counts only after both answers.
-    for (const field of ['Received from', 'Received until']) {
-        const updated = page.waitForResponse((response) => response.url().includes('/livewire'));
+    // Each date goes to the server on change, sometimes in more than one request. Wait for the answer to
+    // the request that carries this date, not any answer: a late one for "from" would leave "until" unread.
+    for (const [field, path] of [['Received from', 'data.from'], ['Received until', 'data.until']]) {
+        const updated = page.waitForResponse((response) => {
+            try {
+                return JSON.parse(response.request().postData() ?? '').components.some((c: { updates?: Record<string, string> }) => c.updates?.[path] === day);
+            } catch {
+                return false;
+            }
+        });
         await page.getByLabel(field).fill(day);
         await updated;
     }
 
-    const count = async (name: string) => {
+    // A count as shown, "<5" included, or null when the category has no row.
+    const shown = async (name: string) => {
         const row = page.getByRole('row').filter({ has: page.getByRole('rowheader', { name, exact: true }) });
 
-        return (await row.count()) ? Number(await row.getByRole('cell').innerText()) : 0;
+        return (await row.count()) ? (await row.getByRole('cell').innerText()).trim() : null;
     };
-
-    return { received: await count('Received'), wages: await count('Wages and benefits'), restricted: await count('Sexual harassment or abuse') };
+    return {
+        // Always shown, 0 included; innerText waits for it.
+        total: parseInt(await page.getByText(/cases? received in this period\./).innerText(), 10),
+        received: await shown('Received'),
+        closed: await shown('Closed'),
+        wages: await shown('Wages and benefits'),
+        restricted: await shown('Sexual harassment, exploitation and abuse'),
+    };
 }
 
 test.describe('administrator', () => {
     test.use({ role: 'administrator' });
+
+    test('is told once when an open case passes its target, as the activity log shows', { tag: ['@U6', '@N1', '@S6'] }, async ({ page }) => {
+        const { reference } = await enterOfflineCase(page, { receivedAt: daysAgo(30).dateTime });
+
+        // The nightly job, twice: the second run must not tell anyone again.
+        const artisan = process.env.E2E_ARTISAN ?? 'php artisan';
+        execSync(`${artisan} ghm:recount-working-days`);
+        execSync(`${artisan} ghm:recount-working-days`);
+
+        await activityLogOf(page, reference);
+        const escalated = page.getByRole('row').filter({ hasText: 'Escalated' }).filter({ hasText: reference });
+        await expect(escalated).toHaveCount(1);
+        await expect(escalated).toContainText('System or complainant');
+    });
 
     test('includes names and contacts in an export when asked', { tag: ['@N4'] }, async ({ page }) => {
         const day = `2023-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`;
@@ -215,11 +273,11 @@ test.describe('administrator', () => {
 
         const csv = await exportCsv(page, day, { personal: true });
 
-        expect(csv).toContain('Reference,Name,Phone,Email,Received');
+        expect(csv).toContain('Reference,Name,Phone,Email,"Received (AD)","Received (BS)"');
         expect(csv).toContain(`${reference},"Test Worker",9800000000,,"${day} 09:00"`);
     });
 
-    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5'] }, async ({ page, staff }, testInfo) => {
+    test('sets status and priority and assigns only to staff who can see the case', { tag: ['@A3', '@A4', '@A5', '@U16', '@U9'] }, async ({ page, staff }, testInfo) => {
         // This worker's focal person and restricted-case officer, so both exist to be offered or not.
         await staff.sessionOf('focal_person');
         await staff.sessionOf('restricted_officer');
@@ -229,8 +287,17 @@ test.describe('administrator', () => {
         await (await findCase(page, reference)).click();
         await expect(page.getByRole('heading', { name: `View ${reference}` })).toBeVisible();
 
-        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        const statusDialog = page.getByRole('dialog', { name: 'Set status' });
+        await open(page.getByRole('button', { name: 'Set status' }), headingOf(statusDialog));
+        await expect(statusDialog.getByLabel('Status').getByRole('option', { name: 'Closed (बन्द गरिएको)' })).toBeAttached();
+        await page.keyboard.press('Escape');
+        await expect(headingOf(statusDialog)).toBeHidden();
+        await setOnCase(page, 'Set status', 'Status', 'under_assessment');
         await setOnCase(page, 'Set priority', 'Priority', 'High');
+        const caseRegion = page.getByRole('region', { name: 'Case' });
+        await expect(caseRegion).toContainText('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)');
+        await expect(caseRegion).toContainText(/Received\s+\d{4}-\d{2}-\d{2} \(\d{4}-\d{2}-\d{2}\) \d{2}:\d{2}/);
+        await expect(page.getByRole('region', { name: 'Grievance' })).toContainText('Wages and benefits (तलब तथा सुविधा)');
 
         const assign = page.getByRole('dialog', { name: 'Assign' });
         await open(page.getByRole('button', { name: 'Assign' }), headingOf(assign));
@@ -248,11 +315,11 @@ test.describe('administrator', () => {
 
     test('filters the case list and flags cases open past 15 working days', { tag: ['@A2'] }, async ({ page }) => {
         test.setTimeout(90_000);
-        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Production plant', receivedAt: daysAgo(30).dateTime });
+        const old = await enterOfflineCase(page, { category: 'Discrimination', location: 'Factory, Hetauda', receivedAt: daysAgo(30).dateTime });
         const fresh = await enterOfflineCase(page);
 
         await (await findCase(page, fresh.reference)).click();
-        await setOnCase(page, 'Set status', 'Status', 'Under assessment');
+        await setOnCase(page, 'Set status', 'Status', 'under_assessment');
         await expect(page.getByRole('region', { name: 'Case' })).toContainText('Under assessment');
 
         await findCase(page, old.reference);
@@ -267,7 +334,7 @@ test.describe('administrator', () => {
             }, fresh, old],
             ['overdue only', () => page.getByRole('switch', { name: /Overdue only/ }).click(), old, fresh],
             ['category', () => page.getByLabel('Category').selectOption('Discrimination'), old, fresh],
-            ['location', () => page.getByLabel('Location').selectOption('Head office'), fresh, old],
+            ['location', () => page.getByLabel('Location').selectOption('Head office, Thapathali'), fresh, old],
             ['received dates', async () => {
                 await page.getByLabel('Received from').fill(daysAgo(31).day);
                 await page.getByLabel('Received until').fill(daysAgo(29).day);
@@ -289,6 +356,22 @@ test.describe('administrator', () => {
                 await expect(noCases(page)).toBeVisible();
             });
         }
+    });
+
+    test('restarts the working-day count when a resolved case is reopened', { tag: ['@U3', '@A2'] }, async ({ page }) => {
+        const old = await enterOfflineCase(page, { receivedAt: daysAgo(30).dateTime });
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).toHaveClass(/fi-color-danger/);
+
+        await (await findCase(page, old.reference)).click();
+        await setOnCase(page, 'Set status', 'Status', 'resolved');
+        await setOnCase(page, 'Set status', 'Status', 'reopened');
+        const caseSection = page.getByRole('region', { name: 'Case' });
+        await expect(caseSection).toContainText('Reopened on');
+        await expect(caseSection).toContainText(/Working days open\s+0/);
+
+        await findCase(page, old.reference);
+        await expect(daysOpenBadge(page, old.reference)).not.toHaveClass(/fi-color-danger/);
     });
 });
 
@@ -354,19 +437,43 @@ test.describe('administrator, working a case', () => {
     test('sees a status change on the activity log', { tag: ['@S6'] }, async ({ page }) => {
         const { reference } = await enterOfflineCase(page);
         await (await findCase(page, reference)).click();
-        await setOnCase(page, 'Set status', 'Status', 'Under investigation');
+        await setOnCase(page, 'Set status', 'Status', 'under_investigation');
 
-        await page.goto('/admin/activity-log');
-        await open(page.getByRole('button', { name: 'Filter' }), page.getByRole('button', { name: 'Apply filters' }));
-        await page.getByLabel('Case reference').fill(reference);
-        await Promise.all([
-            page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('livewire')),
-            page.getByRole('button', { name: 'Apply filters' }).click(),
-        ]);
+        await activityLogOf(page, reference);
 
         const entry = page.getByRole('row').filter({ hasText: 'Status Changed' }).filter({ hasText: reference });
         await expect(entry).toContainText(reference);
         await expect(entry).toContainText('Received → Under Investigation');
+    });
+
+    test('removes a restricted mark only with a reason, kept as a note and shown in the activity log', { tag: ['@U5', '@A5', '@S6'] }, async ({ page }) => {
+        const reason = `Reviewed ${Date.now()}: about wages, not harassment.`;
+        const { reference } = await enterOfflineCase(page);
+        await (await findCase(page, reference)).click();
+
+        const mark = page.getByRole('alertdialog', { name: 'Mark restricted' });
+        await open(page.getByRole('button', { name: 'Mark restricted' }), headingOf(mark));
+        await mark.getByRole('button', { name: 'Confirm' }).click();
+        await expect(headingOf(mark)).toBeHidden();
+
+        // No reason, no removal: the browser keeps the dialog open on the empty field (the server refuses it too, in Pest).
+        const remove = page.getByRole('dialog', { name: 'Remove restricted mark' });
+        await open(page.getByRole('button', { name: 'Remove restricted mark' }), headingOf(remove));
+        await remove.getByRole('button', { name: 'Submit' }).click();
+        await expect(headingOf(remove)).toBeVisible();
+        expect(await remove.getByLabel('Reason').evaluate((field: HTMLTextAreaElement) => field.validity.valueMissing)).toBe(true);
+
+        await remove.getByLabel('Reason').fill(reason);
+        await remove.getByRole('button', { name: 'Submit' }).click();
+        await expect(headingOf(remove)).toBeHidden();
+        await expect(page.getByRole('button', { name: 'Mark restricted' })).toBeVisible();
+
+        await openTab(page, 'Notes');
+        await expect(page.getByRole('tabpanel', { name: 'Notes' })).toContainText(reason);
+
+        await activityLogOf(page, reference);
+        const entry = page.getByRole('row').filter({ hasText: 'Restriction Changed' }).filter({ hasText: 'yes → no' });
+        await expect(entry).toContainText(`Reason: ${reason}`);
     });
 });
 
@@ -376,7 +483,7 @@ test.describe('focal person, documents', () => {
     test('cannot download a document from a restricted case', { tag: ['@S4', '@A5'] }, async ({ page, browser, baseURL, staff }) => {
         const officer = await browser.newContext({ baseURL, storageState: await staff.sessionOf('restricted_officer') });
         const officerPage = await officer.newPage();
-        const { reference } = await enterOfflineCase(officerPage, { category: 'Sexual harassment or abuse', anonymous: true });
+        const { reference } = await enterOfflineCase(officerPage, { category: 'Sexual harassment, exploitation and abuse', anonymous: true });
         await (await findCase(officerPage, reference)).click();
         const address = await uploadDocument(officerPage);
         await officer.close();

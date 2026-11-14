@@ -11,23 +11,32 @@
     <x-form.errors :anchors="[
         'is_anonymous' => 'is_anonymous-1',
         'preferred_contact' => 'preferred_contact-phone',
-        'incident_date' => 'incident_day',
+        'incident_date' => app()->getLocale() === 'ne' ? 'incident_bs_day' : 'incident_day',
         'recurrence' => 'recurrence-once',
     ]" />
     <noscript><p class="hint">{{ __('form.language_first') }}</p></noscript>
     <p><a href="{{ route('status.lookup') }}">{{ __('form.check_link') }}</a></p>
 
+    {{-- The notice's first paragraph is its heading; a paragraph of lines starting "- " is a list. --}}
     <section class="notice" aria-labelledby="notice-heading">
-        <h2 id="notice-heading">{{ __('form.notice_heading') }}</h2>
-        @foreach ($notice as $paragraph)
-            <p>{!! nl2br(e($paragraph)) !!}</p>
+        <h2 id="notice-heading">{{ $notice[0] }}</h2>
+        @foreach (array_slice($notice, 1) as $paragraph)
+            @if (str_starts_with($paragraph, '- '))
+                <ul>
+                    @foreach (preg_split('/\R/u', $paragraph) as $point)
+                        <li>{{ Str::chopStart($point, '- ') }}</li>
+                    @endforeach
+                </ul>
+            @else
+                <p>{!! nl2br(e($paragraph)) !!}</p>
+            @endif
         @endforeach
     </section>
 
     <form method="post" action="{{ route('grievance.store') }}" enctype="multipart/form-data" novalidate data-grievance>
         @csrf
         <input type="hidden" name="form_started" value="{{ $started }}">
-        {{-- A trap for scripts that fill every field (P9); people never see it. --}}
+        {{-- A trap for scripts that fill every field; people never see it. --}}
         <div class="trap" aria-hidden="true">
             <label for="website">{{ __('form.trap') }}</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -72,4 +81,9 @@
 
         <button type="submit" id="send" class="button button-primary" data-sending="{{ __('form.sending') }}">{{ __('form.submit') }}</button>
     </form>
+
+    <section class="section other-ways" aria-labelledby="other-ways-heading">
+        <h2 id="other-ways-heading">{{ __('form.other_ways.heading') }}</h2>
+        <p>{{ __('form.other_ways.body') }}</p>
+    </section>
 @endsection

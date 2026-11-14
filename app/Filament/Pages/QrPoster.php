@@ -12,7 +12,7 @@ use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 
 /**
- * A QR code to the public form for posters (P10), for every role: print the poster, or download the
+ * A QR code to the public form for posters, for every role: print the poster, or download the
  * code for the company's own designs. It points at the site root, which opens the form in the
  * visitor's last language, Nepali the first time.
  */

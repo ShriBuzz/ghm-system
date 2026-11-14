@@ -1,8 +1,25 @@
-// Progressive enhancement for the public form (P1, P5, S9). Everything works without it.
+// Progressive enhancement for the public form. Everything works without it.
 (() => {
     // After a refused submission, take screen readers and keyboards straight to what needs fixing; after an
     // action, to what it did. A message already on the page when it opens is rarely read out otherwise.
     (document.querySelector('[data-error-summary]') ?? document.querySelector('[data-notice]'))?.focus();
+
+    // An error link brings its field's question into view (the group's legend, or the field's own label) and then
+    // focuses the field, so the question, hint and error are never left above the screen, whatever the font.
+    // Without JavaScript, the scroll room in the stylesheet does the same for most fonts.
+    for (const link of document.querySelectorAll('[data-error-summary] a[href^="#"]')) {
+        link.addEventListener('click', (event) => {
+            const field = document.getElementById(link.hash.slice(1));
+            const question = field?.closest('.choices, .date-parts-group')?.querySelector('legend')
+                ?? (field ? document.querySelector(`label[for="${field.id}"]`) : null);
+            if (!field || !question) {
+                return;
+            }
+            event.preventDefault();
+            question.scrollIntoView();
+            field.focus({ preventScroll: true });
+        });
+    }
 
     // A file over the limit is refused before a slow upload on a phone connection, not after it.
     for (const input of document.querySelectorAll('input[type="file"][data-max-bytes]')) {
@@ -24,7 +41,7 @@
         });
     }
 
-    // A second tap while a slow upload is still on its way would send the grievance twice (P1, P7). Only for
+    // A second tap while a slow upload is still on its way would send the grievance twice. Only for
     // 10 seconds: the browser's Stop button cancels a send without an event, and must not leave Send dead.
     for (const each of document.querySelectorAll('form[method="post"]')) {
         each.addEventListener('submit', (event) => {
@@ -53,22 +70,13 @@
         }
     });
 
-    // Switching language loads the same form in the other language (P2). Carry what was typed across,
+    // Switching language loads the same form in the other language. Carry what was typed across,
     // in this tab only, and forget it the moment it is put back. A chosen file cannot be carried.
     const form = document.querySelector('form[data-grievance]');
     if (form) {
         const key = 'grievance-draft';
         const skip = new Set(['_token', 'form_started', 'website']);
         const fields = () => [...form.elements].filter((el) => el.name && !skip.has(el.name) && !['file', 'hidden', 'submit'].includes(el.type));
-        const changed = (el) => {
-            if (el.type === 'radio') {
-                return el.checked !== el.defaultChecked;
-            }
-            if (el.tagName === 'SELECT') {
-                return [...el.options].some((option) => option.selected !== option.defaultSelected);
-            }
-            return el.value !== el.defaultValue;
-        };
 
         let draft = null;
         try {
@@ -90,10 +98,9 @@
         }
 
         for (const link of document.querySelectorAll('.language-switch a')) {
+            // Always, even when nothing was edited here: a form sent back with an error was filled in by the
+            // server, and its answers would be lost too.
             link.addEventListener('click', () => {
-                if (!fields().some(changed)) {
-                    return;
-                }
                 const values = {};
                 for (const el of fields()) {
                     if (el.type !== 'radio' || el.checked) {

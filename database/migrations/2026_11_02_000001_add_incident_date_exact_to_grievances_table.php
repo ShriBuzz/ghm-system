@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * "I don't remember the exact day" (P5): the date then holds the first of the month.
+     * "I don't remember the exact day": the date then holds the first of the month.
      */
     public function up(): void
     {

@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Staff enter a grievance received offline (A6). It gets a reference and PIN
+ * Staff enter a grievance received offline. It gets a reference and PIN
  * like a web case; the PIN is shown once on the next page and stored only hashed.
  */
 class CreateGrievance extends CreateRecord
@@ -36,12 +36,16 @@ class CreateGrievance extends CreateRecord
     {
         $valid = $this->validateCase($data);
 
-        return DB::transaction(function () use ($valid): Grievance {
-            $pin = Pin::generate();
+        // The PIN's slow hash before the transaction: the reference counter's row stays locked until the commit,
+        // and every other submission waits for it.
+        $pin = Pin::generate();
+        $pinHash = Hash::make($pin);
+
+        return DB::transaction(function () use ($valid, $pin, $pinHash): Grievance {
             $case = new Grievance;
             $case->forceFill($valid + [
                 'reference' => ReferenceNumber::next(),
-                'pin_hash' => Hash::make($pin),
+                'pin_hash' => $pinHash,
                 'status' => Status::Received,
                 'created_by' => auth()->id(),
             ])->save();
@@ -91,7 +95,7 @@ class CreateGrievance extends CreateRecord
         }
 
         $valid = $validator->validated();
-        // The day picked stands for its month, as the public form's "I don't remember the day" (P5).
+        // The day picked stands for its month, as the public form's "I don't remember the day".
         if (! $valid['incident_date_exact']) {
             $valid['incident_date'] = CarbonImmutable::parse($valid['incident_date'])->startOfMonth()->toDateString();
         }

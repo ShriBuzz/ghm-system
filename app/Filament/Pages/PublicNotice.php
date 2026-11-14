@@ -17,8 +17,8 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * The notice above the public form, on confidentiality, no retaliation and what happens next (P3).
- * The Administrator changes it without a developer (A7); NBI provides the final wording.
+ * The notice above the public form, on confidentiality, no retaliation and what happens next.
+ * The Administrator changes it without a developer; the company provides the final wording.
  *
  * @property-read Schema $form
  */
@@ -45,7 +45,7 @@ class PublicNotice extends Page
 
     public function form(Schema $schema): Schema
     {
-        $hint = 'Shown above the grievance form. Plain text; leave an empty line between paragraphs.';
+        $hint = 'Shown above the grievance form. Plain text: the first paragraph is the heading, leave an empty line between paragraphs, and start each point of a list with "- " on its own line.';
 
         return $schema->statePath('data')->components([
             Textarea::make('ne')->label('Nepali')->required()->maxLength(3000)->rows(8)->helperText($hint)

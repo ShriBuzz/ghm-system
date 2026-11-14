@@ -6,6 +6,21 @@ use App\Models\GrievanceMessage;
 use App\Models\GrievanceNote;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
+it('encrypts the session on disk, where the PIN waits until Done', function () {
+    $sessions = storage_path('framework/testing/sessions-'.Str::random(8));
+    File::ensureDirectoryExists($sessions);
+    config(['session.driver' => 'file', 'session.files' => $sessions]);
+
+    $this->post('/en', formInput())->assertRedirect(route('grievance.received', ['locale' => 'en']));
+    $pin = session('received.pin');
+    $stored = collect(File::files($sessions))->map->getContents()->implode('');
+    File::deleteDirectory($sessions);
+
+    expect($pin)->toMatch('/^\d{6}$/')->and($stored)->not->toBe('')->not->toContain($pin);
+})->group('S3', 'P7');
 
 it('stores the field as ciphertext', function (string $model, string $column) {
     $record = $model::factory()->create([$column => 'Sensitive test value']);

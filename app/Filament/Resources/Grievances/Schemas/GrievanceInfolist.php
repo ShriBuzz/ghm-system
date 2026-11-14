@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\Grievances\Schemas;
 
+use App\Enums\Status;
 use App\Models\Grievance;
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 /**
- * The submission as staff read it on the case page (A3). Encrypted fields are
+ * The submission as staff read it on the case page. Encrypted fields are
  * decrypted by the model casts; nothing here is shown to the complainant.
  */
 class GrievanceInfolist
@@ -23,26 +26,35 @@ class GrievanceInfolist
                     ->columns(['default' => 2, 'lg' => 4])
                     ->schema([
                         TextEntry::make('reference'),
-                        TextEntry::make('status')->badge(),
+                        // With the Nepali the complainant reads on the status page.
+                        TextEntry::make('status')->badge()->formatStateUsing(fn (Status $state): string => $state->withNepali()),
                         TextEntry::make('priority')->badge()->placeholder('Not set'),
                         TextEntry::make('assignee.name')->label('Assigned to')->placeholder('Nobody'),
-                        TextEntry::make('received_at')->label('Received')->dateTime(),
+                        TextEntry::make('received_at')->label('Received')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
                         TextEntry::make('working_days_open')->label('Working days open'),
-                        TextEntry::make('closed_at')->label('Closed')->dateTime()->placeholder('Not closed'),
+                        TextEntry::make('closed_at')->label('Closed')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true))->placeholder('Not closed'),
+                        // Working days count from here once a stopped case is reopened.
+                        TextEntry::make('reopened_at')->label('Reopened on')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true))
+                            ->visible(fn (Grievance $record): bool => $record->reopened_at !== null),
                         TextEntry::make('channel'),
                         IconEntry::make('is_restricted')->label('Restricted')->boolean(),
                     ]),
                 Section::make('Grievance')
                     ->columns(['default' => 1, 'lg' => 2])
                     ->schema([
-                        TextEntry::make('category.name_en')->label('Category'),
+                        TextEntry::make('category.name_en')->label('Category')
+                            ->formatStateUsing(fn (Grievance $record): string => "{$record->category?->name_en} ({$record->category?->name_ne})"),
                         TextEntry::make('location.name_en')->label('Location'),
                         TextEntry::make('incident_date')->label('When it happened')
-                            ->formatStateUsing(fn (Grievance $record): string => $record->incident_date_exact
-                                ? $record->incident_date->format('j M Y')
-                                : $record->incident_date->format('F Y').', exact day not remembered'),
+                            ->formatStateUsing(fn (Grievance $record): string => match (true) {
+                                $record->incident_date_exact => BsDate::forStaff($record->incident_date),
+                                // A BS month straddles two AD months, so it is shown as the month the complainant chose.
+                                $record->incident_date_calendar === 'bs' => self::bsMonth($record->incident_date).', exact day not remembered',
+                                default => $record->incident_date->format('F Y').', exact day not remembered',
+                            }),
                         TextEntry::make('recurrence')->label('How often'),
-                        TextEntry::make('description')->columnSpanFull(),
+                        // The complainant's own words, line breaks kept: escaped first, so typed HTML stays text.
+                        TextEntry::make('description')->columnSpanFull()->formatStateUsing(fn (string $state): string => nl2br(e($state)))->html(),
                     ]),
                 Section::make('Complainant')
                     ->columns(['default' => 1, 'lg' => 2])
@@ -70,5 +82,15 @@ class GrievanceInfolist
                         TextEntry::make('disability')->state(fn (Grievance $record) => $record->answerLabel('disability'))->placeholder('Not given'),
                     ]),
             ]);
+    }
+
+    /**
+     * A BS month and year, such as "Kartik 2083".
+     */
+    private static function bsMonth(CarbonInterface $date): string
+    {
+        [$year, $month] = BsDate::fromAd($date);
+
+        return __("bs_month.{$month}")." {$year}";
     }
 }

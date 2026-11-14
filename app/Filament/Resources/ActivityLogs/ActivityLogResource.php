@@ -6,8 +6,12 @@ use App\Enums\Role;
 use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Models\Category;
 use App\Models\Grievance;
+use App\Models\GrievanceNote;
+use App\Models\Holiday;
 use App\Models\User;
+use App\Support\BsDate;
 use BackedEnum;
+use Carbon\CarbonInterface;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -21,7 +25,7 @@ use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;
 
 /**
- * The activity log (S6), read only and for the Administrator alone: who
+ * The activity log, read only and for the Administrator alone: who
  * changed, viewed or added what on each case, and sign-ins. Entries hold codes
  * and IDs, never case text, and cannot be edited or deleted here.
  */
@@ -54,11 +58,12 @@ class ActivityLogResource extends Resource
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['subject', 'causer']))
             ->defaultSort('id', 'desc')
             ->columns([
-                TextColumn::make('created_at')->label('When')->dateTime(),
+                TextColumn::make('created_at')->label('When')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
                 TextColumn::make('event')->label('What')->formatStateUsing(fn (string $state): string => str($state)->headline()->toString()),
-                TextColumn::make('subject_id')->label('Case or category')->formatStateUsing(fn (Activity $record): ?string => match (true) {
+                TextColumn::make('subject_id')->label('Case or setting')->formatStateUsing(fn (Activity $record): ?string => match (true) {
                     $record->subject instanceof Grievance => $record->subject->reference,
                     $record->subject instanceof Category => "Category: {$record->subject->name_en}",
+                    $record->subject instanceof Holiday => "Holiday: {$record->subject->name}",
                     default => null,
                 }),
                 // After what and which case, so a narrow screen shows those first.
@@ -96,7 +101,9 @@ class ActivityLogResource extends Resource
         };
 
         if ($properties->has('old') || $properties->has('new')) {
-            return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '');
+            return $show($properties->get('old')).' → '.$show($properties->get('new')).($properties->has('reason') ? " ({$properties->get('reason')})" : '')
+                // A removed restriction's reason is an encrypted note; the log holds only its ID.
+                .($properties->has('note_id') ? '. Reason: '.GrievanceNote::whereKey($properties->get('note_id'))->first()?->body : '');
         }
 
         return $properties->map(fn (mixed $value, string $key): string => $key.': '.(is_bool($value) ? ($value ? 'yes' : 'no') : $value))->implode(', ');

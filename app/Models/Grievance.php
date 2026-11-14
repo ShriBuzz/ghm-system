@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AgeGroup;
+use App\Enums\AlertKind;
 use App\Enums\Channel;
 use App\Enums\ComplainantType;
 use App\Enums\ContactMethod;
@@ -16,6 +17,7 @@ use App\Enums\Status;
 use App\Notifications\Acknowledgement;
 use App\Notifications\CaseAlert;
 use App\Observers\GrievanceObserver;
+use App\Support\WorkingDays;
 use Database\Factories\GrievanceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -39,7 +41,13 @@ class Grievance extends Model
     use HasFactory, RoutesNotifications;
 
     /**
-     * The optional questions about the complainant (P6) and their options. Each column holds
+     * The internal note giving the reason a restriction was removed, for the activity log
+     * entry of that save. Never a column: the log holds this ID, the note holds the text.
+     */
+    public ?int $reasonNoteId = null;
+
+    /**
+     * The optional questions about the complainant and their options. Each column holds
      * the chosen code, encrypted; the form, the rules, the case page and the export read this list.
      *
      * @var array<string, class-string<AgeGroup|ComplainantType|Disability|Ethnicity|Sex>>
@@ -53,7 +61,7 @@ class Grievance extends Model
     ];
 
     /**
-     * The one rule for which cases a staff member may see (A1, A5). Every
+     * The one rule for which cases a staff member may see. Every
      * list, page, file, summary, export and alert goes through it.
      *
      * @param  Builder<self>  $query
@@ -73,9 +81,9 @@ class Grievance extends Model
     }
 
     /**
-     * Active staff who may see this case, the only people it can be assigned to (A3, A5).
+     * Active staff who may see this case, the only people it can be assigned to.
      *
-     * shortcut: one visibility query per active user, fine for the RFQ's 3 to 5 staff.
+     * shortcut: one visibility query per active user, fine for the company's 3 to 5 staff.
      *
      * @return Collection<int, User>
      */
@@ -87,7 +95,7 @@ class Grievance extends Model
     }
 
     /**
-     * Clear the assignee once they can no longer see the case, after it became restricted (A5).
+     * Clear the assignee once they can no longer see the case, after it became restricted.
      */
     public function dropUnseeingAssignee(): void
     {
@@ -104,20 +112,50 @@ class Grievance extends Model
     }
 
     /**
-     * Alert the staff who can see this case to it, or to a complainant's message (N1).
-     * No Administrator alerts until NBI decides otherwise; whoever
-     * entered an offline case already knows about it.
+     * Alert staff to this case, as the company set out:
+     * - a new case, a case just marked restricted, or a message on a case with no active assignee:
+     *   the active staff who can see it, but not the Administrators;
+     * - a message on a case whose assignee is active and can see it: the assignee alone, even
+     *   when that is an Administrator;
+     * - a case nobody else can see (no active restricted-case officer for a restricted case, no active
+     *   focal person for another): the Administrators;
+     * - a case set to Critical, or past its target: the Administrators.
+     * Whoever entered a case, marked it restricted or set it to Critical already knows and is not told.
      */
-    public function alertStaff(bool $message = false): void
+    public function alertStaff(AlertKind $kind = AlertKind::NewCase): void
     {
-        $recipients = $this->assignableUsers()->reject(fn (User $user): bool => $user->role === Role::Administrator
-            || (! $message && $user->id === $this->created_by));
+        $staff = $this->assignableUsers();
+        $administrators = $staff->where('role', Role::Administrator);
+        $assignee = $staff->firstWhere('id', $this->assigned_to);
 
-        Notification::send($recipients, new CaseAlert($this->id, $message));
+        $recipients = match (true) {
+            $kind === AlertKind::Critical, $kind === AlertKind::PastTarget => $administrators,
+            $kind === AlertKind::Message && $assignee !== null => collect([$assignee]),
+            $staff->diff($administrators)->isEmpty() => $administrators,
+            default => $staff->diff($administrators),
+        };
+        $informed = match ($kind) {
+            AlertKind::NewCase => $this->created_by,
+            AlertKind::Restricted, AlertKind::Critical => auth()->id(),
+            default => null,
+        };
+
+        Notification::send($recipients->reject(fn (User $user): bool => $user->id === $informed), new CaseAlert($this->id, $kind));
     }
 
     /**
-     * Email the reference and PIN to a complainant who gave an email (N2, P7).
+     * Working days open until now, counted from the last reopening if there was one, else
+     * from receipt. The observer and the nightly recount both use it.
+     *
+     * @return int<0, max>
+     */
+    public function workingDaysSoFar(): int
+    {
+        return WorkingDays::between($this->reopened_at ?? $this->received_at, now());
+    }
+
+    /**
+     * Email the reference and PIN to a complainant who gave an email.
      * Called where the PIN is made: the only moment it exists in clear.
      */
     public function acknowledge(string $pin): void
@@ -128,7 +166,7 @@ class Grievance extends Model
     }
 
     /**
-     * An optional answer (P6) by its label, or null when the complainant gave none.
+     * An optional answer by its label, or null when the complainant gave none.
      */
     public function answerLabel(string $field): ?string
     {
@@ -138,7 +176,7 @@ class Grievance extends Model
     }
 
     /**
-     * The complainant's email, for the acknowledgement (N2).
+     * The complainant's email, for the acknowledgement.
      */
     public function routeNotificationForMail(): ?string
     {
@@ -170,14 +208,6 @@ class Grievance extends Model
     }
 
     /**
-     * @return BelongsTo<User, $this>
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
      * @return HasMany<GrievanceMessage, $this>
      */
     public function messages(): HasMany
@@ -204,7 +234,7 @@ class Grievance extends Model
     /**
      * Get the attributes that should be cast.
      *
-     * Personal fields are encrypted (S3), the demographic fields too.
+     * Personal fields are encrypted, the demographic fields too.
      *
      * @return array<string, string>
      */
@@ -232,6 +262,8 @@ class Grievance extends Model
             'is_restricted' => 'boolean',
             'received_at' => 'datetime',
             'closed_at' => 'datetime',
+            'reopened_at' => 'datetime',
+            'escalated_at' => 'datetime',
             'working_days_open' => 'integer',
         ];
     }

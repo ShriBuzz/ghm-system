@@ -27,7 +27,9 @@ class GrievanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'reference' => sprintf('GHM-%d-%04d', now()->year, fake()->unique()->numberBetween(1, 9999)),
+            // 1000 to 8999: tests name references below 1000 and from 9998 themselves, and the app's own counter
+            // starts at 0001 when a test sends a form, so a factory case never takes one of theirs.
+            'reference' => sprintf('GHM-%d-%04d', now()->year, fake()->unique()->numberBetween(1000, 8999)),
             'pin_hash' => static::$pinHash ??= Hash::make('123456'),
             'channel' => 'phone',
             'is_anonymous' => false,

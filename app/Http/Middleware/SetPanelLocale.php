@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * The staff panel is in English until NBI decides.
+ * The staff panel is in English until the company decides otherwise.
  * APP_LOCALE stays Nepali, because it is the public pages' default.
  */
 class SetPanelLocale

@@ -1,10 +1,10 @@
 <?php
 
+use App\Enums\AlertKind;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Models\Grievance;
 use App\Models\User;
-use App\Support\WorkingDays;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -16,18 +16,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 Artisan::command('ghm:recount-working-days', function () {
-    // Quietly: a system job, not a staff action, so no observer or activity entry.
+    // Quietly: a system job, not a staff action, so no observer or staff activity entry.
     Grievance::whereIn('status', Status::open())->lazyById()->each(function (Grievance $grievance): void {
-        $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
+        $grievance->working_days_open = $grievance->workingDaysSoFar();
+
+        // Past its target for the first time since it was received or reopened: tell the Administrators once.
+        // shortcut: every case's target is 15 working days; add per-category targets once the company sets them.
+        $escalate = $grievance->escalated_at === null && $grievance->working_days_open > Config::integer('ghm.sla_days');
+        if ($escalate) {
+            $grievance->escalated_at = now();
+        }
+
         $grievance->saveQuietly();
+
+        if ($escalate) {
+            activity()->performedOn($grievance)->event('escalated')
+                ->withProperties(['working_days' => $grievance->working_days_open])->log('Past target');
+            $grievance->alertStaff(AlertKind::PastTarget);
+        }
     });
-})->purpose('Recount working days open for open cases (A2)');
+})->purpose('Recount working days open for open cases, and tell the Administrators of a case past its target');
 
 Schedule::command('ghm:recount-working-days')->dailyAt('00:30');
 
 Artisan::command('ghm:clear-temporary-uploads', function () {
     // Livewire clears these only when a later upload finishes, so a file chosen in a dialog that was then
-    // cancelled, an uncleaned original with its name, could wait weeks. Same age rule as Livewire's (S5).
+    // cancelled, an uncleaned original with its name, could wait weeks. Same age rule as Livewire's.
     $storage = FileUploadConfiguration::storage();
 
     foreach ($storage->allFiles(FileUploadConfiguration::path()) as $file) {
@@ -35,14 +49,14 @@ Artisan::command('ghm:clear-temporary-uploads', function () {
             $storage->delete($file);
         }
     }
-})->purpose('Delete temporary uploads older than a day (S5)');
+})->purpose('Delete temporary uploads older than a day');
 
 Schedule::command('ghm:clear-temporary-uploads')->hourly();
 
 Artisan::command('ghm:prune-cache', function () {
     // The file cache deletes an expired entry only when its key is read again. Sign-in counters for
     // emails never tried twice would stay on disk for good, and a bot trying many emails could fill
-    // the host's file quota (S2). Each file starts with its expiry time; 0 or unreadable is skipped.
+    // the host's file quota. Each file starts with its expiry time; 0 or unreadable is skipped.
     // Walked lazily, not listed and sorted first, so a folder a bot filled cannot exhaust memory.
     foreach (Finder::create()->files()->in(Config::string('cache.stores.file.path')) as $file) {
         $expires = (int) file_get_contents($file->getPathname(), length: 10);
@@ -51,7 +65,7 @@ Artisan::command('ghm:prune-cache', function () {
             File::delete($file->getPathname());
         }
     }
-})->purpose('Delete expired file-cache entries (S2)');
+})->purpose('Delete expired file-cache entries');
 
 // Hourly: a bot trying a new email each time leaves two files per attempt.
 Schedule::command('ghm:prune-cache')->hourlyAt(15);
@@ -66,7 +80,7 @@ Schedule::command('queue:work --stop-when-empty --tries=4 --backoff=60,600,3600'
 // refused email's address (App\Support\FailedJobStore), and an acknowledgement's job is encrypted.
 Schedule::command('queue:prune-failed --hours=168')->daily();
 
-// S7: the night's backup, then the 14-day cleanup, then a check that a fresh backup exists.
+// The night's backup, then the 14-day cleanup, then a check that a fresh backup exists.
 Schedule::command('backup:run')->dailyAt('01:00')->withoutOverlapping();
 Schedule::command('backup:clean')->dailyAt('01:30');
 Schedule::command('backup:monitor')->dailyAt('02:00');
@@ -104,4 +118,4 @@ Artisan::command('ghm:e2e-user {role} {key} {--without-mfa}', function (string $
 
     // Raw: the console formatter would read a "\<" in the password as an escaped "<" and break the JSON.
     $this->output->writeln((string) json_encode($credentials), OutputInterface::OUTPUT_RAW);
-})->purpose('A fake user with a fresh password and MFA secret for the Playwright specs (A1)');
+})->purpose('A fake user with a fresh password and MFA secret for the Playwright specs');

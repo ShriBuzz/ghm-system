@@ -4,6 +4,7 @@ use App\Enums\Priority;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Filament\Resources\Grievances\Pages\CreateGrievance;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
 use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
@@ -62,10 +63,29 @@ it('logs status, priority, assignment and restriction changes with old and new v
     expect($assignments)->toEqual([['old' => null, 'new' => $colleague->id], ['old' => $colleague->id, 'new' => null, 'reason' => 'assignee can no longer see the case']]);
 })->group('S6');
 
-it('logs notes, replies, uploads and document views', function () {
+it('logs the removal of a restriction with the ID of its reason note, and shows the reason on the log page', function () {
+    $case = Grievance::factory()->create(['manually_restricted' => true]);
+    $admin = signedInAs(Role::Administrator);
+
+    Livewire::test(ViewGrievance::class, ['record' => $case->getRouteKey()])
+        ->callAction('unrestrict', data: ['reason' => 'Reviewed with <b>HR</b>: not sensitive.']);
+
+    $entry = logged('restriction_changed');
+    $note = $case->notes()->sole();
+    expect($entry->causer_id)->toBe($admin->id)
+        ->and($entry->properties->toArray())->toEqual(['old' => true, 'new' => false, 'note_id' => $note->id])
+        // The log is not encrypted, so the reason itself stays in the encrypted note.
+        ->and(json_encode($entry->properties))->not->toContain('Reviewed');
+
+    Livewire::test(ManageActivityLogs::class)
+        ->assertSee('yes → no. Reason: Reviewed with &lt;b&gt;HR&lt;/b&gt;: not sensitive.', false);
+})->group('S6', 'U5');
+
+it('logs notes, replies, uploads and document views, with who and when', function () {
     Storage::fake('local');
+    $this->travelTo('2026-11-20 10:00');
     $case = Grievance::factory()->create();
-    signedInAs(Role::FocalPerson);
+    $staff = signedInAs(Role::FocalPerson);
 
     $page = ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class];
     Livewire::test(NotesRelationManager::class, $page)->callAction(TestAction::make('create')->table(), data: ['body' => 'Private note text']);
@@ -74,7 +94,8 @@ it('logs notes, replies, uploads and document views', function () {
     $this->get(route('filament.admin.attachments.download', $attachment))->assertOk();
 
     foreach (['note_added', 'reply_sent', 'attachment_uploaded', 'attachment_viewed'] as $event) {
-        expect(logged($event)->subject_id)->toBe($case->id, $event);
+        expect(logged($event))->subject_id->toBe($case->id, $event)->causer_id->toBe($staff->id, $event)
+            ->created_at->toDateTimeString()->toBe('2026-11-20 10:00:00', $event);
     }
 })->group('S6');
 

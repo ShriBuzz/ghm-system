@@ -59,7 +59,7 @@ test('adds a category and marks it restricted', { tag: ['@A7', '@A5'] }, async (
     const name = `Spec category ${unique()}`;
     await create(page, 'categories', 'category', async (dialog) => {
         await dialog.getByLabel('Name in English').fill(name);
-        await dialog.getByLabel('Name in Nepali').fill('परीक्षण वर्ग');
+        await dialog.getByLabel('Name in Nepali').fill(`परीक्षण वर्ग ${unique()}`); // Nepali names are unique too
         await dialog.getByRole('switch', { name: 'Offered on the forms' }).click();
     });
 
@@ -126,4 +126,22 @@ test('adds a user, changes their role and deactivates them', { tag: ['@A7', '@A1
     await expect(await rowWith(page, 'users', name)).toContainText('Restricted-case officer');
     const reopened = await edit(page, 'users', name);
     await expect(reopened.getByRole('switch', { name: 'Active' })).toHaveAttribute('aria-checked', 'false');
+});
+
+test.describe('focal person', () => {
+    test.use({ role: 'focal_person' });
+
+    test('enters a holiday, which only the Administrator can delete', { tag: ['@A2', '@A7'] }, async ({ page }) => {
+        const name = `Spec holiday ${unique()}`;
+        // A far-off year, so the holidays this spec leaves behind never collide or touch a case.
+        const date = `${2100 + Math.floor(Math.random() * 7000)}-0${1 + Math.floor(Math.random() * 9)}-1${Math.floor(Math.random() * 9)}`;
+        await create(page, 'holidays', 'holiday', async (dialog) => {
+            await dialog.getByLabel('Date').fill(date);
+            await dialog.getByLabel('Name').fill(name);
+        });
+
+        const row = await rowWith(page, 'holidays', name);
+        await expect(row.getByRole('button', { name: 'Edit' })).toBeVisible();
+        await expect(row.getByRole('button', { name: 'Delete' })).toHaveCount(0);
+    });
 });

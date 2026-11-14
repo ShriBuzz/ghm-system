@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AttachmentController
 {
     /**
-     * Stream a case document to staff who may see its case (S4). Always a
+     * Stream a case document to staff who may see its case. Always a
      * download, never shown inline, under its original name.
      */
     public function __invoke(Attachment $attachment): StreamedResponse

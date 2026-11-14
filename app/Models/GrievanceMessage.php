@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AlertKind;
 use App\Enums\MessageDirection;
 use Database\Factories\GrievanceMessageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -25,7 +26,7 @@ class GrievanceMessage extends Model
                 ->withProperties(['message_id' => $message->id])->log($staff ? 'Reply sent' : 'Message received');
 
             if (! $staff) {
-                $grievance->alertStaff(message: true);
+                $grievance->alertStaff(AlertKind::Message);
             }
         });
     }
