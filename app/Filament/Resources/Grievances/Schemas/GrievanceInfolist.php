@@ -26,8 +26,9 @@ class GrievanceInfolist
                     ->columns(['default' => 2, 'lg' => 4])
                     ->schema([
                         TextEntry::make('reference'),
-                        // With the Nepali the complainant reads on the status page.
-                        TextEntry::make('status')->badge()->formatStateUsing(fn (Status $state): string => $state->withNepali()),
+                        // With the Nepali the complainant reads on the status page. Plain text, not a badge:
+                        // Filament never wraps a badge, so the long statuses were cut off at the column's edge.
+                        TextEntry::make('status')->formatStateUsing(fn (Status $state): string => $state->withNepali()),
                         TextEntry::make('priority')->badge()->placeholder('Not set'),
                         TextEntry::make('assignee.name')->label('Assigned to')->placeholder('Nobody'),
                         TextEntry::make('received_at')->label('Received')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),

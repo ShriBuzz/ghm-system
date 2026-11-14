@@ -311,6 +311,12 @@ test.describe('administrator', () => {
         await expect(caseSection).toContainText('Under assessment');
         await expect(caseSection).toContainText('High');
         await expect(caseSection).toContainText(focal);
+
+        // The whole status shows on a phone, on more lines if it must, not cut off at the column's edge.
+        await page.setViewportSize({ width: 360, height: 740 });
+        const status = (await caseSection.getByText('Under assessment (प्रारम्भिक मूल्याङ्कनको क्रममा)').boundingBox())!;
+        const section = (await caseSection.boundingBox())!;
+        expect(status.x + status.width).toBeLessThanOrEqual(section.x + section.width);
     });
 
     test('filters the case list and flags cases open past 15 working days', { tag: ['@A2'] }, async ({ page }) => {
