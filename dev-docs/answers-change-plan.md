@@ -1,6 +1,6 @@
 # Change plan: the company's answers and Policy updates
 
-Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 5, 7 and 10 to 12 of section 6 are built; the step status is in `docs/progress.md`. The work is WP4 (section 6). Step status goes in `docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
+Written 2026-11-12, when three documents arrived from the company (NEEK). Steps 1 to 5, 7 and 10 to 12 of section 6 are built; the step status is in `dev-docs/progress.md`. The work is WP4 (section 6). Step status goes in `dev-docs/progress.md`, the requirement wording in `docs/rfq-requirements.md` ("After the RFQ"), and the status of each ID in `docs/requirements-traceability.md`.
 
 **Decision, 2026-11-12: answers first.** The project lead chose to build now what answers our own clarification questions, together with what the company added while answering them. Everything that answers no question we asked is a new requirement, held until scope and price are agreed with NBI. Section 3 marks each ID's track. Section 6, "Answers first", has the items, the defaults for the conflicts and what to tell the company.
 
@@ -211,7 +211,7 @@ What changes:
 2. **Reason for un-restricting (U5).** "Remove restricted mark" asks for a required reason. The reason is saved as an internal note (of kind "Restriction removed" once note kinds exist), and the activity log's `restriction_changed` entry carries the note's ID. The Activity log page shows the reason by reading that note. Why a note: the activity log holds codes and IDs only, never free text, because it is not encrypted and a reason can name people (S3, the project's privacy rules). Tests: `RestrictionTest` and `ActivityLogTest`.
 3. Nothing.
 
-The Senior Manager as Administrator: the user guide gains an Administrator part in plain words for a non-technical reader, covering settings, holidays, target days, extensions, removing restrictions, the export with names, and the activity log. Training covers it too. At go-live, the first Administrator account is the Senior Manager's. The IT contact gets server access only, with no panel login (Brief section 2). `docs/credentials-handover.md` and `docs/deploy.md` say who receives what.
+The Senior Manager as Administrator: the user guide gains an Administrator part in plain words for a non-technical reader, covering settings, holidays, target days, extensions, removing restrictions, the export with names, and the activity log. Training covers it too. At go-live, the first Administrator account is the Senior Manager's. The IT contact gets server access only, with no panel login (Brief section 2). `dev-docs/credentials-handover.md` and `docs/deploy.md` say who receives what.
 
 Impact: points 1 and 3 **None**. Point 2 **Small**, about 2 hours, without note kinds. Docs **Small**. Scope: Answer for points 1 and 3. The reason is an Addition, made with the answer to question 12.
 
@@ -493,7 +493,7 @@ Track, as decided on 2026-11-12 (section 6, "Answers first"):
 - **Addition:** what the company added while answering one of our questions, on the same topic. Built now.
 - **New:** answers no question we asked. Held until scope and price are agreed with NBI.
 
-The question numbers are those in `docs/clarification-questions.md`. The WhatsApp answers follow `docs/client-discussion.md`, which has the same numbers.
+The question numbers are those in `dev-docs/clarification-questions.md`. The WhatsApp answers follow `dev-docs/client-discussion.md`, which has the same numbers.
 
 | ID | Change | RFQ rows it changes | Built today | Track | Size | Estimate |
 |---|---|---|---|---|---|---|
@@ -633,8 +633,8 @@ Still open from the first questions: 1 (hosting; staging is planned for 16 to 18
 
 - **Scope and price.** The RFQ is fixed price, and items marked New in section 3 are new requirements from the Policy and SOP. Plan section 11 says: "anything new is logged as a change request outside the fixed price". Decide which new items go in at no charge, which become change requests, and which wait for support. Decided for now (2026-11-12): the answers and the company's additions to them go first, and the new items wait (section 6, "Answers first").
 - **Timeline.** About 3.5 working days remain before the 18 Nov test version (12, 13, 16 and 17 Nov: 14 Nov is a Saturday and 15 Nov is Chhath). About 5 more remain before go-live on 27 Nov, and those also hold UAT, fixes, training on 25 Nov and the production deploy. The full list takes 10 to 12 days, so not everything fits. The answers track is about 6 days, ordered in section 6. The RFQ asks the vendor to tell NBI at once if a date is at risk.
-- **The PDFs and the public repository.** The repository is public, and the Brief names staff and holds internal policy. Do not commit the three PDFs, or the two Word files, while the repository is public. Keep them in the vendor's private workspace, or make the repository private first (open question 2 in `docs/progress.md`). Until then, keep them untracked.
-- **The shared plan doc.** `docs/implementation-plan.md` now has a section 12 that the shared plan doc lacks. Add it there before the file is next regenerated.
+- **The PDFs and the public repository.** The repository is public, and the Brief names staff and holds internal policy. Do not commit the three PDFs, or the two Word files, while the repository is public. Keep them in the vendor's private workspace, or make the repository private first (open question 2 in `dev-docs/progress.md`). Until then, keep them untracked.
+- **The shared plan doc.** `dev-docs/implementation-plan.md` now has a section 12 that the shared plan doc lacks. Add it there before the file is next regenerated.
 - **Design choices made in this plan**, to confirm or veto before WP4 starts:
   - target days copied onto each case at creation;
   - every reason (extension, un-restricting, reopening) kept as a typed internal note, with the activity log pointing at it;
@@ -657,7 +657,7 @@ The project lead's decision:
 - **Built now:** what answers our own clarification questions, and what the company added while answering them, on the same topic.
 - **Held:** everything that answers no question we asked, until scope and price are agreed with NBI.
 
-Section 3's Track column marks each ID. The question wording that counts is `docs/client-discussion.md`'s, which the WhatsApp answers follow.
+Section 3's Track column marks each ID. The question wording that counts is `dev-docs/client-discussion.md`'s, which the WhatsApp answers follow.
 
 On 2026-11-12 the project lead also moved the brief's public page text (U10) into the track, because the answers announced it (item 18).
 
@@ -743,7 +743,7 @@ Phase 1 was proposed for the 18 Nov test version, because it settles stored code
 | 13 | Dashboard indicators by quarter | U13, N3 | 3 | steps 2, 6, 11; C23 | 1 to 1.5 days | `docs/user-guide.md` (summary) |
 | 14 | Structured feedback form, if wanted | U4 | 3 | step 9; C10, C13 | 2 days | `docs/manual-testing.md`, `DESIGN.md`, `docs/user-guide.md` |
 | 15 | Retention: the rule in the technical note; the delete action later | U15 | 3 | C27 | 1 hour, or 0.5 day | `docs/technical-note.md`, `docs/technical-reference.md` |
-| 16 | Close WP4: Administrator part of the user guide, schema regenerated, credentials sheet (who gets what), traceability, walk per role, `/ponytail-review`, the sync to `main` | all | each phase | | 0.5 day per phase | `docs/user-guide.md`, `docs/database-schema.sql`, `docs/credentials-handover.md`, `docs/requirements-traceability.md` |
+| 16 | Close WP4: Administrator part of the user guide, schema regenerated, credentials sheet (who gets what), traceability, walk per role, `/ponytail-review`, the sync to `main` | all | each phase | | 0.5 day per phase | `docs/user-guide.md`, `docs/database-schema.sql`, `dev-docs/credentials-handover.md`, `docs/requirements-traceability.md` |
 
 Phase 1 is steps 1 to 4, about 2.5 to 3.25 days. Phase 2 is steps 5 to 11, about 5 days. Phase 3 is steps 12 to 15, about 3.5 to 5 days, plus a Nepali panel if the company asks for one (C14).
 
@@ -751,14 +751,14 @@ Phase 1 is steps 1 to 4, about 2.5 to 3.25 days. Phase 2 is steps 5 to 11, about
 
 | File | Change |
 |---|---|
-| `docs/answers-change-plan.md` | This file (dev-only; added to `DEV_ONLY` in `scripts/sync-main.sh`) |
+| `dev-docs/answers-change-plan.md` | This file (dev-only; added to `DEV_ONLY` in `scripts/sync-main.sh`) |
 | `docs/rfq-requirements.md` | Confirmed Nepali labels for A4; "After the RFQ": U1 to U16 wording and the company's lists |
 | `docs/requirements-traceability.md` | Rows U1 to U16; notes on the RFQ rows the answers change |
-| `docs/clarification-questions.md` | Answers recorded per question; follow-up questions pointed here |
-| `docs/client-discussion.md` | Decision lines filled in |
-| `docs/progress.md` | WP4 table, open questions, the design choices to confirm |
-| `docs/handoff.md` | Where things stand, next steps, read first |
-| `docs/implementation-plan.md` | Section 12, which the shared plan doc still lacks |
+| `dev-docs/clarification-questions.md` | Answers recorded per question; follow-up questions pointed here |
+| `dev-docs/client-discussion.md` | Decision lines filled in |
+| `dev-docs/progress.md` | WP4 table, open questions, the design choices to confirm |
+| `dev-docs/handoff.md` | Where things stand, next steps, read first |
+| `dev-docs/implementation-plan.md` | Section 12, which the shared plan doc still lacks |
 | `CLAUDE.md` | Order of authority and scope include U1 to U16 |
 
 The other docs (user guide, manual testing, technical reference and note, deploy, schema, credentials sheet) describe the system as built. They change step by step, as listed in section 6.

@@ -1,6 +1,6 @@
 # GHM System: Implementation Plan (NBI/GHM/RFQ/01)
 
-Plan dated 30 Oct 2026. This file is a Markdown copy of the shared plan doc (revision 26), kept at `docs/implementation-plan.md` so coding agents can read it. The shared doc stays the source of truth: when the doc changes, regenerate this file. Diagrams are rendered here as a Mermaid chart and a dated table, and the checklist's status column lives in the doc and in `docs/requirements-traceability.md`.
+Plan dated 30 Oct 2026. This file is a Markdown copy of the shared plan doc (revision 26), kept at `dev-docs/implementation-plan.md` so coding agents can read it. The shared doc stays the source of truth: when the doc changes, regenerate this file. Diagrams are rendered here as a Mermaid chart and a dated table, and the checklist's status column lives in the doc and in `docs/requirements-traceability.md`.
 
 Section 12 was added to this copy on 2026-11-12 and is not in the shared doc yet. Copy it there before regenerating this file, or it is lost.
 
@@ -527,7 +527,7 @@ On 12 Nov the company sent three documents:
 - a brief of the updates its GHM Policy and SOP make, as approved by UNDP;
 - Policy Annex A, the grievance types with their target times.
 
-They add 16 requirements, U1 to U16. U1 to U11 are the brief's own "Updates since the RFQ" table. The wording is at the end of `docs/rfq-requirements.md` and the status in `docs/requirements-traceability.md`. The full change plan is in `docs/answers-change-plan.md`: one section per answer, the size of each change, the conflicts between the documents, the follow-up questions C1 to C27, and the steps.
+They add 16 requirements, U1 to U16. U1 to U11 are the brief's own "Updates since the RFQ" table. The wording is at the end of `docs/rfq-requirements.md` and the status in `docs/requirements-traceability.md`. The full change plan is in `dev-docs/answers-change-plan.md`: one section per answer, the size of each change, the conflicts between the documents, the follow-up questions C1 to C27, and the steps.
 
 **What this section overrides in sections 2 to 11.**
 
@@ -548,7 +548,7 @@ They add 16 requirements, U1 to U16. U1 to U11 are the brief's own "Updates sinc
 | 2 | UAT window, if NBI agrees, otherwise after go-live | Note kinds and reasons; extensions; alerts; status rules; feedback due and the closure rule; both languages and BS dates on the case page; "<5" in the summary |
 | 3 | After go-live, as change requests or support | Export contents; dashboard indicators; the optional structured feedback form; retention |
 
-Decided 2026-11-12, replacing these phases for now: the answers to our questions, and what the company added while answering them, are built first, with the brief's public page text (about 6 working days). The new requirements wait until scope and price are agreed. The steps and their order are in the change plan, section 6, and the WP4 table in `docs/progress.md`.
+Decided 2026-11-12, replacing these phases for now: the answers to our questions, and what the company added while answering them, are built first, with the brief's public page text (about 6 working days). The new requirements wait until scope and price are agreed. The steps and their order are in the change plan, section 6, and the WP4 table in `dev-docs/progress.md`.
 
 **New risks.**
 

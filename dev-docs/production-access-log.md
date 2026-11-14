@@ -9,7 +9,7 @@ The live site's staff accounts used by the company's own staff are not recorded 
 - Ask in writing (email is enough) before each access, and say why. Permission for one occasion does not cover the next.
 - Look at the least data the task needs. Never copy personal data off the server, and never use live data for testing.
 - The only automated access to production is the read-only `@smoke` Playwright suite, which needs no row here.
-- If anything unexpected is seen during the access, follow `docs/breach-report-template.md`.
+- If anything unexpected is seen during the access, follow `dev-docs/breach-report-template.md`.
 
 ## Log
 

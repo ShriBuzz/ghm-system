@@ -9,13 +9,13 @@ They were planned for the RFQ clarification email, due 2 Nov 2026 (RFQ section 1
 | Questions to NBI | Asked after contract signing, by WhatsApp |
 | NBI's answers | Received 2026-11-12 for questions 2, 5 to 8 and 10 to 15, with the company's brief of its Policy and SOP updates. Questions 1, 3, 4, 9 and 16 are still open |
 
-The answers, what each changes in the system, the conflicts between the company's documents and the follow-up questions (C1 to C27) are in `docs/answers-change-plan.md`. Section 1 there follows the WhatsApp answers one by one; in the "Answer" column below, "Plan 1.4" means its section 1.4. The changes are planned as WP4 and are not applied yet, so every "Done" box below stays empty until its WP4 step is built.
+The answers, what each changes in the system, the conflicts between the company's documents and the follow-up questions (C1 to C27) are in `dev-docs/answers-change-plan.md`. Section 1 there follows the WhatsApp answers one by one; in the "Answer" column below, "Plan 1.4" means its section 1.4. The changes are planned as WP4 and are not applied yet, so every "Done" box below stays empty until its WP4 step is built.
 
 The email text below was written to go before the quotation; adjust its opening and question 1 (which mentions quoting new hosting) when it is sent.
 
-Questions 1, 3, 4, 5, 7, 8, 10 to 14 and 16 are written up for the first client meeting, with the options in use today, in `docs/client-discussion.md`.
+Questions 1, 3, 4, 5, 7, 8, 10 to 14 and 16 are written up for the first client meeting, with the options in use today, in `dev-docs/client-discussion.md`.
 
-When the answers arrive: record each one in the "Answer" column below, apply the change listed for it, tick it off, and move any decision into `docs/progress.md`.
+When the answers arrive: record each one in the "Answer" column below, apply the change listed for it, tick it off, and move any decision into `dev-docs/progress.md`.
 
 ## Email text
 
@@ -70,7 +70,7 @@ What the code assumes until NBI answers, and what to change after. Everything no
 | # | Answer | Assumption in the repo today | Change once answered | Done |
 |---|---|---|---|---|
 | 1 | Not answered yet | Company host passes; no hosting quoted | Annex A item 5 if it fails; `docs/technical-reference.md` hosting line; staging plan | [ ] |
-| 2 | Lists received 2026-11-12: 19 categories with target days, two restricted by default (sexual harassment, exploitation and abuse; reporting wrongdoing), and 3 locations. The notice and the other public text also arrived. Plan 1.6, 1.7 (WP4 steps 1, 4) | Placeholder categories ("Sexual harassment or abuse" restricted) and locations in `Database\Seeders\PlaceholderListsSeeder`, run outside production only; the notice above the form is a marked draft (`notice.default` in `lang/*.json`) | Edit the lists in Settings (or the seeder before go-live); enter the notice in Settings, Public notice (P3); kick-off date in `docs/progress.md` | [x] lists (WP4 step 1); [x] notice, the built-in default (WP4 step 4) |
+| 2 | Lists received 2026-11-12: 19 categories with target days, two restricted by default (sexual harassment, exploitation and abuse; reporting wrongdoing), and 3 locations. The notice and the other public text also arrived. Plan 1.6, 1.7 (WP4 steps 1, 4) | Placeholder categories ("Sexual harassment or abuse" restricted) and locations in `Database\Seeders\PlaceholderListsSeeder`, run outside production only; the notice above the form is a marked draft (`notice.default` in `lang/*.json`) | Edit the lists in Settings (or the seeder before go-live); enter the notice in Settings, Public notice (P3); kick-off date in `dev-docs/progress.md` | [x] lists (WP4 step 1); [x] notice, the built-in default (WP4 step 4) |
 | 3 | Not answered yet | `MAIL_MAILER=array` locally (`.env.example`); never `log`, which writes recipients into `laravel.log` | `MAIL_*` settings in the production `.env` (WP3) | [ ] |
 | 4 | Not answered. The brief asks that no complainant IP address be kept in application or server logs, which is what this question asks of the host | Not controlled by the app | Deployment notes (`docs/deploy.md`, WP3); otherwise a known limit in `docs/technical-reference.md` | [ ] |
 | 5 | New lists for Who are you? (11 options), age group (18–24, 25–34, 35–44) and caste/ethnicity (adds Tharu); Sex and Disability unchanged; "Under 18" kept apart; groups under 5 hidden in reports. Two documents differ on some Nepali wording (C1 to C4, C9). Plan 1.1 (WP4 steps 1, 11) | Enums `ComplainantType`, `Sex`, `AgeGroup`, `Ethnicity`, `Disability` with placeholder options, each with "prefer not to say" (`Grievance::OPTIONAL_ANSWERS`) | Edit the cases in those enums and their labels in `lang/en.json` and `lang/ne.json`, before production: the codes are stored encrypted | [x] lists (WP4 step 1); [x] under 5 (WP4 step 11) |
