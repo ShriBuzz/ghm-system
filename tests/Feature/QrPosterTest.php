@@ -21,5 +21,5 @@ it('gives every role the poster, with the code to print or download and the addr
         ->assertSee(url('/'))
         ->assertSee('src="data:image/svg+xml;base64,', false)
         ->assertSee('href="data:image/png;base64,', false)
-        ->assertSee('गुनासो पठाउनुहोस्')->assertSee('Send a grievance');
+        ->assertSee('गुनासो दर्ता गर्नुहोस्')->assertSee('Raise a grievance');
 })->with([Role::Administrator, Role::FocalPerson, Role::RestrictedOfficer])->group('P10', 'A1');

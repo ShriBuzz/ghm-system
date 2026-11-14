@@ -13,7 +13,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- A page sent back with errors says so first, for screen readers (S9). --}}
+    {{-- A page sent back with errors says so first, for screen readers. --}}
     <title>@if ($errors->any()){{ __('form.errors.prefix') }} @endif@hasSection('title')@yield('title') · @endif{{ __('site.name') }}</title>
     <link rel="stylesheet" href="{{ asset('css/public.css') }}">
     @stack('head')
@@ -23,6 +23,8 @@
 </head>
 <body>
     <header class="site-header">
+        {{-- The company's emergency line, the whole sentence a phone link so it is easy to tap. --}}
+        <p class="emergency"><a href="tel:100">{{ __('emergency.line') }}</a></p>
         <a class="site-name" href="{{ route('home') }}">{{ __('site.name') }}</a>
         <nav class="language-switch" aria-label="{{ __('language.label') }}">
             <ul>

@@ -2,10 +2,6 @@
 
 @section('title', __('received.title'))
 
-@push('head')
-    <meta name="robots" content="noindex">
-@endpush
-
 @section('content')
     <h1>{{ __('received.title') }}</h1>
 
@@ -17,13 +13,15 @@
             <dt>{{ __('received.pin') }}</dt>
             <dd class="code" data-pin>{{ $pin }}</dd>
         </dl>
-        <p>{{ __('received.advice') }}</p>
+        <p>{{ __('received.keep_safe') }}</p>
+        <p class="advice">{{ __('received.advice') }}</p>
     </section>
 
     @if ($emailed)
         <p>{{ __('received.emailed') }}</p>
     @endif
     <p>{{ __('received.next') }}</p>
+    <p>{{ __('received.free') }}</p>
     <p><a href="{{ route('status.lookup') }}">{{ __('received.check_link') }}</a></p>
 
     <form method="post" action="{{ route('grievance.done') }}" class="done">

@@ -32,7 +32,7 @@ function signedInAs(Role $role): User
 
 /**
  * What the public form sends for a valid anonymous grievance, as strings, like a browser,
- * including a fill-time stamp from ten seconds ago (P9).
+ * including a fill-time stamp from ten seconds ago, so the spam check takes it for a person.
  *
  * @return array<string, mixed>
  */

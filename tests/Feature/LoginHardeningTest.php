@@ -98,6 +98,11 @@ it('never polls the server for notifications', function () {
     $this->actingAs($user)->get('/admin')->assertOk()->assertDontSee('wire:poll');
 })->group('S2');
 
+it('signs staff out after 30 idle minutes, in the example environment and when the server sets nothing', function () {
+    expect(file_get_contents(base_path('.env.example')))->toContain("\nSESSION_LIFETIME=30\n")
+        ->and(file_get_contents(config_path('session.php')))->toContain("env('SESSION_LIFETIME', 30)");
+})->group('S2');
+
 it('loads the idle script with the session lifetime on every panel page', function () {
     $user = User::factory()->create(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP']);
     $script = '<script src="'.asset('js/admin-idle.js').'" data-lifetime-minutes="'.config('session.lifetime').'" defer></script>';

@@ -11,7 +11,7 @@ const server = (port: number, env: Record<string, string>) => ({
     command: `php artisan serve --host=127.0.0.1 --port=${port}`,
     url: `http://127.0.0.1:${port}/up`,
     // Several PHP workers, so parallel specs do not queue behind one request.
-    // The public limits (P8, P9) would refuse a test that fills the form in milliseconds and sends dozens
+    // The public limits would refuse a test that fills the form in milliseconds and sends dozens
     // an hour from one address; Pest checks the limits themselves.
     env: {
         PHP_CLI_SERVER_WORKERS: '4',
@@ -28,7 +28,7 @@ export default defineConfig({
     testDir: 'tests/e2e',
     fullyParallel: true,
     // Two, as on CI's runner: with more, the local servers fall behind and waits time out at random.
-    // The run takes as long either way, because the S2 idle spec waits out a one-minute session.
+    // The run takes as long either way, because the idle sign-out spec waits out a one-minute session.
     workers: 2,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,
@@ -58,7 +58,7 @@ export default defineConfig({
     webServer: local
         ? [
               server(8001, {}),
-              // S2: sessions end after one idle minute instead of 30. They live in cookies here,
+              // Sessions end after one idle minute instead of 30. They live in cookies here,
               // so this server's session clean-up cannot delete the other servers' session files.
               server(8002, { SESSION_LIFETIME: '1', SESSION_DRIVER: 'cookie' }),
           ]

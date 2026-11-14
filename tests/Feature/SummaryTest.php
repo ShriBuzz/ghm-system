@@ -55,6 +55,37 @@ it('counts only the cases each role may see', function () {
         ->categories->toBe(['Harassment' => 1]);
 })->group('N3', 'A5');
 
+/**
+ * The summary's tables as shown, row label => shown count.
+ *
+ * @return array<string, string>
+ */
+function shownCounts(string $html): array
+{
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8"?>'.$html);
+    $shown = [];
+    foreach ((new DOMXPath($dom))->query('//tr[th[@scope="row"] and td]') as $row) {
+        $shown[trim($row->getElementsByTagName('th')->item(0)->textContent)] = trim($row->getElementsByTagName('td')->item(0)->textContent);
+    }
+
+    return $shown;
+}
+
+it('shows a count from 1 to 4 as "<5", and 0 or 5 and more as they are, with the exact total', function () {
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    Grievance::factory()->count(4)->create(['category_id' => $this->wages->id, 'status' => Status::Received, 'received_at' => '2026-11-05 10:00']);
+    signedInAs(Role::Administrator);
+
+    $page = Livewire::test(Summary::class)->fillForm(['from' => '2026-11-01', 'until' => '2026-11-15']);
+
+    expect(shownCounts($page->html()))->toMatchArray([
+        'Received' => '6', 'Under assessment' => '0', 'Under investigation' => '<5', 'Closed' => '<5',
+        'Wages' => '6', 'Safety' => '<5', 'Harassment' => '<5',
+    ]);
+    $page->assertSee('8 cases received in this period.');
+})->group('U11', 'N3');
+
 it('starts at this month and refuses a range that ends before it starts', function () {
     signedInAs(Role::FocalPerson);
 

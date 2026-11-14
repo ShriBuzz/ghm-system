@@ -2,15 +2,16 @@
 
 namespace App\Observers;
 
+use App\Enums\AlertKind;
+use App\Enums\Priority;
 use App\Enums\Status;
 use App\Models\Grievance;
-use App\Support\WorkingDays;
 use BackedEnum;
 
 class GrievanceObserver
 {
     /**
-     * Case fields whose changes go into the activity log (S6), with the event name.
+     * Case fields whose changes go into the activity log, with the event name.
      * Only codes, IDs and flags: never encrypted text.
      */
     private const LOGGED = [
@@ -21,7 +22,7 @@ class GrievanceObserver
     ];
 
     /**
-     * A case is restricted when its category is restricted or a user marked it so (A5).
+     * A case is restricted when its category is restricted or a user marked it so.
      */
     public function saving(Grievance $grievance): void
     {
@@ -48,10 +49,22 @@ class GrievanceObserver
             if ($grievance->wasChanged($field)) {
                 $plain = fn (mixed $value): mixed => $value instanceof BackedEnum ? $value->value : $value;
 
+                $reason = $field === 'manually_restricted' && $grievance->reasonNoteId !== null ? ['note_id' => $grievance->reasonNoteId] : [];
+
                 activity()->performedOn($grievance)->event($event)
-                    ->withProperties(['old' => $plain($grievance->getOriginal($field)), 'new' => $plain($grievance->getAttribute($field))])
+                    ->withProperties(['old' => $plain($grievance->getOriginal($field)), 'new' => $plain($grievance->getAttribute($field)), ...$reason])
                     ->log(str($event)->headline()->toString());
             }
+        }
+
+        // A case marked restricted reaches the people who can now see it, as a new restricted case does.
+        if ($grievance->wasChanged('is_restricted') && $grievance->is_restricted) {
+            $grievance->alertStaff(AlertKind::Restricted);
+        }
+
+        // The Administrators are told each time a case becomes Critical: it needs action the same day.
+        if ($grievance->wasChanged('priority') && $grievance->priority === Priority::Critical) {
+            $grievance->alertStaff(AlertKind::Critical);
         }
     }
 
@@ -66,8 +79,8 @@ class GrievanceObserver
     }
 
     /**
-     * Days open run while the case is open and freeze when it stops (A2).
-     * A reopened case counts again from the day it was received.
+     * Days open run while the case is open and freeze when it stops. A stopped case that is
+     * reopened counts again from the reopening date.
      */
     private function updateClock(Grievance $grievance): void
     {
@@ -76,8 +89,15 @@ class GrievanceObserver
         // Any status can follow Closed, so the date goes whenever the case leaves it.
         $grievance->closed_at = $grievance->status === Status::Closed ? now() : null;
 
+        // A stopped case set to any open status restarts, not only at Reopened, so the stopped days never
+        // count; an open, overdue case set to Reopened keeps its count. The past-target alert is due again.
+        if ($grievance->status->isOpen() && $was instanceof Status && ! $was->isOpen()) {
+            $grievance->reopened_at = now();
+            $grievance->escalated_at = null;
+        }
+
         if (! $was instanceof Status || $was->isOpen() || $grievance->status->isOpen()) {
-            $grievance->working_days_open = WorkingDays::between($grievance->received_at, now());
+            $grievance->working_days_open = $grievance->workingDaysSoFar();
         }
     }
 }

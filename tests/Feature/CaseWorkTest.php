@@ -24,6 +24,22 @@ function onCasePage(string $relationManager, Grievance $case): Testable
     return Livewire::test($relationManager, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class]);
 }
 
+it('refuses every case tab to a focal person once the case is restricted, a page left open included', function () {
+    $case = Grievance::factory()->create();
+    signedInAs(Role::FocalPerson);
+    // Opened while the case was visible, then left open.
+    $notes = onCasePage(NotesRelationManager::class, $case)->assertOk();
+
+    $case->update(['manually_restricted' => true]);
+
+    // The open tab's next request is refused, and so is each tab opened afresh. Each tab checks this itself:
+    // Filament does not check the case page again when a tab sends a request.
+    $notes->call('$refresh')->assertForbidden();
+    foreach ([NotesRelationManager::class, MessagesRelationManager::class, AttachmentsRelationManager::class] as $tab) {
+        onCasePage($tab, $case)->assertForbidden();
+    }
+})->group('A5', 'S4');
+
 it('adds dated internal notes with their author, which cannot be edited or deleted', function () {
     $case = Grievance::factory()->create();
     $staff = signedInAs(Role::FocalPerson);
@@ -40,28 +56,32 @@ it('adds dated internal notes with their author, which cannot be edited or delet
 
     onCasePage(NotesRelationManager::class, $case)
         ->assertCanSeeTableRecords([$note])
+        ->assertSee($staff->name)
         ->assertActionDoesNotExist(TestAction::make('edit')->table($note))
         ->assertActionDoesNotExist(TestAction::make('delete')->table($note));
 })->group('A3');
 
-it('sends a staff reply into the complainant thread, next to their messages', function () {
+it('sends a staff reply into the complainant thread, next to their messages, as typed', function (string $body) {
     $case = Grievance::factory()->create();
     $fromComplainant = GrievanceMessage::factory()->for($case)->create(['direction' => MessageDirection::Complainant]);
     $staff = signedInAs(Role::FocalPerson);
 
     onCasePage(MessagesRelationManager::class, $case)
         ->assertCanSeeTableRecords([$fromComplainant])
-        ->callAction(TestAction::make('create')->table(), data: ['body' => 'We have spoken to the payroll office.'])
+        ->callAction(TestAction::make('create')->table(), data: ['body' => $body])
         ->assertHasNoActionErrors();
 
     $reply = GrievanceMessage::where('direction', MessageDirection::Staff)->sole();
     expect($reply->author_id)->toBe($staff->id)
-        ->and($reply->body)->toBe('We have spoken to the payroll office.');
+        ->and($reply->body)->toBe($body);
 
     onCasePage(MessagesRelationManager::class, $case)
         ->assertActionDoesNotExist(TestAction::make('edit')->table($reply))
         ->assertActionDoesNotExist(TestAction::make('delete')->table($reply));
-})->group('A3');
+})->with([
+    'English' => 'We have spoken to the payroll office.',
+    'Nepali, two lines' => "तलब शाखासँग कुरा भयो।\nसोमबारसम्म जवाफ दिनेछौं।",
+])->group('A3', 'U16');
 
 it('uploads a staff document to the private store', function () {
     Storage::fake('local');

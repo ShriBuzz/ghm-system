@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AlertKind;
 use App\Models\Grievance;
 use App\Models\User;
 use App\Notifications\Acknowledgement;
@@ -73,7 +74,7 @@ it('loads nothing from another site in an email, whatever the app is called', fu
     config(['app.name' => 'Laravel']);
     $case = Grievance::factory()->create(['email' => 'complainant@example.com']);
 
-    $emails = (string) (new CaseAlert($case->id, message: false))->toMail(User::factory()->create())->render()
+    $emails = (string) (new CaseAlert($case->id, AlertKind::NewCase))->toMail(User::factory()->create())->render()
         .(string) (new Acknowledgement('048213'))->toMail($case)->render();
 
     expect($emails)->not->toContain('laravel.com')->not->toContain('<img');
@@ -105,6 +106,20 @@ it('records a failed email without the address the mail server quoted', function
 
     expect(DB::table('failed_jobs')->sole()->exception)->toContain('mail server code 550')
         ->not->toContain('complainant@example.com');
+})->group('N2', 'S3', 'S5');
+
+it('logs and records an address the mailer itself refuses without that address', function () {
+    // The mailer refuses this address while building the email, with an error that quotes it.
+    Log::spy();
+    config(['queue.default' => 'database']);
+    Grievance::factory()->create(['email' => 'ram(home)@gmail.com'])->acknowledge('048213');
+
+    $this->artisan('queue:work --stop-when-empty --tries=1 --sleep=0')->assertSuccessful();
+
+    expect(DB::table('failed_jobs')->sole()->exception)->toContain('the address is not valid')
+        ->not->toContain('ram(home)@gmail.com');
+    Log::shouldHaveReceived('error')->withArgs(fn (string $message) => ! str_contains($message, 'ram(home)'));
+    Log::shouldNotHaveReceived('error', [Mockery::on(fn ($message) => str_contains((string) $message, 'ram(home)')), Mockery::any()]);
 })->group('N2', 'S3', 'S5');
 
 it('deletes failed jobs after 7 days', function () {

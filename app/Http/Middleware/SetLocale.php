@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Public pages take their language from the URL, /ne/... or /en/... (P2). The
+ * Public pages take their language from the URL (/ne/... or /en/...). The
  * last language used is kept in a cookie, so "/" can send a returning visitor to it.
  */
 class SetLocale

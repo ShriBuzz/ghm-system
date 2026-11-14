@@ -19,7 +19,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 
 /**
- * Staff accounts and their roles (A1, A7). Each user sets up their own
+ * Staff accounts and their roles. Each user sets up their own
  * authenticator app at first sign-in.
  */
 class UserResource extends Resource

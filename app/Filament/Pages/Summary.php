@@ -20,8 +20,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 /**
- * Cases received in a date range, counted by status and by category (N3).
+ * Cases received in a date range, counted by status and by category.
  * Counts only what the signed-in user may see, through the one visibility rule.
+ * A count from 1 to 4 shows as "<5", so a small group cannot be picked out.
  *
  * @property-read Schema $form
  */
@@ -61,16 +62,25 @@ class Summary extends Page
                         ->state(function (): array {
                             $counts = $this->summary()['statuses'];
 
-                            return collect(Status::cases())->mapWithKeys(fn (Status $status) => [$status->getLabel() => (string) $counts[$status->value]])->all();
+                            return collect(Status::cases())->mapWithKeys(fn (Status $status) => [$status->getLabel() => self::shown($counts[$status->value])])->all();
                         }),
                 ]),
                 Section::make('Cases by category')->schema([
                     KeyValueEntry::make('categories')->hiddenLabel()->keyLabel('Category')->valueLabel('Cases')
                         ->placeholder('No cases in this period.')
-                        ->state(fn () => array_map(strval(...), $this->summary()['categories'])),
+                        ->state(fn () => array_map(self::shown(...), $this->summary()['categories'])),
                 ]),
             ]),
         ]);
+    }
+
+    /**
+     * A count as the page shows it. 0 stays 0, as nobody is singled out by it; the total line
+     * above the tables stays exact.
+     */
+    private static function shown(int $count): string
+    {
+        return $count >= 1 && $count <= 4 ? '<5' : (string) $count;
     }
 
     /**

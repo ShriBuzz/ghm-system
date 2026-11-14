@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Grievances\RelationManagers;
 
+use App\Support\BsDate;
+use Carbon\CarbonInterface;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Internal notes: dated, with author, never shown to the complainant, and
- * never edited or deleted (A3).
+ * never edited or deleted.
  */
 class NotesRelationManager extends RelationManager
 {
@@ -44,9 +46,9 @@ class NotesRelationManager extends RelationManager
             ->heading('Internal notes')
             ->defaultSort('created_at', 'desc')
             ->columns([
-                TextColumn::make('created_at')->label('Date')->dateTime(),
+                TextColumn::make('created_at')->label('Date')->formatStateUsing(fn (CarbonInterface $state): string => BsDate::forStaff($state, time: true)),
                 TextColumn::make('user.name')->label('Author'),
-                TextColumn::make('body')->label('Note')->wrap(),
+                TextColumn::make('body')->label('Note')->wrap()->formatStateUsing(fn (string $state): string => nl2br(e($state)))->html(),
             ])
             ->headerActions([
                 CreateAction::make()

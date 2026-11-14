@@ -25,7 +25,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Public form and status page limits (P8, P9)
+    | Public form and status page limits
     |--------------------------------------------------------------------------
     |
     | Per visitor key (App\Support\VisitorKey, never the IP itself). Factory

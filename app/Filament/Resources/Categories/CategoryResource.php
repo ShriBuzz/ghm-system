@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 
 /**
- * Grievance categories, and which of them are restricted (A5, A7).
+ * Grievance categories, and which of them are restricted.
  */
 class CategoryResource extends Resource
 {
@@ -33,7 +33,7 @@ class CategoryResource extends Resource
     {
         return $schema
             ->components([
-                // Unique, inactive ones included: the summary (N3) lists categories by name.
+                // Unique, inactive ones included: the summary page lists categories by name.
                 TextInput::make('name_en')->label('Name in English')->required()->maxLength(255)->unique(ignoreRecord: true),
                 TextInput::make('name_ne')->label('Name in Nepali')->required()->maxLength(255)->unique(ignoreRecord: true),
                 Toggle::make('is_restricted')

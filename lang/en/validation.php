@@ -1,6 +1,6 @@
 <?php
 
-// Messages for the public form (P1, S9) that name the problem and the fix. Laravel's own English
+// Messages for the public form that name the problem and the fix. Laravel's own English
 // messages cover every other rule; this file only overrides these.
 return [
     'uploaded' => 'The file could not be used. Choose another photo or PDF, up to 5 MB.',
@@ -11,7 +11,7 @@ return [
         'body' => ['required' => 'Write your message.', 'max' => 'Shorten the message to 5,000 characters or fewer.'],
         'is_anonymous' => ['required' => 'Choose whether to give your name.'],
         'name' => ['required' => 'Write your name, or choose to stay anonymous.'],
-        'phone' => ['required_if' => 'Write the phone number we should call.'],
+        'phone' => ['required_if' => 'Write the phone number we should call.', 'required_without' => 'Give a phone number or an email.'],
         'email' => ['required_if' => 'Write the email address we should write to.', 'email' => 'Write the email address like name@example.com.'],
         'preferred_contact' => ['required' => 'Choose how we should contact you.'],
         'category_id' => ['required' => 'Choose what the grievance is about.', 'exists' => 'Choose one of the listed topics.'],
@@ -34,7 +34,7 @@ return [
         'complainant_type' => 'who you are',
         'sex' => 'sex',
         'age_group' => 'age group',
-        'ethnicity' => 'ethnic group',
+        'ethnicity' => 'caste/ethnicity',
         'disability' => 'disability',
     ],
 ];
