@@ -1,10 +1,10 @@
 # Points to discuss with the client
 
-For the first meeting with NBI and the company after contract signing, RFQ NBI/GHM/RFQ/01. These are questions 1, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14 and 16 from `docs/clarification-questions.md`, kept under the same numbers. Requirement IDs refer to RFQ section 3.
+For the first meeting with NBI and the company after contract signing, RFQ NBI/GHM/RFQ/01. These are questions 1, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14 and 16 from `dev-docs/clarification-questions.md`, kept under the same numbers. Requirement IDs refer to RFQ section 3.
 
-The system is built and works on the assumptions given under "What it does today". Each answer changes one setting or list, not the design. After the meeting, record each answer in the "Apply when answered" table of `docs/clarification-questions.md`.
+The system is built and works on the assumptions given under "What it does today". Each answer changes one setting or list, not the design. After the meeting, record each answer in the "Apply when answered" table of `dev-docs/clarification-questions.md`.
 
-2026-11-12: the company answered most of these by WhatsApp and sent a brief of its Policy and SOP updates. The answers are recorded under "Decision:" below. Several go beyond one setting or list (targets per category, extensions, the feedback step, alerts), so `docs/answers-change-plan.md` sets out what each changes, the conflicts to settle and the follow-up questions.
+2026-11-12: the company answered most of these by WhatsApp and sent a brief of its Policy and SOP updates. The answers are recorded under "Decision:" below. Several go beyond one setting or list (targets per category, extensions, the feedback step, alerts), so `dev-docs/answers-change-plan.md` sets out what each changes, the conflicts to settle and the follow-up questions.
 
 ## Hosting and deployment
 
