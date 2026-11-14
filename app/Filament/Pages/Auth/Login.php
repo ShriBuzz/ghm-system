@@ -3,9 +3,11 @@
 namespace App\Filament\Pages\Auth;
 
 use App\Models\User;
+use Carbon\CarbonInterval;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
@@ -43,6 +45,16 @@ class Login extends BaseLogin
         }
 
         return $response;
+    }
+
+    /**
+     * Filament gives the wait as a count of seconds; a 15-minute lockout reads better as "14 minutes and 32 seconds".
+     */
+    protected function getRateLimitedNotification(TooManyRequestsException $exception): ?Notification
+    {
+        $wait = CarbonInterval::seconds($exception->secondsUntilAvailable)->cascade()->forHumans(['join' => true]);
+
+        return parent::getRateLimitedNotification($exception)?->body("Please try again in {$wait}.");
     }
 
     public function form(Schema $schema): Schema

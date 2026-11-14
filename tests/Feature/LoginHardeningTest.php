@@ -3,6 +3,7 @@
 use App\Filament\Pages\Auth\Login;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -35,6 +36,19 @@ it('locks an email for 15 minutes from the fifth failed sign-in', function () {
     $this->travel(2)->minutes();
     signIn($user->email, 'password')->assertHasNoErrors();
     $this->assertAuthenticatedAs($user);
+})->group('S2');
+
+it('gives the wait in minutes and seconds, not a count of seconds', function () {
+    app()->setLocale('en'); // As SetPanelLocale does for every panel request.
+    $user = User::factory()->create();
+    $this->freezeTime();
+
+    failSignIn($user->email, 5);
+    $this->travel(28)->seconds();
+
+    signIn($user->email, 'password')->assertNotified(
+        Notification::make()->title('Too many login attempts')->body('Please try again in 14 minutes and 32 seconds.')->danger(),
+    );
 })->group('S2');
 
 it('locks the email, however it is typed, and no other account', function () {
