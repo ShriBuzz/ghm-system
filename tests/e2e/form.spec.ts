@@ -158,6 +158,19 @@ test('carries what was typed across a language switch after the form came back w
     await expect(page.getByLabel('तपाईंको नाम')).toHaveValue('Test Complainant');
 });
 
+test('leaves every About-you question optional, each with "Prefer not to say", and sends with it chosen', { tag: ['@P6', '@U8'] }, async ({ page }) => {
+    await page.goto('/en');
+    await fillRequired(page, 'Test grievance with every About-you answer set to prefer not to say');
+    for (const question of ['Who are you?', 'Sex', 'Age group', 'Caste/ethnicity', 'Do you have a disability?']) {
+        const answer = page.getByLabel(question, { exact: true });
+        await expect(answer).not.toHaveAttribute('required');
+        await answer.selectOption({ label: 'Prefer not to say' });
+    }
+    await page.getByRole('button', { name: 'Send grievance' }).click();
+
+    await expect(page).toHaveURL(/\/en\/received$/);
+});
+
 test('turns away a file over 5 MB before it is sent', { tag: ['@P5'] }, async ({ page }) => {
     await page.goto('/en');
     const file = page.getByLabel('A photo or document (optional)');
