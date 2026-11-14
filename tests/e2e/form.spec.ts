@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { baseURL } from './target';
 
@@ -178,6 +178,40 @@ test('turns away a file over 5 MB before it is sent', { tag: ['@P5'] }, async ({
 
     await expect(page.getByRole('alert')).toHaveText('This file is larger than 5 MB. Choose a smaller photo or PDF.');
     await expect(file).toHaveValue('');
+});
+
+/** Presses Tab until the field has focus, as someone without a mouse moves down the form. */
+async function tabTo(page: Page, field: Locator): Promise<void> {
+    for (let presses = 0; presses < 80; presses++) {
+        if (await field.evaluate((element) => element === document.activeElement)) {
+            return;
+        }
+        await page.keyboard.press('Tab');
+    }
+    throw new Error('Tab never reached the field');
+}
+
+test('can be filled in and sent with the keyboard alone', { tag: ['@S9', '@P1'] }, async ({ page }) => {
+    await page.goto('/en');
+    // A select takes typed letters as its choice on every platform; arrow keys open it on some.
+    for (const [label, typed] of [
+        ['What is it about?', 'Wages'],
+        ['Where did it happen?', 'Head'],
+        ['Day', '3'],
+        ['Month', 'Oct'],
+        ['Year', String(new Date().getFullYear() - 1)],
+    ]) {
+        await tabTo(page, page.getByLabel(label, { exact: true }));
+        await page.keyboard.type(typed);
+    }
+    await tabTo(page, page.getByRole('radio', { name: 'Once', exact: true }));
+    await page.keyboard.press('Space');
+    await tabTo(page, page.getByLabel('Describe what happened'));
+    await page.keyboard.type('Test grievance sent with the keyboard alone');
+    await tabTo(page, page.getByRole('button', { name: 'Send grievance' }));
+    await page.keyboard.press('Enter');
+
+    await expect(page).toHaveURL(/\/en\/received$/);
 });
 
 test('takes the visitor to what needs fixing, each message linked to its field', { tag: ['@S9', '@P1'] }, async ({ page }) => {

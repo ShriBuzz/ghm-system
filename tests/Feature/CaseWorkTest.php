@@ -56,6 +56,7 @@ it('adds dated internal notes with their author, which cannot be edited or delet
 
     onCasePage(NotesRelationManager::class, $case)
         ->assertCanSeeTableRecords([$note])
+        ->assertSee($staff->name)
         ->assertActionDoesNotExist(TestAction::make('edit')->table($note))
         ->assertActionDoesNotExist(TestAction::make('delete')->table($note));
 })->group('A3');

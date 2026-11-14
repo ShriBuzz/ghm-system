@@ -68,8 +68,17 @@ it('offers the company\'s lists, in its order and words', function () {
         ->and($labels(Disability::class, 'en'))->toBe(['Yes', 'No', 'Prefer not to say'])
         ->and($labels(AgeGroup::class, 'ne'))->toBe(['१८ वर्षभन्दा कम', '१८–२४', '२५–३४', '३५–४४', '४५–५९', '६० वर्ष वा माथि', 'भन्न चाहँदिन'])
         ->and($labels(Disability::class, 'ne'))->toBe(['हो', 'होइन', 'भन्न चाहँदिन'])
-        ->and($labels(ComplainantType::class, 'ne')[2])->toBe('करार कामदार, जस्तै सुरक्षाकर्मी, सरसफाई, चालक आदि')
-        ->and($labels(Ethnicity::class, 'ne')[4])->toBe('थारु');
+        ->and($labels(ComplainantType::class, 'ne'))->toBe([
+            'स्थायी कर्मचारी', 'अस्थायी वा परीक्षणकालीन कर्मचारी', 'करार कामदार, जस्तै सुरक्षाकर्मी, सरसफाई, चालक आदि',
+            'पूर्व कर्मचारी', 'आपूर्तिकर्ता वा आपूर्ति शृंखलामा आबद्ध कामदार', 'ग्राहक', 'समुदायको सदस्य', 'ट्रेड युनियन',
+            'कामदार प्रतिनिधि', 'नागरिक समाज', 'अन्य', 'भन्न चाहँदिन',
+        ])
+        ->and($labels(Sex::class, 'ne'))->toBe(['महिला', 'पुरुष', 'अन्य', 'भन्न चाहँदिन'])
+        ->and($labels(Ethnicity::class, 'ne'))->toBe([
+            'ब्राह्मण/क्षेत्री', 'आदिवासी जनजाति', 'दलित', 'मधेशी', 'थारु', 'मुस्लिम', 'अन्य', 'भन्न चाहँदिन',
+        ])
+        ->and(array_map(fn (string $question) => __("form.about.{$question}", [], 'ne'), array_keys(Grievance::OPTIONAL_ANSWERS)))
+        ->toBe(['तपाईं को हुनुहुन्छ?', 'लिङ्ग', 'उमेर समूह', 'जाति/जातीयता', 'के तपाईं अपाङ्गता भएको व्यक्ति हुनुहुन्छ?']);
 })->group('P6', 'U8');
 
 it('accepts a case with every optional answer left out or blank, and refuses an unknown answer', function () {

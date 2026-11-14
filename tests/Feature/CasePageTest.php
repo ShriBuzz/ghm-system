@@ -7,9 +7,11 @@ use App\Enums\Status;
 use App\Filament\Resources\ActivityLogs\Pages\ManageActivityLogs;
 use App\Filament\Resources\Grievances\Pages\ListGrievances;
 use App\Filament\Resources\Grievances\Pages\ViewGrievance;
+use App\Filament\Resources\Grievances\RelationManagers\AttachmentsRelationManager;
 use App\Filament\Resources\Grievances\RelationManagers\MessagesRelationManager;
 use App\Filament\Resources\Grievances\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\Holidays\Pages\ManageHolidays;
+use App\Models\Attachment;
 use App\Models\Category;
 use App\Models\Grievance;
 use App\Models\GrievanceMessage;
@@ -190,9 +192,20 @@ it('shows every date staff read in Bikram Sambat with AD alongside', function ()
     GrievanceNote::factory()->for($case)->create(['body' => 'A note']);
     Holiday::forceCreate(['date' => '2026-11-08', 'name' => 'A holiday']);
     Holiday::forceCreate(['date' => '2207-05-13', 'name' => 'Beyond the BS table']);
+    // Each later date has its own time, so each assertion can only match its own field.
+    $this->travelTo('2026-11-08 11:30');
+    $case->forceFill(['status' => Status::Closed])->save();
+    $this->travelTo('2026-11-08 12:15');
+    GrievanceMessage::factory()->for($case)->create();
+    $this->travelTo('2026-11-08 13:45');
+    Attachment::factory()->for($case)->create();
     signedInAs(Role::Administrator);
 
-    viewCase($case)->assertSee('2083-07-22 (2026-11-08) 10:00')->assertSee('2083-07-11 (2026-10-28)');
+    viewCase($case)->assertSee('2083-07-22 (2026-11-08) 10:00')->assertSee('2083-07-11 (2026-10-28)')
+        ->assertSee('2083-07-22 (2026-11-08) 11:30');
+    $page = ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class];
+    Livewire::test(MessagesRelationManager::class, $page)->assertSee('2083-07-22 (2026-11-08) 12:15');
+    Livewire::test(AttachmentsRelationManager::class, $page)->assertSee('2083-07-22 (2026-11-08) 13:45');
     Livewire::test(ListGrievances::class)->assertSee('2083-07-22 (2026-11-08)');
     Livewire::test(NotesRelationManager::class, ['ownerRecord' => $case, 'pageClass' => ViewGrievance::class])->assertSee('2083-07-22 (2026-11-08) 10:00');
     Livewire::test(ManageActivityLogs::class)->assertSee('2083-07-22 (2026-11-08) 10:00');
