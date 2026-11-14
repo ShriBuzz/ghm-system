@@ -5,7 +5,7 @@
 set -eu
 
 # Kept on main-backup, never on main. A new dev-only file goes here in the same commit.
-DEV_ONLY='.claude .impeccable CLAUDE.md PRODUCT.md DESIGN.md WP0-kickoff.md WP2-kickoff.md
+DEV_ONLY='.claude .impeccable CLAUDE.md PRODUCT.md DESIGN.md
 docs/implementation-plan.md docs/progress.md docs/handoff.md docs/clarification-questions.md
 docs/client-discussion.md docs/breach-report-template.md docs/production-access-log.md
 docs/credentials-handover.md docs/answers-change-plan.md docs/neek-call-2026-11-13.md scripts/sync-main.sh'

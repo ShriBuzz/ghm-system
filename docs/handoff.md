@@ -36,11 +36,10 @@ Step-by-step status is in the WP2 and WP3 tables in `docs/progress.md`; which re
 1. `CLAUDE.md`: the rules. They win over any skill.
 2. `docs/rfq-requirements.md`: the RFQ requirement wording, P1 to P10, A1 to A7, N1 to N4, S1 to S10, and the company's updates U1 to U16 at the end.
 3. `docs/clarification-questions.md`: questions for NBI, the assumptions the code follows until they answer, and what to change after. `docs/answers-change-plan.md`: the company's answers of 2026-11-12, what each changes, and the WP4 plan.
-4. `WP0-kickoff.md`: the WP0 steps. `WP2-kickoff.md`: the WP2 (admin side) steps.
-5. `docs/progress.md`: what is done, what is next, open questions and decisions.
-6. `docs/local-setup.md`: how to set up a machine.
-7. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/deploy.md`: putting it on a server. `docs/restore.md`: restoring a backup.
-8. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views. `DESIGN.md`: the visual rules those pages follow.
+4. `docs/progress.md`: what is done, what is next, open questions and decisions.
+5. `docs/local-setup.md`: how to set up a machine.
+6. `docs/manual-testing.md`: how to run the app and try everything by hand. `docs/deploy.md`: putting it on a server. `docs/restore.md`: restoring a backup.
+7. `PRODUCT.md`: product context for Impeccable work on public pages, emails and print views. `DESIGN.md`: the visual rules those pages follow.
 
 ## Branches and sync
 

@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-13: a whole-repo audit and its must-fix fixes, under "Audit of 2026-11-13". Before that, 2026-11-12. The company's answers and the brief of its Policy and SOP updates arrived; they are planned as WP4 in `docs/answers-change-plan.md`. Steps 1 (the company's lists and labels, pull request #19), 2 (the count restarting on reopening and holidays entered by focal persons, pull request #20) 3 (Bikram Sambat dates on the Nepali form) and 10 (Bikram Sambat dates and Nepali names on the staff screens) are built; the rest of WP4 is not. Decided the same day: the answers go first, and the new requirements wait until scope and price are agreed with NBI. Before that, on 2026-11-11: the handover package docs, branch `handover/docs`, and before them the `main` and `main-backup` split, under Decisions. WP0, WP2 and WP3 are merged and audited (pull requests #1 to #10). WP1, the public side, is built and reviewed: steps 1 to 5 (the form, the reference and PIN page, spam protection) in pull request #11, steps 6 and 7 (the status page) in #12, steps 8 and 9 (the QR poster and the close-out) in #13. #12 and #13 were merged into their stacked branches after #11 had landed, so steps 6 to 9 reach `main` through #14 (`wp1/land-steps-6-9`). The clarification questions were answered in part on 2026-11-12. Until WP4 applies the answers, the code follows the assumptions in `docs/clarification-questions.md`.
 
-Step numbers follow `WP0-kickoff.md`. When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
+Step numbers follow the WP0 kickoff plan, removed on 2026-11-14 as finished (`git show ef9ace4:WP0-kickoff.md`). When a step's commit is pushed, mark it done here with the commit. Anything blocked goes under "Open questions".
 
 ## WP0 Foundations
 
@@ -27,7 +27,7 @@ WP1 (public side), WP2 (admin side) and WP3 (alerts, reports, security) start on
 
 ## WP2 Admin side
 
-Step numbers follow `WP2-kickoff.md`. WP1 is built in parallel by a teammate; step 1 is shared with it.
+Step numbers follow the WP2 kickoff plan, removed on 2026-11-14 as finished (`git show ef9ace4:WP2-kickoff.md`). WP1 is built in parallel by a teammate; step 1 is shared with it.
 
 | Step | Work | IDs | Status | Commit or note |
 |---|---|---|---|---|
