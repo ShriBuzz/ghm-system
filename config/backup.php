@@ -300,7 +300,7 @@ return [
             'disks' => array_map(trim(...), explode(',', env('BACKUP_DISKS', 'backups'))),
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
-                // Set to what the host's disk quota leaves for backups, once the host is known (S7).
+                // Set to what the host's disk quota leaves for backups, once the host is known.
                 MaximumStorageInMegabytes::class => 5000,
             ],
         ],
@@ -367,8 +367,8 @@ return [
              * this amount of megabytes has been reached.
              * Set null for unlimited size.
              */
-            // RFQ S7: never below 14 days for size. Every archive holds all attachments, so they grow; the
-            // monitor's storage check below emails BACKUP_MAIL_TO when they pass its limit instead.
+            // Backups are kept at least 14 days, so none is deleted for size. Every archive holds all attachments,
+            // so they grow; the monitor's storage check below emails BACKUP_MAIL_TO when they pass its limit instead.
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
 

@@ -50,7 +50,7 @@ class GrievanceController
         $file = $request->file('attachment');
 
         // The PIN's slow hash before the transaction: the reference counter's row stays locked until the commit,
-        // and every other submission waits for it (P7).
+        // and every other submission waits for it.
         $pin = Pin::generate();
         $pinHash = Hash::make($pin);
 
